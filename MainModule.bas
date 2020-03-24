@@ -1,4 +1,4 @@
-Attribute VB_Name = "VersionModule"
+Attribute VB_Name = "MainModule"
 'The MIT License (MIT)
 '
 'Copyright (c) 2020 FORREST
@@ -25,5 +25,32 @@ Attribute VB_Name = "VersionModule"
 '
 ' THE EVO TOOL
 
-' 0.01 basic scafold for the dev
 
+
+Public Sub runMain(ictrl As IRibbonControl)
+    
+    ' ---------------------------------------------
+    
+    Debug.Print "start -> run main"
+    main
+    
+    ' ---------------------------------------------
+    
+End Sub
+
+
+
+
+
+' here is the main logic for whole tool
+Private Sub main()
+
+
+    Dim sh As StatusHandler
+    Set sh = New StatusHandler
+    
+    
+    
+    Set sh = Nothing
+    
+End Sub

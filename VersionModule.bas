@@ -1,4 +1,4 @@
-Attribute VB_Name = "MainModule"
+Attribute VB_Name = "VersionModule"
 'The MIT License (MIT)
 '
 'Copyright (c) 2020 FORREST
@@ -25,24 +25,13 @@ Attribute VB_Name = "MainModule"
 '
 ' THE EVO TOOL
 
+' ==============================================================
+' 0.01 basic scafold for the dev
+' ==============================================================
 
 
-Public Sub runMain(ictrl As IRibbonControl)
-    
-    ' ---------------------------------------------
-    
-    Debug.Print "start -> run main"
-    main
-    
-    ' ---------------------------------------------
-    
-End Sub
-
-
-
-
-
-' here is the main logic for whole tool
-Private Sub main()
-
-End Sub
+' ==============================================================
+' 0.02
+' Export Dev Implementation Module for GitHub
+' status form with the handling class reusable
+' ==============================================================

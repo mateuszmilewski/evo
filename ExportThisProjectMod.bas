@@ -1,6 +1,6 @@
 Attribute VB_Name = "ExportThisProjectMod"
 ' working great!
-Global Const REPO_PATH = "C:\WORKSPACE\dev\c41_tools\evo\repo"
+Global Const REPO_PATH = "C:\WORKSPACE\dev\c41_tools\evo\repo\"
 
 Private Sub export_this_project()
     
@@ -56,7 +56,7 @@ Private Sub import_this_project()
     Set VBProj = ThisWorkbook.VBProject
     Set VBComps = VBProj.VBComponents
     
-    For Each objFile In objFSO.GetFolder(XWiz.REPO_PATH).Files
+    For Each objFile In objFSO.GetFolder(REPO_PATH).Files
         ' body
         ' ==============================================================
         
