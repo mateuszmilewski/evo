@@ -77,13 +77,15 @@ Public Sub catchDocInfoFiles(ictrl As IRibbonControl)
     Set regSh = Nothing
     
     Application.DisplayAlerts = True
-    
     ThisWorkbook.Activate
     
     Dim w As Workbook
     For Each w In Workbooks
         
-        Debug.Print w.Name
+        Debug.Print w.Name & " " & Chr(10) & _
+            w.FullName & " " * Chr(10) & _
+            w.Path & _
+            Chr(10) & Chr(10) & Chr(10)
     Next w
     
     logMsg = logMsg & " imported and ready to work!"
@@ -92,7 +94,6 @@ Public Sub catchDocInfoFiles(ictrl As IRibbonControl)
     ' ---------------------------------------------------
 
 End Sub
-
 
 Public Sub verifyDocInfoFiles(ictrl As IRibbonControl)
     MsgBox "to be implemented!"
