@@ -49,7 +49,7 @@ Private Sub main()
     Dim sh As StatusHandler
     Set sh = New StatusHandler
     
-    
+    MsgBox "to be implemented!"
     
     Set sh = Nothing
     

@@ -43,3 +43,12 @@ Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
                       (ByVal lpBuffer As String, nSize As Long) As Long
 #End If
 
+
+
+Global Const REG_SH_NM = "register"
+Global Const INPUT_SH_NM = "input"
+
+Global Const MAIN_SH_FEED = "FICHERO TRANSFER ONL-MON"
+Global Const MAIN_SH_BASE = "BASE"
+
+
