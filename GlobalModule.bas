@@ -25,6 +25,27 @@ Attribute VB_Name = "GlobalModule"
 '
 ' THE EVO TOOL
 
+
+
+' IS_PRODUCTION
+Global Const G_PROD = True
+
+' DH COLUMNS !!!
+Global Const G_DHEF_COL = 44
+Global Const G_DHAS_COL = 45
+
+Global Const G_COD_TRANSPORT_COLUMN = 36
+Global Const G_PU_TIME_COLUMN = 37
+Global Const G_T_TIME_COLUMN = 38
+Global Const G_DEL_TIME_COLUMN = 39
+
+Global Const G_TXT_IN_CELL = "transport by supplier (serial logistic in DAP)"
+Global Const G_DAP = "DAP"
+Global Const G_NON_TMC = "non"
+
+
+
+
 ' delay time
 Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 

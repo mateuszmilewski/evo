@@ -79,7 +79,7 @@ Public Sub progress_increase()
         avr_on_one_pn = avr_on_one_pn * 60
         avr_on_one_pn = avr_on_one_pn * 60
         
-        If collection_of_avr_on_pn.COUNT > 1 Then
+        If collection_of_avr_on_pn.Count > 1 Then
             collection_of_avr_on_pn.Remove 1
             collection_of_avr_on_pn.Remove 1
         End If
@@ -91,9 +91,9 @@ Public Sub progress_increase()
         
         ' to bedzie taki warunek brzegowy czy w ogole zajmowac sie
         'dokladnym przeliczaniem makra
-        If collection_of_avr_on_pn.COUNT > 10 Then
+        If collection_of_avr_on_pn.Count > 10 Then
             
-            For x = act To collection_of_avr_on_pn.COUNT
+            For x = act To collection_of_avr_on_pn.Count
                 '' Debug.Print collection_of_avr_on_pn.COUNT
                 collection_of_avr_on_pn.Remove x
                 '' Debug.Print collection_of_avr_on_pn.COUNT
@@ -129,9 +129,9 @@ Public Function convert_and_show(et As Long) As String
 End Function
 
 Public Sub show()
-    StatusForm.PasekPostepu.backColor = RGB(254, 190, 16)
-    StatusForm.TloPaskaPostepu.backColor = RGB(0, 0, 0)
-    StatusForm.BtnPrzerwij.backColor = RGB(0, 0, 0)
+    StatusForm.PasekPostepu.BackColor = RGB(254, 190, 16)
+    StatusForm.TloPaskaPostepu.BackColor = RGB(0, 0, 0)
+    StatusForm.BtnPrzerwij.BackColor = RGB(0, 0, 0)
     StatusForm.BtnPrzerwij.ForeColor = RGB(254, 190, 16)
     
     StatusForm.show vbModeless
@@ -155,7 +155,7 @@ Private Sub Class_Initialize()
     jeden_procent = CDbl(szerokosc_paska) / CDbl(100)
     act = 0
     StatusForm.PasekPostepu.Width = 0
-    StatusForm.PasekPostepu.backColor = RGB(255, 0, 0)
+    StatusForm.PasekPostepu.BackColor = RGB(255, 0, 0)
     If max <> 0 Then
         StatusForm.FrameProgress.Caption = CStr(Int((CDbl(act) / CDbl(max)) * 100)) & " %"
     Else

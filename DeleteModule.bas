@@ -34,8 +34,8 @@ Public Sub deleteThisSheet(ictrl As IRibbonControl)
     
     If sh.Name <> "register" Then
         
-        If sh.Name = "input" Then
-            MsgBox "You can not remove input sheet!", vbExclamation
+        If sh.Name = "forValidation" Then
+            MsgBox "You can not remove forValidation sheet!", vbExclamation
         Else
             Application.DisplayAlerts = False
             sh.Delete
@@ -63,7 +63,7 @@ Public Sub deleteAllDataSheets(ictrl As IRibbonControl)
             Else
                 Sheets(x).Delete
             End If
-        Loop Until x > Sheets.COUNT
+        Loop Until x > Sheets.Count
         Application.DisplayAlerts = True
     End If
 End Sub
@@ -71,7 +71,7 @@ End Sub
 Private Function checkIfYouCanDelete(sh As Worksheet) As Boolean
     checkIfYouCanDelete = True
     
-    If sh.Name = "input" Then
+    If sh.Name = "forValidation" Then
         Exit Function
     End If
     

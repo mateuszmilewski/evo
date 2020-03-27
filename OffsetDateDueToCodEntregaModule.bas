@@ -1,4 +1,4 @@
-Attribute VB_Name = "MainModule"
+Attribute VB_Name = "OffsetDateDueToCodEntregaModule"
 'The MIT License (MIT)
 '
 'Copyright (c) 2020 FORREST
@@ -25,47 +25,23 @@ Attribute VB_Name = "MainModule"
 '
 ' THE EVO TOOL
 
-Public Sub reset()
-    Application.ScreenUpdating = True
-    Application.EnableEvents = True
-    Application.Calculation = xlCalculationAutomatic
-End Sub
-
-
-
-Public Sub runMain(ictrl As IRibbonControl)
+Public Function offsetDate(kod As String, mon As Date) As Date
+    Dim ofst As Integer
+    ofst = 0
     
-    ' ---------------------------------------------
     
-    Debug.Print "start -> run main"
-    main
+    '111 MONDAY
+    '112 TUESDAY
+    '...
+    '115 FRIDAY
+    '-----------------------------------------
+    For x = 111 To 115
+        If CStr(kod) = CStr(x) Then
+        
+            ofst = x - 111
+        End If
+    Next x
+    '-----------------------------------------
     
-    ' ---------------------------------------------
-    
-End Sub
-
-
-
-
-
-' here is the main logic for whole tool
-Private Sub main()
-
-
-    Dim sh As StatusHandler
-    Set sh = New StatusHandler
-    
-    ' steps
-    ' -------------------------------------
-    ' obsolete
-    'innerCatchDocInfoFiles
-    ' obsolete
-    'innerVerifyDocInfoFiles
-    'innerCopyData
-    
-    MsgBox "to be implemented!"
-    ' -------------------------------------
-    
-    Set sh = Nothing
-    
-End Sub
+    offsetDate = mon + ofst
+End Function
