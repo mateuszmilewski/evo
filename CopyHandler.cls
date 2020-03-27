@@ -11,13 +11,16 @@ Private cofors As Dictionary
 Private linesIter As Dictionary
 Private pns As Dictionary
 
+' for optimisation logic - init when dwa = 2
+Private pns2 As Dictionary
+
 
 Private master As Worksheet
 Private feed As Worksheet
 
 Private Sub Class_Initialize()
     Set cofors = New Dictionary
-    
+    Set pns2 = Nothing
     
     Set master = Nothing
     Set feed = Nothing
@@ -25,6 +28,7 @@ End Sub
 
 Private Sub Class_Terminate()
     Set cofors = Nothing
+    Set pns2 = Nothing
     
     Set master = Nothing
     Set feed = Nothing
@@ -39,14 +43,14 @@ Public Sub optimise(sh As StatusHandler)
     Dim innerDicForByTMC As Dictionary
 
     
-    If Not cofors Is Nothing Then
-        If cofors.Count > 0 Then
+    If Not pns2 Is Nothing Then
+        If pns2.Count > 0 Then
         
             sh.init_statusbar (cofors.Count + 1)
             sh.show
             sh.progress_increase
             
-            For Each k1 In cofors.Keys
+            For Each k1 In pns2.Keys
             
             
                 Dim sourceLi As LineItem
@@ -56,7 +60,7 @@ Public Sub optimise(sh As StatusHandler)
                 poczatek = True
             
                 Set byTMC = New Dictionary
-                Set linesIter = cofors(k1)
+                Set linesIter = pns2(k1)
                 
                 For Each k2 In linesIter.Keys
                 
@@ -74,7 +78,7 @@ Public Sub optimise(sh As StatusHandler)
                     End If
                 Next
                 
-                Debug.Print "count TMCs: " & byTMC.Count & " for COFOR: " & k1 & " wiersz: " & li.wiersz
+                Debug.Print "count TMCs: " & byTMC.Count & " for PN: " & k1 & " wiersz: " & li.wiersz
                 
                 
                 ' Debug.Assert li.wiersz <> 11
@@ -278,6 +282,16 @@ Public Sub workWithData(sh As StatusHandler)
                             li.sourceRow = f.Row
                             
                             
+                            ' check if past
+                            ' ================================================================
+                            If li.monday < Date Then
+                                master.Cells(li.wiersz, EVO.E_MASTER_ECHANCIER_ONL_S).Font.Bold = True
+                                master.Cells(li.wiersz, EVO.E_MASTER_ECHANCIER_ONL_S).Font.Color = RGB(255, 255, 255)
+                                master.Cells(li.wiersz, EVO.E_MASTER_ECHANCIER_ONL_S).Interior.Color = RGB(160, 160, 160)
+                            End If
+                            ' ================================================================
+                            
+                            
                             ' main coping!!
                             ' ================================================================
                             ''
@@ -369,8 +383,10 @@ Private Sub mainCopyBasedOnRegisterData(li As LineItem, ByRef linesIter As Dicti
                     ' diff data - yellow color
                     ElseIf msh.Cells(optWiersz, kolumna1).Value <> lsh.Cells(optSrcWiersz, kolumna2).Value Then
                     
-                        tmpTxt = CStr(msh.Cells(optWiersz, kolumna1).Value)
-                        msh.Cells(optWiersz, kolumna1).Value = lsh.Cells(optSrcWiersz, kolumna2).Value
+                        ' tmpTxt = CStr(msh.Cells(optWiersz, kolumna1).Value)
+                        tmpTxt = CStr(lsh.Cells(optSrcWiersz, kolumna2).Value)
+                        
+                        'msh.Cells(optWiersz, kolumna1).Value = lsh.Cells(optSrcWiersz, kolumna2).Value
                         msh.Cells(optWiersz, kolumna1).Interior.Color = RGB(255, 255, 150)
                         'msh.Cells(optWiersz, 1).Interior.Color = RGB(255, 255, 200)
                         
@@ -518,7 +534,7 @@ Private Function removeIndice(fullPn As String) As String
 End Function
 
 
-Public Sub init(m_master As Worksheet, m_feed As Worksheet)
+Public Sub init(m_master As Worksheet, m_feed As Worksheet, Optional dwa As Integer)
 
 
     Set master = m_master
@@ -530,7 +546,12 @@ Public Sub init(m_master As Worksheet, m_feed As Worksheet)
         
         ' no need to pass args cos master and feed are class fields!
         ' -------------------------------------------------------------
-        initAllDictionaries
+        ' init by wrong cofro - but that giving any hurt
+        If dwa = 1 Then
+            initAllDictionaries 1
+        Else
+            initAllDictionaries 2
+        End If
         ' -------------------------------------------------------------
         
     Else
@@ -541,106 +562,141 @@ Public Sub init(m_master As Worksheet, m_feed As Worksheet)
 
 End Sub
 
-Private Sub initAllDictionaries()
+Private Sub initAllDictionaries(dwa As Integer)
 
     Dim thisLine As LineItem
-    Dim strTempCofor As String
-
     Dim base As Worksheet
     Set base = master
     
-    Set cofors = New Dictionary
-    
     Dim r As Range
     Set r = base.Cells(3, EVO.E_MASTER_Reference)
-    Do
-    
-    
-        strTempCofor = Trim(CStr(r.Offset(0, EVO.E_MASTER_cofor - 1).Value))
-    
-        If Not cofors.Exists(strTempCofor) Then
-        
-            Set linesIter = Nothing
-            Set linesIter = New Dictionary
-            
-        
-            Set thisLine = New LineItem
-            
-            With thisLine
-                .cofor = strTempCofor
-                .pn = Trim(CStr(r.Offset(0, EVO.E_MASTER_Reference - 1).Value))
-                ' !!!
-                Set .masterRng = r
-                '
-                .wiersz = CLng(r.Row)
-                .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
-                
-                .yyyycw = CLng(calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
-                
-                .monday = CDate(getMondayFromYYYYCW(CLng(.yyyycw)))
-                
-            End With
-            
-            linesIter.Add r.Row, thisLine
-            
-        
-            cofors.Add strTempCofor, linesIter
-        Else
-        
-            ' this cofor is listed - also it means that dictionary inside that cofor as well
-            
-            Set linesIter = cofors(strTempCofor)
-            
-            
-            Set thisLine = New LineItem
-            
-            With thisLine
-                .cofor = strTempCofor
-                .pn = Trim(CStr(r.Offset(0, EVO.E_MASTER_Reference - 1).Value))
-                ' !!!
-                Set .masterRng = r
-                '
-                .wiersz = CLng(r.Row)
-                .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
-                .yyyycw = CLng(calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
-                
-                .monday = CDate(getMondayFromYYYYCW(CLng(.yyyycw)))
-            End With
-            
-            
-            linesIter.Add r.Row, thisLine
-            
-            
-        End If
-    
-        Set r = r.Offset(1, 0)
-    Loop Until Trim(r) = ""
-    
-    
-    
-    
-    ' afer all check math
-    Debug.Print "count cofors: " & cofors.Count
-    
-    ' check all lines
-    xl = 0
-    For Each k In cofors.Keys
-        
-        Set linesIter = cofors(k)
-        
-        Debug.Print "for cofor: " & k & " we have: " & linesIter.Count & " lines"
-        xl = xl + linesIter.Count
-        
-    Next
-    
-    ' -1 for loop -2 for labels
-    Debug.Print "checksum on all lines: " & xl & " rows in file: " & (r.Row - 1 - 2)
 
+
+    If dwa = 2 Then
+        Dim strTempPn As String
+        Set pns2 = New Dictionary
+        Do
+            strTempPn = Trim(r.Value)
+            
+            If Not pns2.Exists(strTempPn) Then
+                Set thisLine = New LineItem
+            Else
+                With thisLine
+                    .pn = strTempPn
+                    .cofor = Trim(CStr(r.Offset(0, EVO.G_COFOR_VENDEUR_COL - 1).Value))
+                    ' !!!
+                    Set .masterRng = r
+                    '
+                    .wiersz = CLng(r.Row)
+                    .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                    
+                    .yyyycw = CLng(calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                    
+                    .monday = CDate(getMondayFromYYYYCW(CLng(.yyyycw)))
+                    
+                End With
+                
+                pns2.Add strTemp, thisLine
+                
+            End If
+            Set r = r.Offset(1, 0)
+        Loop Until Trim(r) = ""
+
+    ElseIf dwa = 1 Then
+
+        
+        Dim strTempCofor As String
+        Set cofors = New Dictionary
+
+        Do
+        
+        
+            strTempCofor = Trim(CStr(r.Offset(0, EVO.E_MASTER_cofor - 1).Value))
+        
+            If Not cofors.Exists(strTempCofor) Then
+            
+                Set linesIter = Nothing
+                Set linesIter = New Dictionary
+                
+            
+                Set thisLine = New LineItem
+                
+                With thisLine
+                    .cofor = strTempCofor
+                    .pn = Trim(CStr(r.Offset(0, EVO.E_MASTER_Reference - 1).Value))
+                    ' !!!
+                    Set .masterRng = r
+                    '
+                    .wiersz = CLng(r.Row)
+                    .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                    
+                    .yyyycw = CLng(calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                    
+                    .monday = CDate(getMondayFromYYYYCW(CLng(.yyyycw)))
+                    
+                End With
+                
+                linesIter.Add r.Row, thisLine
+                
+            
+                cofors.Add strTempCofor, linesIter
+            Else
+            
+                ' this cofor is listed - also it means that dictionary inside that cofor as well
+                
+                Set linesIter = cofors(strTempCofor)
+                
+                
+                Set thisLine = New LineItem
+                
+                With thisLine
+                    .cofor = strTempCofor
+                    .pn = Trim(CStr(r.Offset(0, EVO.E_MASTER_Reference - 1).Value))
+                    ' !!!
+                    Set .masterRng = r
+                    '
+                    .wiersz = CLng(r.Row)
+                    .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                    .yyyycw = CLng(calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                    
+                    .monday = CDate(getMondayFromYYYYCW(CLng(.yyyycw)))
+                End With
+                
+                
+                linesIter.Add r.Row, thisLine
+                
+                
+            End If
+        
+            Set r = r.Offset(1, 0)
+        Loop Until Trim(r) = ""
+        
+        
+        
+        
+        ' afer all check math
+        Debug.Print "count cofors: " & cofors.Count
+        
+        ' check all lines
+        xl = 0
+        For Each k In cofors.Keys
+            
+            Set linesIter = cofors(k)
+            
+            Debug.Print "for cofor: " & k & " we have: " & linesIter.Count & " lines"
+            xl = xl + linesIter.Count
+            
+        Next
+        
+        ' -1 for loop -2 for labels
+        Debug.Print "checksum on all lines: " & xl & " rows in file: " & (r.Row - 1 - 2)
     
-    If CLng(xl) = CLng(r.Row - 1 - 2) Then
-        '  OK
-    Else
-        MsgBox "Checksum on data is not right - there is sth not right with the BASE worksheet!", vbCritical
+        
+        If CLng(xl) = CLng(r.Row - 1 - 2) Then
+            '  OK
+        Else
+            MsgBox "Checksum on data is not right - there is sth not right with the BASE worksheet!", vbCritical
+        End If
     End If
 End Sub
 

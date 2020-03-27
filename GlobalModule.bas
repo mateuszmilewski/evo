@@ -34,6 +34,9 @@ Global Const G_PROD = True
 Global Const G_DHEF_COL = 44
 Global Const G_DHAS_COL = 45
 
+' COFOR
+Global Const G_COFOR_VENDEUR_COL = 17
+
 Global Const G_COD_TRANSPORT_COLUMN = 36
 Global Const G_PU_TIME_COLUMN = 37
 Global Const G_T_TIME_COLUMN = 38

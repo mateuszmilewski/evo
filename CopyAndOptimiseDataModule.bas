@@ -77,7 +77,7 @@ Public Sub innerCopyData(masterFileName, feedFileName, Optional sh As StatusHand
 
     Dim copy_h As CopyHandler
     Set copy_h = New CopyHandler
-    copy_h.init m, f
+    copy_h.init m, f, 1
     
     copy_h.workWithData sh
     
@@ -124,7 +124,7 @@ Public Sub innerOptimiseData(Optional sh As StatusHandler)
 
     Dim copy_h As CopyHandler
     Set copy_h = New CopyHandler
-    copy_h.init m, f
+    copy_h.init m, f, 2
     
     copy_h.optimise sh
     

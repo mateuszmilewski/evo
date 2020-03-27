@@ -82,3 +82,26 @@ Attribute VB_Name = "VersionModule"
 ' initial prototype for history/archive in comment
 
 ' ==============================================================
+
+
+' ==============================================================
+'0.09
+'
+' - if CPL cell empty do not overwrite
+'yellow scenario - do not overwrite! - but leave note in comment
+'manual ajdustment in PUS
+'
+'initial KPI for PUS MASTER
+'
+'
+'
+'case with TMC and PN -> (2 diff COFORS rememeber!!) rather then TMC and COFOR
+'to correct 86945E  01
+'
+'
+'if (ECHANCIER ONL (semaine) < TOday then
+'    move? DHEF and DHAS?
+'    1. ?
+'
+' ==============================================================
+
