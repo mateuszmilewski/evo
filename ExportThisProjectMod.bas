@@ -1,4 +1,6 @@
 Attribute VB_Name = "ExportThisProjectMod"
+Option Explicit
+
 'The MIT License (MIT)
 '
 'Copyright (c) 2020 FORREST
@@ -29,6 +31,9 @@ Attribute VB_Name = "ExportThisProjectMod"
 Global Const REPO_PATH = "C:\WORKSPACE\dev\c41_tools\evo\repo\"
 
 Private Sub export_this_project()
+
+
+    Dim txt As String
     
     Dim VBProj As VBIDE.VBProject
     Dim VBComp As VBIDE.VBComponent
@@ -101,6 +106,9 @@ End Sub
 
 
 Private Sub remove_current_implementation()
+
+
+    Dim txt As String
     
     Dim VBProj As VBIDE.VBProject
     Dim VBComp As VBIDE.VBComponent

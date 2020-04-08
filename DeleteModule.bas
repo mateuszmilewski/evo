@@ -1,4 +1,7 @@
 Attribute VB_Name = "DeleteModule"
+Option Explicit
+
+
 'The MIT License (MIT)
 '
 'Copyright (c) 2020 FORREST
@@ -48,7 +51,10 @@ End Sub
 
 
 Public Sub deleteAllDataSheets(ictrl As IRibbonControl)
-    
+
+
+    Dim ret As Variant
+    Dim x As Integer
     
     ret = MsgBox("Delete all?", vbQuestion + vbYesNo)
     If ret = vbYes Then

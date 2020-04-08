@@ -1,6 +1,5 @@
-Attribute VB_Name = "CopyAndOptimiseDataModule"
+Attribute VB_Name = "TCAMModule"
 Option Explicit
-
 
 'The MIT License (MIT)
 '
@@ -29,17 +28,13 @@ Option Explicit
 ' THE EVO TOOL
 
 
-Public Sub copyData(ictrl As IRibbonControl)
+Public Sub createSourceForPivot(ictrl As IRibbonControl)
 
-    ' this obsolete from version 006
-    ' innerCopyData
-    
-    ' prepare form
     
     Dim w As Workbook
     
     With FileChooser
-        .scenarioType = E_FORM_SCENARIO_COPY_PASTE
+        .scenarioType = E_FORM_SCENARIO_CREATE_PIVOT_SCENARIO
         .BtnCopy.Enabled = False
         .BtnValid.Enabled = True
         
@@ -52,20 +47,22 @@ Public Sub copyData(ictrl As IRibbonControl)
             .ComboBoxMaster.AddItem w.Name
         Next w
         
+        .ComboBoxFeed.Value = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("m2").Value
+        .ComboBoxMaster.Value = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("m1").Value
         
         .show
     End With
     
     MsgBox "GOTOWE!", vbInformation
+    
 End Sub
 
-Public Sub innerCopyData(masterFileName, feedFileName, Optional sh As StatusHandler)
-
+Public Sub innerCreateSourceForPivot(masterFileName, feedFileName, Optional sh As StatusHandler)
 
     Application.ScreenUpdating = False
     Application.EnableEvents = False
     Application.Calculation = xlCalculationManual
-
+    
     
     If IsMissing(sh) Or (sh Is Nothing) Then
         Set sh = New StatusHandler
@@ -74,70 +71,34 @@ Public Sub innerCopyData(masterFileName, feedFileName, Optional sh As StatusHand
     ' master and feed worksheets
     Dim m As Worksheet, f As Worksheet
     ' starting from most impotant sheets!
+    On Error Resume Next
     Set m = Workbooks(masterFileName).Sheets(MAIN_SH_BASE)
+    On Error Resume Next
     Set f = Workbooks(feedFileName).Sheets(G_FEED_SH_MAIN)
-    
 
-
-    Dim copy_h As CopyHandler
-    Set copy_h = New CopyHandler
-    copy_h.init m, f, E_COPY_HANDLER_COPY_ONE
+    Dim ch As CopyHandler, ph As PivotHandler
+    Set ch = New CopyHandler
+    Set ph = New PivotHandler
     
-    copy_h.copyData sh
+    ch.init m, f, E_COPY_HANDLER_FOR_PIVOT_CREATION
+    
+    ' MsgBox "implementation under way!", vbInformation
+    ch.copyForSourcePivot ph, sh
+    
     
     Application.ScreenUpdating = True
     Application.EnableEvents = True
     Application.Calculation = xlCalculationAutomatic
-    
-    
-    
-    
 
 End Sub
 
 
-
-
-Public Sub optimiseDatesByTMC(ictrl As IRibbonControl)
-
-    innerOptimiseData
+Public Sub makePivot(ictrl As IRibbonControl)
     
-    MsgBox "GOTOWE!", vbInformation
+    innerMakePivot
 End Sub
 
-Public Sub innerOptimiseData(Optional sh As StatusHandler)
 
-
-    Application.ScreenUpdating = False
-    Application.EnableEvents = False
-    Application.Calculation = xlCalculationManual
-
-    
-    If IsMissing(sh) Or (sh Is Nothing) Then
-        Set sh = New StatusHandler
-    End If
-    
-    Dim m As Worksheet, f As Worksheet
-    'ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value
-    Dim masterFileName As String
-    Dim feedFileName As String
-    masterFileName = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value
-    feedFileName = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M2").Value
-    Set m = Workbooks(masterFileName).Sheets("BASE")
-    Set f = Workbooks(feedFileName).Sheets(G_FEED_SH_MAIN)
-
-    Dim copy_h As CopyHandler
-    Set copy_h = New CopyHandler
-    copy_h.init m, f, E_COPY_HANDLER_BY_TMC_OPT
-    
-    copy_h.optimise sh
-    
-    Application.ScreenUpdating = True
-    Application.EnableEvents = True
-    Application.Calculation = xlCalculationAutomatic
-    
-    
-    
-    
-
+Private Sub innerMakePivot()
+    MsgBox "implementation under way!", vbInformation
 End Sub

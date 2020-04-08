@@ -7,6 +7,38 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
+
+
+'The MIT License (MIT)
+'
+'Copyright (c) 2020 FORREST
+' Mateusz Milewski mateusz.milewski@mpsa.com aka FORREST
+'
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights
+'to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+'copies of the Software, and to permit persons to whom the Software is
+'furnished to do so, subject to the following conditions:
+'
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
+'
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+'IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+'FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+'AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+'SOFTWARE.
+'
+'
+' THE EVO TOOL
+
+
+
+
 Private pusSh As Worksheet
 Private cpl As Worksheet
 
@@ -15,10 +47,9 @@ Private cpl As Worksheet
 Public Function getWorksheetForValidation(pusWrkName As String, fileType As E_FILE_TYPE) As Boolean
 
 
-
     Dim shName As String
     Dim rowLabel As Integer
-    Dim rRef As Range
+    Dim rRef As Range, refR As Range
     
     If fileType = E_MASTER_PUS Then
         Set refR = ThisWorkbook.Sheets("forValidation").Range("D6")
@@ -41,7 +72,7 @@ Public Function getWorksheetForValidation(pusWrkName As String, fileType As E_FI
 
     Dim wrk As Workbook
     Set wrk = Workbooks(CStr(pusWrkName))
-    Dim mainSh As Worksheet
+    Dim mainSh As Worksheet, main As Worksheet
     Set main = Nothing
     On Error Resume Next
     Set main = wrk.Sheets(shName)
@@ -72,7 +103,7 @@ Public Function getWorksheetForValidation(pusWrkName As String, fileType As E_FI
                 
                 Set vr = vr.Offset(0, 1)
                 Set srcr = srcr.Offset(0, 1)
-            Loop Until Trim(vr) = ""
+            Loop Until vr.Value = ""
         
         Else
             getWorksheetForValidation = False

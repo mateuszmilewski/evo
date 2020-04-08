@@ -1,4 +1,6 @@
 Attribute VB_Name = "GlobalModule"
+Option Explicit
+
 'The MIT License (MIT)
 '
 'Copyright (c) 2020 FORREST
@@ -27,8 +29,18 @@ Attribute VB_Name = "GlobalModule"
 
 
 
+' for status handler
+Global Const INITIAL_TIMING_FOR_ONE_PN = 1
+
+
 ' IS_PRODUCTION
 Global Const G_PROD = True
+
+
+' QTY and CQTY
+Global Const G_QTY_COL = 3
+Global Const G_CONF_QTY_COL = 4
+
 
 ' DH COLUMNS !!!
 Global Const G_DHEF_COL = 44
@@ -36,16 +48,32 @@ Global Const G_DHAS_COL = 45
 
 ' COFOR
 Global Const G_COFOR_VENDEUR_COL = 17
+Global Const G_COFOR_EXPEDITEUR_COL = 18
+
+' pack and UC
+Global Const G_CONDI_COL = 24
+Global Const G_UC_COL = 25
 
 Global Const G_COD_TRANSPORT_COLUMN = 36
 Global Const G_PU_TIME_COLUMN = 37
 Global Const G_T_TIME_COLUMN = 38
 Global Const G_DEL_TIME_COLUMN = 39
 
+Global Const G_PLE_SUB_FOR_ORDER_COLUMN = 37
+
 Global Const G_TXT_IN_CELL = "transport by supplier (serial logistic in DAP)"
 Global Const G_DAP = "DAP"
 Global Const G_NON_TMC = "non"
 
+
+
+' column "G"
+Global Const G_PLE_SHIPPER_COFOR = 7
+Global Const G_CLOE_SHIPPER_COFOR = 1
+Global Const G_UA_KEY = 1
+Global Const G_UA_MAX_CAPACITY_COLUMN = 6
+Global Const G_FEED_MAIN_SH_SHIPPER_COFOR = 4
+Global Const G_FEED_MAIN_SH_CONDI = 10
 
 
 
@@ -72,7 +100,13 @@ Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 Global Const REG_SH_NM = "register"
 Global Const INPUT_SH_NM = "input"
 
-Global Const MAIN_SH_FEED = "FICHERO TRANSFER ONL-MON"
+' Global Const MAIN_SH_FEED = "FICHERO TRANSFER ONL-MON"
 Global Const MAIN_SH_BASE = "BASE"
+
+
+Global Const G_FEED_SH_MAIN = "MAIN"
+Global Const G_FEED_SH_PLE = "PLE"
+Global Const G_FEED_SH_CLOE = "CLOE"
+Global Const G_FEED_SH_UA = "UA"
 
 

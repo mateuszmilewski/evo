@@ -1,0 +1,205 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "CopyIterationForPivotSource"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Explicit
+
+
+'The MIT License (MIT)
+'
+'Copyright (c) 2020 FORREST
+' Mateusz Milewski mateusz.milewski@mpsa.com aka FORREST
+'
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights
+'to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+'copies of the Software, and to permit persons to whom the Software is
+'furnished to do so, subject to the following conditions:
+'
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
+'
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+'IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+'FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+'AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+'SOFTWARE.
+'
+'
+' THE EVO TOOL
+
+
+
+
+Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, ByRef li As LineItem, ByRef ph As PivotHandler, linia As Long)
+
+    
+
+    
+    'Debug.Print "li.supplementForPivotSource.refRangeForCloe.Address: " & _
+    '    li.supplementForPivotSource.refRangeForCloe.Address
+    
+    'Debug.Print "li.supplementForPivotSource.refRangeForPLE.Address: " & _
+    '    li.supplementForPivotSource.refRangeForPLE.Address
+        
+    'Debug.Print "li.sourceRng.Address: " & _
+    '    li.sourceRng.Address
+    
+    
+    ' ID LATER AFTER DEL DATE!
+    
+    sh.Cells(linia, EVO.E_PIVOT_SRC_WIERSZ).Value = li.wiersz
+    sh.Cells(linia, EVO.E_PIVOT_SRC_REF).Value = li.pn
+    sh.Cells(linia, EVO.E_PIVOT_SRC_COFOR_VENDEUR).Value = _
+        li.sourceRng.Offset(0, -1).Value
+    sh.Cells(linia, EVO.E_PIVOT_SRC_COFOR_EXPEDITEUR).Value = li.cofor
+    sh.Cells(linia, EVO.E_PIVOT_SRC_SUPPLIER_NAME).Value = _
+        li.supplementForPivotSource.refRangeForPLE.Offset(0, -2).Value
+        
+    ' DEL DATE
+    If IsDate(li.delDate) Then
+    
+    
+        If CLng(li.delDate) <> 0 Then
+    
+            sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_DATE).Value = li.delDate
+            sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_YEAR).Value = Year(li.delDate)
+            sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_MONTH).Value = Month(li.delDate)
+            sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_WEEK).Value = _
+                Application.WorksheetFunction.IsoWeekNum(li.delDate)
+                
+            sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_YYYYCW).Value = CLng(Year(li.delDate)) * 100 + _
+                CLng(sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_WEEK).Value)
+                
+        End If
+        
+        
+    End If
+    
+    ' for order date calc
+    ' -------------------------------------------------------------------------------------------------
+    sh.Cells(linia, EVO.E_PIVOT_SRC_AK_COL_FROM_PLE).Value = li.supplementForPivotSource.heoDecalageJX
+    ' -------------------------------------------------------------------------------------------------
+    
+    ' ID !!!
+    ' --------------
+    ' --------------
+    ' -------------------------------------------------------------------------------------------------
+    sh.Cells(linia, EVO.E_PIVOT_SRC_ID).Value = _
+        CStr(li.pn) & _
+        "-" & CStr(li.cofor) & _
+        "-" & Trim(sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_YYYYCW).Value)
+    ' -------------------------------------------------------------------------------------------------
+    
+    
+    If IsDate(li.supplementForPivotSource.orderDate) Then
+    
+        If CLng(li.supplementForPivotSource.orderDate) <> 0 Then
+    
+            sh.Cells(linia, EVO.E_PIVOT_SRC_ORDER_DATE).Value = _
+                li.supplementForPivotSource.orderDate
+            sh.Cells(linia, EVO.E_PIVOT_SRC_ORDER_YEAR).Value = _
+                Year(li.supplementForPivotSource.orderDate)
+            sh.Cells(linia, EVO.E_PIVOT_SRC_ORDER_MONTH).Value = _
+                Month(li.supplementForPivotSource.orderDate)
+            sh.Cells(linia, EVO.E_PIVOT_SRC_ORDER_WEEK).Value = _
+                Application.WorksheetFunction.IsoWeekNum(li.supplementForPivotSource.orderDate)
+                
+                
+            sh.Cells(linia, EVO.E_PIVOT_SRC_ORDER_YYYYCW).Value = _
+                CLng(Year(li.supplementForPivotSource.orderDate)) * 100 + _
+                CLng(sh.Cells(linia, EVO.E_PIVOT_SRC_ORDER_WEEK).Value)
+                
+        End If
+            
+            
+            
+    End If
+    
+    
+    'E_PIVOT_SRC_ROUTE
+    'E_PIVOT_SRC_PILOT
+    'E_PIVOT_SRC_ROUTE_AND_PILOT
+    sh.Cells(linia, EVO.E_PIVOT_SRC_ROUTE).Value = _
+        li.supplementForPivotSource.refRangeForCloe.Offset(0, 2).Value
+    sh.Cells(linia, EVO.E_PIVOT_SRC_PILOT).Value = _
+        li.supplementForPivotSource.refRangeForCloe.Offset(0, 3).Value
+        
+    sh.Cells(linia, EVO.E_PIVOT_SRC_ROUTE_AND_PILOT).Value = "" & _
+        li.supplementForPivotSource.refRangeForCloe.Offset(0, 2).Value & _
+        " - " & _
+        li.supplementForPivotSource.refRangeForCloe.Offset(0, 3).Value
+        
+    ' QTY
+    ' -------------------------------------------------------------------
+    sh.Cells(linia, EVO.E_PIVOT_SRC_QTY).Value = li.qty2
+    sh.Cells(linia, EVO.E_PIVOT_SRC_CQTY).Value = li.confirmedQty
+    ' -------------------------------------------------------------------
+    
+    
+    ' HERE MASTER!
+    ' ======================================================================================
+    sh.Cells(linia, EVO.E_PIVOT_SRC_UC).Value = master.Cells(li.wiersz, EVO.G_UC_COL).Value
+    sh.Cells(linia, EVO.E_PIVOT_SRC_SUMIF_UC).Value = master.Cells(li.wiersz, EVO.G_UC_COL).Value
+    ' ======================================================================================
+    
+    
+    ' OQ - QTY per UC
+    ' -------------------------------------------------------------------
+    If IsNumeric(master.Cells(li.wiersz, EVO.G_UC_COL).Value) Then
+        If CLng(master.Cells(li.wiersz, EVO.G_UC_COL).Value) > 0 Then
+        
+        
+            sh.Cells(linia, EVO.E_PIVOT_SRC_OQ).Value = _
+                CDbl(li.qty2) / CDbl(CLng(master.Cells(li.wiersz, EVO.G_UC_COL).Value))
+                
+            sh.Cells(linia, EVO.E_PIVOT_SRC_COQ).Value = _
+                CDbl(li.confirmedQty) / CDbl(CLng(master.Cells(li.wiersz, EVO.G_UC_COL).Value))
+                
+            sh.Cells(linia, EVO.E_PIVOT_SRC_ROUNDUP_OQ1).Value = _
+                CDbl(Application.WorksheetFunction.RoundUp(CDbl(sh.Cells(linia, EVO.E_PIVOT_SRC_OQ).Value), 0))
+                
+            sh.Cells(linia, EVO.E_PIVOT_SRC_ROUNDUP_COQ1).Value = _
+                CDbl(Application.WorksheetFunction.RoundUp(CDbl(sh.Cells(linia, EVO.E_PIVOT_SRC_COQ).Value), 0))
+            
+        End If
+    End If
+    ' -------------------------------------------------------------------
+    
+    ' Debug.Assert li.wiersz <> 2866
+    
+    If Trim(li.condi) <> "" Then
+    
+        sh.Cells(linia, EVO.E_PIVOT_SRC_CONDI).Value = li.condi
+        
+        'E_PIVOT_SRC_UA_PC_GV
+        'E_PIVOT_SRC_UA_BPC
+        'E_PIVOT_SRC_UA_MC
+        'E_PIVOT_SRC_UA_MBU
+        'E_PIVOT_SRC_UA_MAX_CAPACITY
+        
+        sh.Cells(linia, EVO.E_PIVOT_SRC_UA_PC_GV).Value = _
+            li.supplementForPivotSource.refRaneForCondi.Offset(0, 1).Value
+        sh.Cells(linia, EVO.E_PIVOT_SRC_UA_BPC).Value = _
+            li.supplementForPivotSource.refRaneForCondi.Offset(0, 2).Value
+        sh.Cells(linia, EVO.E_PIVOT_SRC_UA_MC).Value = _
+            li.supplementForPivotSource.refRaneForCondi.Offset(0, 3).Value
+        sh.Cells(linia, EVO.E_PIVOT_SRC_UA_MBU).Value = _
+            li.supplementForPivotSource.refRaneForCondi.Offset(0, 4).Value
+        sh.Cells(linia, EVO.E_PIVOT_SRC_UA_MAX_CAPACITY).Value = _
+            li.supplementForPivotSource.refRaneForCondi.Offset(0, 5).Value
+
+    End If
+    
+
+        
+        
+End Sub

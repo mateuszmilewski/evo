@@ -1,4 +1,6 @@
 Attribute VB_Name = "MailModule"
+Option Explicit
+
 'The MIT License (MIT)
 '
 'Copyright (c) 2020 FORREST

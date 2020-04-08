@@ -1,4 +1,7 @@
 Attribute VB_Name = "formatDHEFandDHASModule"
+Option Explicit
+
+
 'The MIT License (MIT)
 '
 'Copyright (c) 2020 FORREST
@@ -103,39 +106,46 @@ Private Function parseStdDateToStrangeFormat(iterDate As Date) As String
     parseStdDateToStrangeFormat = ""
     
     
-    yyyy = Year(iterDate)
-    mm = Month(iterDate)
+    Dim yyyy As String
+    Dim mm As String
+    Dim dd As String
+    Dim hh As String
+    Dim mmm As String
+    Dim sS As String
+    
+    yyyy = CStr(Year(iterDate))
+    mm = CStr(Month(iterDate))
     
     If Len(mm) = 1 Then
         mm = "0" & mm
     End If
     
-    dd = Day(iterDate)
+    dd = CStr(Day(iterDate))
     
     If Len(dd) = 1 Then
-        dd = "0" & d
+        dd = "0" & dd
     End If
     
-    hh = Hour(iterDate)
+    hh = CStr(Hour(iterDate))
     
     If Len(hh) = 1 Then
         hh = "0" & hh
     End If
     
     
-    mmm = Minute(iterDate)
+    mmm = CStr(Minute(iterDate))
     
     If Len(mmm) = 1 Then
         mmm = "0" & mmm
     End If
     
-    ss = Second(iterDate)
+    sS = CStr(Second(iterDate))
     
-    If Len(ss) = 1 Then
-        ss = "0" & ss
+    If Len(sS) = 1 Then
+        sS = "0" & sS
     End If
     
     parseStdDateToStrangeFormat = "" & CStr(dd) & "/" & CStr(mm) & "/" & CStr(yyyy) & "  " & _
-        CStr(hh) & ":" & CStr(mmm) & ":" & CStr(ss)
+        CStr(hh) & ":" & CStr(mmm) & ":" & CStr(sS)
     
 End Function

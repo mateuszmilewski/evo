@@ -1,4 +1,12 @@
-Attribute VB_Name = "OffsetDateDueToCodEntregaModule"
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "LineItemPivotSrouceSupplement"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 Option Explicit
 
 'The MIT License (MIT)
@@ -27,23 +35,15 @@ Option Explicit
 '
 ' THE EVO TOOL
 
-Public Function offsetDate(kod As String, mon As Date) As Date
-    Dim ofst As Integer, x As Integer
-    ofst = 0
-    
-    
-    '111 MONDAY
-    '112 TUESDAY
-    '...
-    '115 FRIDAY
-    '-----------------------------------------
-    For x = 111 To 115
-        If CStr(kod) = CStr(x) Then
-        
-            ofst = x - 111
-        End If
-    Next x
-    '-----------------------------------------
-    
-    offsetDate = mon + ofst
-End Function
+Public orderDate As Date
+Public orderTime As Date
+
+Public heoDecalageJX As Integer
+
+
+
+Public refRangeForCloe As Range
+Public refRangeForPLE As Range
+Public refRaneForCondi As Range
+
+

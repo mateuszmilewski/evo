@@ -7,6 +7,36 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
+
+
+'The MIT License (MIT)
+'
+'Copyright (c) 2020 FORREST
+' Mateusz Milewski mateusz.milewski@mpsa.com aka FORREST
+'
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights
+'to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+'copies of the Software, and to permit persons to whom the Software is
+'furnished to do so, subject to the following conditions:
+'
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
+'
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+'IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+'FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+'AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+'SOFTWARE.
+'
+'
+' THE EVO TOOL
+
+
 Public szerokosc_paska As Double
 ' bardzo wazne zeby nie przekroczyc zakresu mozliwosci tych dwoch zmiennych
 Public act As Double
@@ -28,7 +58,7 @@ Private collection_of_avr_on_pn As Collection
 
 Public Sub init_statusbar(m_max, Optional m_min)
 
-
+    Dim x As Integer
 
     Set collection_of_avr_on_pn = New Collection
 
@@ -49,7 +79,7 @@ Public Sub init_statusbar(m_max, Optional m_min)
     est_time = CDbl(max) * CDbl(avr_on_one_pn)
     
     
-    
+    Dim mitem As Variant
     est_time = 0
     For Each mitem In collection_of_avr_on_pn
         est_time = est_time + CDbl(mitem)
@@ -92,7 +122,7 @@ Public Sub progress_increase()
         ' to bedzie taki warunek brzegowy czy w ogole zajmowac sie
         'dokladnym przeliczaniem makra
         If collection_of_avr_on_pn.Count > 10 Then
-            
+            Dim x As Integer
             For x = act To collection_of_avr_on_pn.Count
                 '' Debug.Print collection_of_avr_on_pn.COUNT
                 collection_of_avr_on_pn.Remove x
@@ -103,6 +133,7 @@ Public Sub progress_increase()
         End If
 
         est_time = 0
+        Dim mitem As Variant
         For Each mitem In collection_of_avr_on_pn
             est_time = est_time + CDbl(mitem)
         Next mitem
@@ -120,6 +151,9 @@ End Sub
 Public Function convert_and_show(et As Long) As String
     convert_and_show = " 00h:00m:00s"
     
+    Dim godziny As Integer
+    Dim minuty As Integer
+    Dim pozostalosc_po_minutach As Integer
     
     godziny = Int(et / 3600)
     minuty = Int(et / 60)

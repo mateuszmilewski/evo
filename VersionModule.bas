@@ -1,4 +1,6 @@
 Attribute VB_Name = "VersionModule"
+Option Explicit
+
 'The MIT License (MIT)
 '
 'Copyright (c) 2020 FORREST
@@ -103,5 +105,104 @@ Attribute VB_Name = "VersionModule"
 '    move? DHEF and DHAS?
 '    1. ?
 '
+' ==============================================================
+
+
+' ==============================================================
+' 0.10
+' dry in hard way
+' ==============================================================
+
+
+' ==============================================================
+' 0.11
+' optimise optimise
+' ==============================================================
+
+
+' ==============================================================
+' 0.12
+' FIX
+'the new version works well except the pickup date if there is a weekend between the dates.
+'
+'Examples for body parts (ferrage/peinture) and this COFORS:
+'94656L  01 ? its OK
+'A007GT  01? its OK
+'26805K  01? not OK
+'A009YG  01? not OK
+' ==============================================================
+
+
+
+' ==============================================================
+' 0.13
+' first class for pivot handling
+'
+' error on formula - blocking field with route
+'
+' btn with remove colors and comments at the end
+' ==============================================================
+
+
+
+' 0.14
+' ==============================================================
+' small fix on working with visible data
+' frist buttons for TCAM
+' ==============================================================
+
+
+' 0.15
+' ==============================================================
+' tcam initial logic
+' information for you:
+' there is a 3 diff ref range for each sepearte source worksheet
+'Dim findByExpCoforInPle As Range
+'Dim findByExpCoforInCloe As Range
+'Dim findByExpCoforInMain As Range
+' for coping there is new sub called:
+' Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
+'
+' also, as you can see there is a new param for pivot hadnler - important
+'
+' new standard for naming worksheets - more english rather angel root naming
+'
+' new class for:
+' TRANSPORT CALCULATION AND MONITORING
+'
+' LineItemPivotSrouceSupplement - component suppling LineItem
+' ==============================================================
+
+
+' 0.16
+' ==============================================================
+' moved fields connected with TCAM into LineItemPivotSrouceSupplement
+' new private sub inside CopyHandler:
+' insideCopyForSourcePivot_setupOrderDate
+' ==============================================================
+
+
+' 0.17
+' ==============================================================
+' new fields in pivot source
+'
+' ! in Private Sub makeMySumIfs(sh As Worksheet)
+' !! in CopyIterationForPivotSource class i've put static code with
+' col A as "matchy"
+' ==============================================================
+
+
+' 0.18
+' ==============================================================
+' Force explicit variable declaration.
+' Option Explicit On !!!
+' change name makeMySumIfs na makeMyFormulas - change into static
+' ==============================================================
+
+
+
+' 0.19
+' ==============================================================
+' removed manquant on sap gui scripting lib
 ' ==============================================================
 
