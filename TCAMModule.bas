@@ -28,6 +28,10 @@ Option Explicit
 ' THE EVO TOOL
 
 
+
+Public Sub showDetails()
+
+
 Public Sub createSourceForPivot(ictrl As IRibbonControl)
 
     
@@ -96,9 +100,81 @@ End Sub
 Public Sub makePivot(ictrl As IRibbonControl)
     
     innerMakePivot
+    
+    MsgBox "READY!"
+End Sub
+
+Public Sub makeTPivot(ictrl As IRibbonControl)
+    
+    innerMakeTPivot
+    
+    MsgBox "READY!"
 End Sub
 
 
 Private Sub innerMakePivot()
-    MsgBox "implementation under way!", vbInformation
+
+
+    If checkActiveSheetIfItIsProxy2() Then
+    
+        Dim ph As PivotHandler, oh As OperationsHandler
+        Set ph = New PivotHandler
+        Set oh = New OperationsHandler
+        
+        Set ph.proxy2 = ActiveSheet
+        ph.initPivotSheet
+        oh.makePivot ph
+        
+    Else
+        MsgBox "Proxy2 sheet need to be active to perform action!", vbInformation
+    End If
+    
 End Sub
+
+Private Sub innerMakeTPivot()
+
+
+    If checkActiveSheetIfItIsProxy2() Then
+    
+        Dim ph As PivotHandler, oh As OperationsHandler
+        Set ph = New PivotHandler
+        Set oh = New OperationsHandler
+        
+        Set ph.proxy2 = ActiveSheet
+        ph.initPivotSheet
+        oh.makeTPivot ph
+        
+    Else
+        MsgBox "Proxy2 sheet need to be active to perform action!", vbInformation
+    End If
+    
+End Sub
+
+Private Function checkActiveSheetIfItIsProxy2() As Boolean
+    checkActiveSheetIfItIsProxy2 = False
+    
+    If ActiveSheet.Name Like "Proxy2_*" Then
+        If ActiveSheet.Cells(1, 1).Value = "ID" Then
+        
+            If ActiveSheet.Cells(1, 2).Value = "WIERSZ" Then
+            
+                If ActiveSheet.Cells(1, 3).Value = "REF" Then
+                
+                
+                    checkActiveSheetIfItIsProxy2 = True
+                    
+                    Dim ans As Variant
+                    ans = MsgBox("Do you want to create PIVOT for: " & CStr(ActiveSheet.Name) & " ? ", vbYesNo + vbQuestion)
+                        
+                    If ans = vbYes Then
+                        checkActiveSheetIfItIsProxy2 = True
+                    Else
+                        checkActiveSheetIfItIsProxy2 = False
+                        MsgBox "Nothing to do!"
+                    End If
+                End If
+            End If
+        End If
+    End If
+
+End Function

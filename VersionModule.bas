@@ -206,3 +206,16 @@ Option Explicit
 ' removed manquant on sap gui scripting lib
 ' ==============================================================
 
+
+
+' 0.20
+' ==============================================================
+' initial logic for pivot
+' ==============================================================
+
+
+' 0.21
+' ==============================================================
+' runMainLogicForCreationPivotTable in PivotHandler
+' runMainLogicForCreationTheoreticPivotTable in PivotHandler
+' ==============================================================

@@ -79,7 +79,14 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
             sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_YYYYCW).Value = CLng(Year(li.delDate)) * 100 + _
                 CLng(sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_WEEK).Value)
                 
+                
+            ' here quickly short date
+            sh.Cells(linia, EVO.E_PIVOT_SRC___SHORT_DEL_DATE).Value = Format(li.delDate, "dd/mm/yy")
+                
         End If
+        
+        
+        
         
         
     End If
@@ -117,6 +124,12 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
             sh.Cells(linia, EVO.E_PIVOT_SRC_ORDER_YYYYCW).Value = _
                 CLng(Year(li.supplementForPivotSource.orderDate)) * 100 + _
                 CLng(sh.Cells(linia, EVO.E_PIVOT_SRC_ORDER_WEEK).Value)
+                
+                
+                
+            ' here quickly short date
+            sh.Cells(linia, EVO.E_PIVOT_SRC___SHORT_ORDER_DATE).Value = _
+                Format(li.supplementForPivotSource.orderDate, "dd/mm/yy")
                 
         End If
             

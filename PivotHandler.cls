@@ -38,6 +38,10 @@ Option Explicit
 ' PIVOT HANDLER
 
 
+Private pC As PivotCache
+Private pT As PivotTable
+
+
 Private srcSheet As Worksheet
 Private refRangeInSrcSheet As Range
 Private pivotSheet As Worksheet
@@ -46,8 +50,212 @@ Private pivotSheetName As String
 
 ' really special one!
 Public proxy2 As Worksheet
+Private rngFromProxy2 As Range
 
 
+
+
+
+
+Public Sub runMainLogicForCreationTheoreticPivotTable()
+
+
+
+    If Not rngFromProxy2 Is Nothing Then
+    
+    
+        Set pC = ThisWorkbook.PivotCaches.Create(xlDatabase, rngFromProxy2)
+        Set pT = pC.CreatePivotTable(pivotSheet.Cells(1, 1), "THEORETIC_PIVOT_" & CStr(pivotSheet.Name))
+        
+        ' test loop through fields
+        Dim pfs As PivotFields, pf As PivotField, pi As PivotItem
+        Set pfs = pT.PivotFields
+        For Each pf In pfs
+            Debug.Print pf.Name
+            ' Debug.Print pf.Orientation
+            
+            If Trim(pf.Name) = "S_ORDER_DATE" Then
+                pf.Orientation = xlRowField
+                pf.Position = 1
+                ' pf.AutoGroup
+                
+                pf.Name = "ORDER"
+                
+            End If
+            
+            If Trim(pf.Name) = "S_DELIVERY_DATE" Then
+                pf.Orientation = xlColumnField
+                pf.Position = 1
+                ' pf.AutoGroup
+                
+                
+                pf.Name = "DELIVERY"
+                
+                'For Each pi In pf.PivotItems
+                '
+                '    If IsDate(pi.Name) Then
+                '        ' Debug.Print pi.Name
+                '        pi.Name = Format(pi.Name, "dd/mm/yyyy")
+                '    End If
+                'Next pi
+            End If
+        Next pf
+        
+        
+        For Each pf In pfs
+            
+            If Trim(pf.Name) = "ROUTE NAME AND PILOT" Then
+                pf.Orientation = xlRowField
+                pf.Position = 2
+            End If
+            
+            
+            If Trim(pf.Name) = "DELIVERY YEAR" Then
+                pf.Orientation = xlPageField
+                pf.Position = 1
+                pf.CurrentPage = Year(Date)
+            End If
+            
+            If Trim(pf.Name) = "DELIVERY WEEK" Then
+                pf.Orientation = xlPageField
+                pf.Position = 1
+                pf.CurrentPage = CStr(Application.WorksheetFunction.IsoWeekNum(CDate(Date)))
+                
+            End If
+            
+            
+            
+            If Trim(pf.Name) = "(RN)(mL)" Then
+                pf.Orientation = xlDataField
+                pf.Position = 1
+                'pf.Caption = "C(RN)(mL)"
+                pf.Function = xlSum
+                pf.Name = "Th(RN)(mL)"
+            End If
+            
+            If Trim(pf.Name) = "ROUNDUP (RN)(mL)" Then
+                pf.Orientation = xlDataField
+                pf.Position = 2
+                'pf.Caption = "RC(RN)(mL)"
+                pf.Function = xlSum
+                pf.Name = "ThR(RN)(mL)"
+            End If
+        Next pf
+        
+        ' ActiveSheet.PivotTables("PivotTable2").RowAxisLayout xlTabularRow
+        ' pT.RowAxisLayout xlTabularRow
+        'pT.RepeatAllLabels xlRepeatLabels
+    Else
+    
+        MsgBox "no data provided for runMainLogicForCreationTheoritcPivotTable", vbCritical
+        
+    End If
+
+End Sub
+
+Public Sub runMainLogicForCreationPivotTable()
+
+    If Not rngFromProxy2 Is Nothing Then
+    
+    
+        Set pC = ThisWorkbook.PivotCaches.Create(xlDatabase, rngFromProxy2)
+        Set pT = pC.CreatePivotTable(pivotSheet.Cells(1, 1), "PIVOT_" & CStr(pivotSheet.Name))
+        
+        ' test loop through fields
+        Dim pfs As PivotFields, pf As PivotField, pi As PivotItem
+        Set pfs = pT.PivotFields
+        For Each pf In pfs
+            Debug.Print pf.Name
+            ' Debug.Print pf.Orientation
+            
+            If Trim(pf.Name) = "S_ORDER_DATE" Then
+                pf.Orientation = xlRowField
+                pf.Position = 1
+                ' pf.AutoGroup
+                
+                pf.Name = "ORDER"
+                
+            End If
+            
+            If Trim(pf.Name) = "S_DELIVERY_DATE" Then
+                pf.Orientation = xlColumnField
+                pf.Position = 1
+                ' pf.AutoGroup
+                
+                
+                pf.Name = "DELIVERY"
+                
+                'For Each pi In pf.PivotItems
+                '
+                '    If IsDate(pi.Name) Then
+                '        ' Debug.Print pi.Name
+                '        pi.Name = Format(pi.Name, "dd/mm/yyyy")
+                '    End If
+                'Next pi
+            End If
+        Next pf
+        
+        
+        For Each pf In pfs
+            
+            If Trim(pf.Name) = "ROUTE NAME AND PILOT" Then
+                pf.Orientation = xlRowField
+                pf.Position = 2
+            End If
+            
+            
+            If Trim(pf.Name) = "DELIVERY YEAR" Then
+                pf.Orientation = xlPageField
+                pf.Position = 1
+                pf.CurrentPage = Year(Date)
+            End If
+            
+            If Trim(pf.Name) = "DELIVERY WEEK" Then
+                pf.Orientation = xlPageField
+                pf.Position = 1
+                pf.CurrentPage = CStr(Application.WorksheetFunction.IsoWeekNum(CDate(Date)))
+                
+            End If
+            
+            
+            
+            If Trim(pf.Name) = "Confirmed (RN)(mL)" Then
+                pf.Orientation = xlDataField
+                pf.Position = 1
+                'pf.Caption = "C(RN)(mL)"
+                pf.Function = xlSum
+                pf.Name = "C(RN)(mL)"
+            End If
+            
+            If Trim(pf.Name) = "ROUNDUP Confirmed (RN)(mL)" Then
+                pf.Orientation = xlDataField
+                pf.Position = 2
+                'pf.Caption = "RC(RN)(mL)"
+                pf.Function = xlSum
+                pf.Name = "RC(RN)(mL)"
+            End If
+        Next pf
+        
+        ' ActiveSheet.PivotTables("PivotTable2").RowAxisLayout xlTabularRow
+        ' pT.RowAxisLayout xlTabularRow
+        'pT.RepeatAllLabels xlRepeatLabels
+    Else
+    
+        MsgBox "no data provided for runMainLogicForCreationPivotTable", vbCritical
+        
+    End If
+End Sub
+
+
+
+Public Sub setRangeDataFromProxy2ForPivot(mr As Range)
+    Set rngFromProxy2 = mr
+End Sub
+
+Public Function getRangeDataFromProxy2() As Range
+    
+    Set getRangeDataFromProxy2 = rngFromProxy2
+End Function
 
 
 Public Function getRefRangeInSrcSheet() As Range
@@ -63,15 +271,21 @@ Public Function getPivotSource() As Worksheet
     Set getPivotSource = srcSheet
 End Function
 
+Public Function getPivot() As Worksheet
+    Set getPivot = pivotSheet
+End Function
+
 
 Private Sub Class_Initialize()
     Set srcSheet = Nothing
     Set pivotSheet = Nothing
+    Set rngFromProxy2 = Nothing
 End Sub
 
 Private Sub Class_Terminate()
     Set srcSheet = Nothing
     Set pivotSheet = Nothing
+    Set rngFromProxy2 = Nothing
 End Sub
 
 
@@ -235,7 +449,16 @@ Public Sub fillPivotSourceWithLabels()
     '    condi
     ' E_PIVOT_SRC_UA_PC_GV
     ' E_PIVOT_SRC_UA_MAX_CAPACITY
-    ' E_PIVOT_SRC_TN_ML
+    ' E_PIVOT_SRC__TN_ML
+    ' E_PIVOT_SRC__CONFIRMED_TN_ML
+    ' E_PIVOT_SRC__LQ
+    ' E_PIVOT_SRC__RP
+    ' E_PIVOT_SRC__TN_box_ML
+    ' E_PIVOT_SRC__CONFIRMED_TN_box_ML
+    ' E_PIVOT_SRC__RN_ML
+    ' E_PIVOT_SRC__CONFIRMED_RN_ML
+    ' short order date
+    ' short del date
 
 
     With srcSheet
@@ -299,6 +522,77 @@ Public Sub fillPivotSourceWithLabels()
             .AddComment CStr("Confirmed (TN)(mL) = sum(OQ/PA) * 13,5")
             .Comment.Shape.TextFrame.AutoSize = True
         End With
+        
+        
+        With .Cells(1, E_PIVOT_SRC__LQ)
+            .Value = "LQ"
+            .AddComment CStr("LQ = roundup(OQ / BPL)")
+            .Comment.Shape.TextFrame.AutoSize = True
+        End With
+        
+        With .Cells(1, E_PIVOT_SRC__CLQ)
+            .Value = "Confirmed LQ"
+            .AddComment CStr("Confirmed LQ = roundup(COQ / BPL)")
+            .Comment.Shape.TextFrame.AutoSize = True
+        End With
+        
+        With .Cells(1, EVO.E_PIVOT_SRC__RP)
+            .Value = "RP"
+            .AddComment CStr("RP = LQ / LPP")
+            .Comment.Shape.TextFrame.AutoSize = True
+        End With
+        
+        
+        With .Cells(1, EVO.E_PIVOT_SRC__CRP)
+            .Value = "Confirmed RP"
+            .AddComment CStr("Confirmed RP = CLQ / LPP")
+            .Comment.Shape.TextFrame.AutoSize = True
+        End With
+        
+        
+        With .Cells(1, EVO.E_PIVOT_SRC__TN_box_ML)
+            .Value = "(TNbox)(mL)"
+            .AddComment CStr("(TNbox)(mL) = ((RP * 1,16) / (90)) * 13,5")
+            .Comment.Shape.TextFrame.AutoSize = True
+        End With
+        
+        
+        With .Cells(1, EVO.E_PIVOT_SRC__CONFIRMED_TN_box_ML)
+            .Value = "Confirmed (TNbox)(mL)"
+            .AddComment CStr("Confirmed (TNbox)(mL) = (( CRP * 1,16) / (90)) * 13,5")
+            .Comment.Shape.TextFrame.AutoSize = True
+        End With
+        
+        
+        With .Cells(1, EVO.E_PIVOT_SRC__RN_ML)
+            .Value = "(RN)(mL)"
+            .AddComment "(RN)(mL) = TN + TN_box"
+            .Comment.Shape.TextFrame.AutoSize = True
+        End With
+        
+        
+        With .Cells(1, EVO.E_PIVOT_SRC__CONFIRMED_RN_ML)
+            .Value = "Confirmed (RN)(mL)"
+            .AddComment "Confirmed (RN)(mL) = TN + TN_box"
+            .Comment.Shape.TextFrame.AutoSize = True
+        End With
+        
+        
+        With .Cells(1, EVO.E_PIVOT_SRC__ROUNDUP_RN_ML)
+            .Value = "ROUNDUP (RN)(mL)"
+            .AddComment "ROUNDUP (RN)(mL) = TN + TN_box"
+            .Comment.Shape.TextFrame.AutoSize = True
+        End With
+        
+        
+        With .Cells(1, EVO.E_PIVOT_SRC__ROUNDUP_CONFIRMED_RN_ML)
+            .Value = "ROUNDUP Confirmed (RN)(mL)"
+            .AddComment "ROUNDUP Confirmed (RN)(mL) = TN + TN_box"
+            .Comment.Shape.TextFrame.AutoSize = True
+        End With
+        
+        .Cells(1, EVO.E_PIVOT_SRC___SHORT_ORDER_DATE).Value = "S_ORDER_DATE"
+        .Cells(1, EVO.E_PIVOT_SRC___SHORT_DEL_DATE).Value = "S_DELIVERY_DATE"
         
     End With
 

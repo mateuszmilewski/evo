@@ -236,10 +236,64 @@ Public Sub makeMyFormulas(sh As Worksheet)
         E_PIVOT_SRC_UA_MAX_CAPACITY, _
         E_PIVOT_SRC_UA_PC_GV, _
         E_PIVOT_SRC__CONFIRMED_TN_ML
-
+        
         
     changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__TN_ML
     changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__CONFIRMED_TN_ML
+    
+    ' BPL  =  BPC
+    makeSpecificDivForZ4 sh, r, CLng(lastRow), _
+        E_PIVOT_SRC_SUMIF_OQ, _
+        E_PIVOT_SRC_UA_BPC, _
+        E_PIVOT_SRC_UA_PC_GV, _
+        E_PIVOT_SRC__LQ
+        
+    makeSpecificDivForZ4 sh, r, CLng(lastRow), _
+        E_PIVOT_SRC_SUMIF_COQ, _
+        E_PIVOT_SRC_UA_BPC, _
+        E_PIVOT_SRC_UA_PC_GV, _
+        E_PIVOT_SRC__CLQ
+        
+    changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__LQ
+    changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__CLQ
+    
+    
+    
+    makeSpecificDivForZ5 sh, r, CLng(lastRow), E_PIVOT_SRC__LQ, E_PIVOT_SRC_UA_MC, E_PIVOT_SRC__RP
+    makeSpecificDivForZ5 sh, r, CLng(lastRow), E_PIVOT_SRC__CLQ, E_PIVOT_SRC_UA_MC, E_PIVOT_SRC__CRP
+    changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__RP
+    changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__CRP
+
+        
+    makeSpecificDivForZ6 sh, r, CLng(lastRow), E_PIVOT_SRC__RP, E_PIVOT_SRC__TN_box_ML
+    makeSpecificDivForZ6 sh, r, CLng(lastRow), E_PIVOT_SRC__CRP, E_PIVOT_SRC__CONFIRMED_TN_box_ML
+    changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__TN_box_ML
+    changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__CONFIRMED_TN_box_ML
+    
+    
+    
+    makeSpecificDivForZ7 sh, r, CLng(lastRow), _
+        E_PIVOT_SRC__TN_box_ML, _
+        E_PIVOT_SRC__TN_ML, _
+        E_PIVOT_SRC__RN_ML
+        
+    changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__RN_ML
+    
+    
+    makeSpecificDivForZ7 sh, r, CLng(lastRow), _
+        E_PIVOT_SRC__CONFIRMED_TN_ML, _
+        E_PIVOT_SRC__CONFIRMED_TN_box_ML, _
+        E_PIVOT_SRC__CONFIRMED_RN_ML
+        
+    changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__CONFIRMED_RN_ML
+    
+    
+    
+    makeSpecificDivForZ8 sh, r, CLng(lastRow), E_PIVOT_SRC__RN_ML, E_PIVOT_SRC__ROUNDUP_RN_ML
+    changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__ROUNDUP_RN_ML
+    
+    makeSpecificDivForZ8 sh, r, CLng(lastRow), E_PIVOT_SRC__CONFIRMED_RN_ML, E_PIVOT_SRC__ROUNDUP_CONFIRMED_RN_ML
+    changeFormulaIntoValue sh, r, CLng(lastRow), E_PIVOT_SRC__ROUNDUP_CONFIRMED_RN_ML
     
 End Sub
 
@@ -250,6 +304,107 @@ Private Sub changeFormulaIntoValue(sh As Worksheet, r As Range, lastRow As Long,
     r.PasteSpecial xlPasteValues
     sh.Range("A2").Select
     Application.CutCopyMode = False
+End Sub
+
+
+Private Sub makeSpecificDivForZ8(sh As Worksheet, r As Range, lastRow As Long, _
+    eforX As E_PIVOT_SRC, e As E_PIVOT_SRC)
+    
+    
+        Dim wynikParsu As String
+    
+        ' column A as a matchy :) by hard
+        Set r = sh.Range("A2:A" & lastRow)
+        wynikParsu = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("Z8").Formula
+        
+        wynikParsu = Replace(wynikParsu, "X", "R2C" & CStr(eforX) & ":R" & CStr(lastRow) & "C" & CStr(eforX))
+        
+        
+        Set r = r.Offset(0, e - 1)
+        r.FormulaArray = wynikParsu
+    
+End Sub
+
+
+Private Sub makeSpecificDivForZ7(sh As Worksheet, r As Range, lastRow As Long, _
+    eforX As E_PIVOT_SRC, eforY As E_PIVOT_SRC, e As E_PIVOT_SRC)
+    
+    
+        Dim wynikParsu As String
+    
+        ' column A as a matchy :) by hard
+        Set r = sh.Range("A2:A" & lastRow)
+        wynikParsu = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("Z7").Formula
+        
+        wynikParsu = Replace(wynikParsu, "X", "R2C" & CStr(eforX) & ":R" & CStr(lastRow) & "C" & CStr(eforX))
+        wynikParsu = Replace(wynikParsu, "Y", "R2C" & CStr(eforY) & ":R" & CStr(lastRow) & "C" & CStr(eforY))
+        
+        
+        Set r = r.Offset(0, e - 1)
+        r.FormulaArray = wynikParsu
+    
+End Sub
+
+
+
+Private Sub makeSpecificDivForZ6(sh As Worksheet, r As Range, lastRow As Long, _
+    eforX As E_PIVOT_SRC, e As E_PIVOT_SRC)
+    
+    
+        Dim wynikParsu As String
+    
+        ' column A as a matchy :) by hard
+        Set r = sh.Range("A2:A" & lastRow)
+        wynikParsu = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("Z6").Formula
+        
+        wynikParsu = Replace(wynikParsu, "X", "R2C" & CStr(eforX) & ":R" & CStr(lastRow) & "C" & CStr(eforX))
+        
+        
+        Set r = r.Offset(0, e - 1)
+        r.FormulaArray = wynikParsu
+    
+End Sub
+
+
+
+Private Sub makeSpecificDivForZ5(sh As Worksheet, r As Range, lastRow As Long, _
+    eforX As E_PIVOT_SRC, eforY As E_PIVOT_SRC, _
+    e As E_PIVOT_SRC)
+    
+    
+        Dim wynikParsu As String
+    
+        ' column A as a matchy :) by hard
+        Set r = sh.Range("A2:A" & lastRow)
+        wynikParsu = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("Z5").Formula
+        
+        wynikParsu = Replace(wynikParsu, "X", "R2C" & CStr(eforX) & ":R" & CStr(lastRow) & "C" & CStr(eforX))
+        wynikParsu = Replace(wynikParsu, "Y", "R2C" & CStr(eforY) & ":R" & CStr(lastRow) & "C" & CStr(eforY))
+        
+        Set r = r.Offset(0, e - 1)
+        r.FormulaArray = wynikParsu
+    
+End Sub
+
+
+Private Sub makeSpecificDivForZ4(sh As Worksheet, r As Range, lastRow As Long, _
+    eforX As E_PIVOT_SRC, eforY As E_PIVOT_SRC, eforZ As E_PIVOT_SRC, _
+    e As E_PIVOT_SRC)
+    
+    
+        Dim wynikParsu As String
+    
+        ' column A as a matchy :) by hard
+        Set r = sh.Range("A2:A" & lastRow)
+        wynikParsu = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("Z4").Formula
+        
+        wynikParsu = Replace(wynikParsu, "X", "R2C" & CStr(eforX) & ":R" & CStr(lastRow) & "C" & CStr(eforX))
+        wynikParsu = Replace(wynikParsu, "Y", "R2C" & CStr(eforY) & ":R" & CStr(lastRow) & "C" & CStr(eforY))
+        wynikParsu = Replace(wynikParsu, "Z", "R2C" & CStr(eforZ) & ":R" & CStr(lastRow) & "C" & CStr(eforZ))
+        
+        Set r = r.Offset(0, e - 1)
+        r.FormulaArray = wynikParsu
+    
 End Sub
 
 
@@ -356,3 +511,59 @@ Public Function makeLeanCopyOfPivotSource(sh As Worksheet) As Worksheet
     Set makeLeanCopyOfPivotSource = newSh
 End Function
 
+
+Public Sub makePivot(ByRef ph As PivotHandler)
+    
+    Dim r As Range, lastRow As Long, wynikParsu As String, localPivotSh As Worksheet
+    Dim sh As Worksheet
+    
+    
+    Set sh = ph.proxy2
+    Set localPivotSh = ph.getPivot()
+    
+    lastRow = calcLastRowInThisPivotSource(sh)
+
+    ' Sheets("SrcPivot_20200408_II").Select
+    ' sh.Activate
+    ' Set newSh = ThisWorkbook.Sheets.Add
+    Set r = sh.UsedRange
+    ' Looks like it is OK!
+    Debug.Print r.Address
+    Debug.Print localPivotSh.Name
+    
+    ph.setRangeDataFromProxy2ForPivot r
+    ' ==================================================
+    ph.runMainLogicForCreationPivotTable
+    ' ==================================================
+    
+    
+End Sub
+
+
+
+Public Sub makeTPivot(ByRef ph As PivotHandler)
+    
+    Dim r As Range, lastRow As Long, wynikParsu As String, localPivotSh As Worksheet
+    Dim sh As Worksheet
+    
+    
+    Set sh = ph.proxy2
+    Set localPivotSh = ph.getPivot()
+    
+    lastRow = calcLastRowInThisPivotSource(sh)
+
+    ' Sheets("SrcPivot_20200408_II").Select
+    ' sh.Activate
+    ' Set newSh = ThisWorkbook.Sheets.Add
+    Set r = sh.UsedRange
+    ' Looks like it is OK!
+    Debug.Print r.Address
+    Debug.Print localPivotSh.Name
+    
+    ph.setRangeDataFromProxy2ForPivot r
+    ' ==================================================
+    ph.runMainLogicForCreationTheoreticPivotTable
+    ' ==================================================
+    
+    
+End Sub
