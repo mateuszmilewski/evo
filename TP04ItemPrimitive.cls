@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "LineItemPivotSrouceSupplement"
+Attribute VB_Name = "TP04ItemPrimitive"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -35,15 +35,15 @@ Option Explicit
 '
 ' THE EVO TOOL
 
-Public orderDate As Date
-Public orderTime As Date
 
-Public heoDecalageJX As Integer
+Public article As String
+Public cofor As String
+Public price As Double
+Public curr As String
+Public rate As Double
+Public priceInEur As Double
+Public pckgUn As String
+Public pckgDiv As Double
 
-
-
-Public refRangeForCloe As Range
-Public refRangeForPLE As Range
-Public refRaneForCondi As Range
-
-
+' priceInEur / pckgDiv
+Public finalPrice As Double

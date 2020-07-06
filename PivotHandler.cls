@@ -38,7 +38,7 @@ Option Explicit
 ' PIVOT HANDLER
 
 
-Private pC As PivotCache
+Private pc As PivotCache
 Private pT As PivotTable
 
 
@@ -47,10 +47,15 @@ Private refRangeInSrcSheet As Range
 Private pivotSheet As Worksheet
 Private srcSheetName As String
 Private pivotSheetName As String
+Private tcamSheetName As String
 
 ' really special one!
 Public proxy2 As Worksheet
 Private rngFromProxy2 As Range
+
+' tcam final
+Public tcamSheet As Worksheet
+Private tcamRng As Range
 
 
 
@@ -64,32 +69,32 @@ Public Sub runMainLogicForCreationTheoreticPivotTable()
     If Not rngFromProxy2 Is Nothing Then
     
     
-        Set pC = ThisWorkbook.PivotCaches.Create(xlDatabase, rngFromProxy2)
-        Set pT = pC.CreatePivotTable(pivotSheet.Cells(1, 1), "THEORETIC_PIVOT_" & CStr(pivotSheet.Name))
+        Set pc = ThisWorkbook.PivotCaches.Create(xlDatabase, rngFromProxy2)
+        Set pT = pc.CreatePivotTable(pivotSheet.Cells(1, 1), "THEORETIC_PIVOT_" & CStr(pivotSheet.name))
         
         ' test loop through fields
         Dim pfs As PivotFields, pf As PivotField, pi As PivotItem
         Set pfs = pT.PivotFields
         For Each pf In pfs
-            Debug.Print pf.Name
+            Debug.Print pf.name
             ' Debug.Print pf.Orientation
             
-            If Trim(pf.Name) = "S_ORDER_DATE" Then
+            If CStr(pf.name) = "S_ORDER_DATE" Then
                 pf.Orientation = xlRowField
                 pf.Position = 1
                 ' pf.AutoGroup
                 
-                pf.Name = "ORDER"
+                pf.name = "ORDER"
                 
             End If
             
-            If Trim(pf.Name) = "S_DELIVERY_DATE" Then
+            If CStr(pf.name) = "S_DELIVERY_DATE" Then
                 pf.Orientation = xlColumnField
                 pf.Position = 1
                 ' pf.AutoGroup
                 
                 
-                pf.Name = "DELIVERY"
+                pf.name = "DELIVERY"
                 
                 'For Each pi In pf.PivotItems
                 '
@@ -104,42 +109,50 @@ Public Sub runMainLogicForCreationTheoreticPivotTable()
         
         For Each pf In pfs
             
-            If Trim(pf.Name) = "ROUTE NAME AND PILOT" Then
+            If CStr(pf.name) = "ROUTE NAME AND PILOT" Then
                 pf.Orientation = xlRowField
                 pf.Position = 2
             End If
             
             
-            If Trim(pf.Name) = "DELIVERY YEAR" Then
+            If CStr(pf.name) = "TYPE_DE_PIECE" Then
                 pf.Orientation = xlPageField
                 pf.Position = 1
+            End If
+            
+            
+            If CStr(pf.name) = "DELIVERY YEAR" Then
+                pf.Orientation = xlPageField
+                pf.Position = 1
+                On Error Resume Next
                 pf.CurrentPage = Year(Date)
             End If
             
-            If Trim(pf.Name) = "DELIVERY WEEK" Then
+            If CStr(pf.name) = "DELIVERY WEEK" Then
                 pf.Orientation = xlPageField
                 pf.Position = 1
+                On Error Resume Next
                 pf.CurrentPage = CStr(Application.WorksheetFunction.IsoWeekNum(CDate(Date)))
                 
             End If
             
             
             
-            If Trim(pf.Name) = "(RN)(mL)" Then
+            If CStr(pf.name) = "(RN)(mL)" Then
                 pf.Orientation = xlDataField
                 pf.Position = 1
                 'pf.Caption = "C(RN)(mL)"
                 pf.Function = xlSum
-                pf.Name = "Th(RN)(mL)"
+                pf.name = "Th(RN)(mL)"
             End If
             
-            If Trim(pf.Name) = "ROUNDUP (RN)(mL)" Then
-                pf.Orientation = xlDataField
-                pf.Position = 2
-                'pf.Caption = "RC(RN)(mL)"
-                pf.Function = xlSum
-                pf.Name = "ThR(RN)(mL)"
-            End If
+            'If Cstr(pf.Name) = "ROUNDUP (RN)(mL)" Then
+            '    pf.Orientation = xlDataField
+            '    pf.Position = 2
+            '    'pf.Caption = "RC(RN)(mL)"
+            '    pf.Function = xlSum
+            '    pf.Name = "ThR(RN)(mL)"
+            'End If
         Next pf
         
         ' ActiveSheet.PivotTables("PivotTable2").RowAxisLayout xlTabularRow
@@ -158,32 +171,32 @@ Public Sub runMainLogicForCreationPivotTable()
     If Not rngFromProxy2 Is Nothing Then
     
     
-        Set pC = ThisWorkbook.PivotCaches.Create(xlDatabase, rngFromProxy2)
-        Set pT = pC.CreatePivotTable(pivotSheet.Cells(1, 1), "PIVOT_" & CStr(pivotSheet.Name))
+        Set pc = ThisWorkbook.PivotCaches.Create(xlDatabase, rngFromProxy2)
+        Set pT = pc.CreatePivotTable(pivotSheet.Cells(1, 1), "PIVOT_" & CStr(pivotSheet.name))
         
         ' test loop through fields
         Dim pfs As PivotFields, pf As PivotField, pi As PivotItem
         Set pfs = pT.PivotFields
         For Each pf In pfs
-            Debug.Print pf.Name
+            Debug.Print pf.name
             ' Debug.Print pf.Orientation
             
-            If Trim(pf.Name) = "S_ORDER_DATE" Then
+            If CStr(pf.name) = "S_ORDER_DATE" Then
                 pf.Orientation = xlRowField
                 pf.Position = 1
                 ' pf.AutoGroup
                 
-                pf.Name = "ORDER"
+                pf.name = "ORDER"
                 
             End If
             
-            If Trim(pf.Name) = "S_DELIVERY_DATE" Then
+            If CStr(pf.name) = "S_DELIVERY_DATE" Then
                 pf.Orientation = xlColumnField
                 pf.Position = 1
                 ' pf.AutoGroup
                 
                 
-                pf.Name = "DELIVERY"
+                pf.name = "DELIVERY"
                 
                 'For Each pi In pf.PivotItems
                 '
@@ -198,42 +211,50 @@ Public Sub runMainLogicForCreationPivotTable()
         
         For Each pf In pfs
             
-            If Trim(pf.Name) = "ROUTE NAME AND PILOT" Then
+            If CStr(pf.name) = "ROUTE NAME AND PILOT" Then
                 pf.Orientation = xlRowField
                 pf.Position = 2
             End If
             
             
-            If Trim(pf.Name) = "DELIVERY YEAR" Then
+            If CStr(pf.name) = "TYPE_DE_PIECE" Then
                 pf.Orientation = xlPageField
                 pf.Position = 1
+            End If
+            
+            
+            If CStr(pf.name) = "DELIVERY YEAR" Then
+                pf.Orientation = xlPageField
+                pf.Position = 1
+                On Error Resume Next
                 pf.CurrentPage = Year(Date)
             End If
             
-            If Trim(pf.Name) = "DELIVERY WEEK" Then
+            If CStr(pf.name) = "DELIVERY WEEK" Then
                 pf.Orientation = xlPageField
                 pf.Position = 1
+                On Error Resume Next
                 pf.CurrentPage = CStr(Application.WorksheetFunction.IsoWeekNum(CDate(Date)))
                 
             End If
             
             
             
-            If Trim(pf.Name) = "Confirmed (RN)(mL)" Then
+            If CStr(pf.name) = "Confirmed (RN)(mL)" Then
                 pf.Orientation = xlDataField
                 pf.Position = 1
                 'pf.Caption = "C(RN)(mL)"
                 pf.Function = xlSum
-                pf.Name = "C(RN)(mL)"
+                pf.name = "C(RN)(mL)"
             End If
             
-            If Trim(pf.Name) = "ROUNDUP Confirmed (RN)(mL)" Then
-                pf.Orientation = xlDataField
-                pf.Position = 2
-                'pf.Caption = "RC(RN)(mL)"
-                pf.Function = xlSum
-                pf.Name = "RC(RN)(mL)"
-            End If
+            'If Cstr(pf.Name) = "ROUNDUP Confirmed (RN)(mL)" Then
+            '    pf.Orientation = xlDataField
+            '    pf.Position = 2
+            '    'pf.Caption = "RC(RN)(mL)"
+            '    pf.Function = xlSum
+            '    pf.Name = "RC(RN)(mL)"
+            'End If
         Next pf
         
         ' ActiveSheet.PivotTables("PivotTable2").RowAxisLayout xlTabularRow
@@ -275,6 +296,19 @@ Public Function getPivot() As Worksheet
     Set getPivot = pivotSheet
 End Function
 
+Public Sub setTcamPivot(mp As PivotTable)
+    Set pT = Nothing
+    On Error Resume Next
+    Set pT = mp
+End Sub
+
+Public Sub setPivotSheet(psh1 As Worksheet)
+    Set pivotSheet = Nothing
+    On Error Resume Next
+    Set pivotSheet = psh1
+End Sub
+
+
 
 Private Sub Class_Initialize()
     Set srcSheet = Nothing
@@ -291,21 +325,29 @@ End Sub
 
 Public Sub initPivotSource()
     Set srcSheet = ThisWorkbook.Sheets.Add
-    srcSheet.Name = CStr(tryToRenameSourceWorksheet(srcSheet))
-    srcSheetName = CStr(srcSheet.Name)
+    srcSheet.name = CStr(tryToRenameSourceWorksheet(srcSheet))
+    srcSheetName = CStr(srcSheet.name)
 End Sub
 
 Public Sub initPivotSheet()
     Set pivotSheet = ThisWorkbook.Sheets.Add
-    pivotSheet.Name = CStr(tryToRenamePivotWorksheet(pivotSheet))
-    pivotSheetName = CStr(pivotSheet.Name)
+    pivotSheet.name = CStr(tryToRenamePivotWorksheet(pivotSheet))
+    pivotSheetName = CStr(pivotSheet.name)
+End Sub
+
+Public Sub initTcamRepSheet()
+    
+    Set tcamSheet = ThisWorkbook.Sheets.Add
+    tcamSheet.name = CStr(tryToRenameTcamRepWorksheet(tcamSheet))
+    tcamSheetName = CStr(tcamSheet.name)
+    
 End Sub
 
 
 
 Public Function tryToRenameProxy2Worksheet(psh As Worksheet) As String
 
-    tryToRenameProxy2Worksheet = psh.Name
+    tryToRenameProxy2Worksheet = psh.name
     
     Dim tmpNewName As String, mm As String, dd As String
     mm = CStr(Month(Date))
@@ -324,12 +366,12 @@ Public Function tryToRenameProxy2Worksheet(psh As Worksheet) As String
     
     
     On Error Resume Next
-    psh.Name = CStr(tmpNewName)
+    psh.name = CStr(tmpNewName)
     
     innerJokeFoo psh, tmpNewName
     
     
-    tryToRenameProxy2Worksheet = psh.Name
+    tryToRenameProxy2Worksheet = psh.name
 
 End Function
 
@@ -337,7 +379,7 @@ End Function
 
 Private Function tryToRenameSourceWorksheet(psh As Worksheet) As String
 
-    tryToRenameSourceWorksheet = psh.Name
+    tryToRenameSourceWorksheet = psh.name
     
     Dim tmpNewName As String, mm As String, dd As String
     mm = CStr(Month(Date))
@@ -356,18 +398,18 @@ Private Function tryToRenameSourceWorksheet(psh As Worksheet) As String
     
     
     On Error Resume Next
-    psh.Name = CStr(tmpNewName)
+    psh.name = CStr(tmpNewName)
     
     innerJokeFoo psh, tmpNewName
     
     
-    tryToRenameSourceWorksheet = psh.Name
+    tryToRenameSourceWorksheet = psh.name
 
 End Function
 
 Private Function tryToRenamePivotWorksheet(psh As Worksheet) As String
 
-    tryToRenamePivotWorksheet = psh.Name
+    tryToRenamePivotWorksheet = psh.name
     
     Dim tmpNewName As String, mm As String, dd As String
     mm = CStr(Month(Date))
@@ -385,12 +427,42 @@ Private Function tryToRenamePivotWorksheet(psh As Worksheet) As String
     
     
     On Error Resume Next
-    psh.Name = CStr(tmpNewName)
+    psh.name = CStr(tmpNewName)
     
     innerJokeFoo psh, tmpNewName
     
     
-    tryToRenamePivotWorksheet = psh.Name
+    tryToRenamePivotWorksheet = psh.name
+
+End Function
+
+
+Private Function tryToRenameTcamRepWorksheet(psh As Worksheet) As String
+
+    tryToRenameTcamRepWorksheet = psh.name
+    
+    Dim tmpNewName As String, mm As String, dd As String
+    mm = CStr(Month(Date))
+    dd = CStr(Day(Date))
+    
+    If Len(mm) = 1 Then
+        mm = "0" & mm
+    End If
+    
+    If Len(dd) = 1 Then
+        dd = "0" & dd
+    End If
+    
+    tmpNewName = "TCAM_" & CStr(Year(Date)) & mm & dd & "_"
+    
+    
+    On Error Resume Next
+    psh.name = CStr(tmpNewName)
+    
+    innerJokeFoo psh, tmpNewName
+    
+    
+    tryToRenameTcamRepWorksheet = psh.name
 
 End Function
 
@@ -398,9 +470,9 @@ End Function
 Private Sub innerJokeFoo(ByRef psh As Worksheet, newName As String)
 
     On Error Resume Next
-    psh.Name = CStr(newName)
+    psh.name = CStr(newName)
     
-    If psh.Name = newName Then
+    If psh.name = newName Then
         Exit Sub
     Else
     
@@ -594,6 +666,9 @@ Public Sub fillPivotSourceWithLabels()
         .Cells(1, EVO.E_PIVOT_SRC___SHORT_ORDER_DATE).Value = "S_ORDER_DATE"
         .Cells(1, EVO.E_PIVOT_SRC___SHORT_DEL_DATE).Value = "S_DELIVERY_DATE"
         
+        .Cells(1, EVO.E_PIVOT_SRC____TYPE_DE_PIECE).Value = "TYPE_DE_PIECE"
+        .Cells(1, EVO.E_PIVOT_SRC____CLOE_COL_E_PRICE).Value = "PRICE_FROM_CLOE_COL_E"
+        
     End With
 
 End Sub
@@ -617,7 +692,7 @@ Private Sub TestTemplateForPivotMacro()
 '
     Sheets.Add After:=ActiveSheet
     Sheets("Sheet1").Select
-    Sheets("Sheet1").Name = "PIVOT_001"
+    Sheets("Sheet1").name = "PIVOT_001"
     ActiveWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:= _
         "[PICK_UP_SHEET_coforTest.xlsm]BASE!R2C1:R370C48", Version:=6). _
         CreatePivotTable TableDestination:="PIVOT_001!R1C1", TableName:= _

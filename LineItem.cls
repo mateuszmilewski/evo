@@ -54,6 +54,7 @@ Public tmc As String
 
 Public pn As String
 Public cofor As String
+Public COFOR_COFOR As String
 
 ' from 0.16 for pivot source!
 ' ---------------------------

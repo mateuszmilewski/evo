@@ -62,16 +62,20 @@ Global Const G_DEL_TIME_COLUMN = 39
 Global Const G_PLE_SUB_FOR_ORDER_COLUMN = 37
 
 Global Const G_TXT_IN_CELL = "transport by supplier (serial logistic in DAP)"
+Global Const G_TXT_IN_CELL_II = "transport by supplier"
 Global Const G_DAP = "DAP"
 Global Const G_NON_TMC = "non"
 
 
 
 ' column "G"
+Global Const G_PLE_VEN_COFOR = 6
 Global Const G_PLE_SHIPPER_COFOR = 7
 Global Const G_CLOE_SHIPPER_COFOR = 1
+Global Const G_CLOE_COFORS = 2
 Global Const G_UA_KEY = 1
 Global Const G_UA_MAX_CAPACITY_COLUMN = 6
+Global Const G_FEED_MAIN_SH_VEN_COFOR = 3
 Global Const G_FEED_MAIN_SH_SHIPPER_COFOR = 4
 Global Const G_FEED_MAIN_SH_CONDI = 10
 
@@ -108,5 +112,12 @@ Global Const G_FEED_SH_MAIN = "MAIN"
 Global Const G_FEED_SH_PLE = "PLE"
 Global Const G_FEED_SH_CLOE = "CLOE"
 Global Const G_FEED_SH_UA = "UA"
+
+
+' TP04
+Global Const G_TP04_TP04_01 = "TP04_"
+
+' SQ01
+Global Const G_REF_MOUNT_SQ1_OUT = "D14"
 
 

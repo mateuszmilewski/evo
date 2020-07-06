@@ -1,12 +1,4 @@
-VERSION 1.0 CLASS
-BEGIN
-  MultiUse = -1  'True
-END
-Attribute VB_Name = "LineItemPivotSrouceSupplement"
-Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Name = "DivByUNModule"
 Option Explicit
 
 'The MIT License (MIT)
@@ -31,19 +23,23 @@ Option Explicit
 'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 'SOFTWARE.
-'
-'
-' THE EVO TOOL
-
-Public orderDate As Date
-Public orderTime As Date
-
-Public heoDecalageJX As Integer
 
 
+Public Function dividerByUn(unRng As Range) As Double
 
-Public refRangeForCloe As Range
-Public refRangeForPLE As Range
-Public refRaneForCondi As Range
-
-
+    ' initiallly
+    dividerByUn = CDbl(1)
+    
+    
+    Dim refFromReg As Range
+    ' yeah i know that is horrible!
+    Set refFromReg = ThisWorkbook.Sheets("register").Range("UN_REF")
+    
+    Do
+        If CStr(unRng) = CStr(refFromReg) Then
+            dividerByUn = CDbl(refFromReg.Offset(0, 1))
+            Exit Function
+        End If
+        Set refFromReg = refFromReg.Offset(1, 0)
+    Loop Until CStr(refFromReg) = ""
+End Function

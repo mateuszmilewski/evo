@@ -488,6 +488,10 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
 
     Dim condi As String
     Dim expCofor As String
+    Dim cofors1 As String
+    Dim cofors2 As String
+    Dim tmp_x As String, tmp_x2 As String
+    Dim xadr1 As String, xadr2 As String
     
     If Not expCofors Is Nothing Then
         If expCofors.Count > 0 Then
@@ -548,6 +552,8 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                             
                                 expCofor = ""
                                 condi = ""
+                                cofors1 = ""
+                                cofors2 = ""
                                 
                                 Set linesIter = expCofors(k1)
                                 
@@ -559,6 +565,8 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                                     Set li = linesIter(k2)
                                     
                                     expCofor = li.cofor
+                                    cofors1 = li.COFOR_COFOR
+                                    cofors2 = Replace(cofors1, "_", "")
                                     condi = li.condi
                                     
                                     
@@ -572,12 +580,139 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                                     Set findByExpCoforInMain = Nothing
                                     Set findByCondiInUa = Nothing
                                     
+                                    'Global Const G_PLE_VEN_COFOR = 6
+                                    'Global Const G_PLE_SHIPPER_COFOR = 7
+                                    'Global Const G_CLOE_SHIPPER_COFOR = 1
+                                    'Global Const G_CLOE_COFORS = 2
+                                    'Global Const G_UA_KEY = 1
+                                    'Global Const G_UA_MAX_CAPACITY_COLUMN = 6
+                                    'Global Const G_FEED_MAIN_SH_VEN_COFOR = 3
+                                    'Global Const G_FEED_MAIN_SH_SHIPPER_COFOR = 4
+                                    'Global Const G_FEED_MAIN_SH_CONDI = 10
+                                    
                                     On Error Resume Next
                                     Set findByExpCoforInPle = pleRng.Find(expCofor)
+                                    
+                                    
+                                    ' Debug.Assert expCofor <> "A001KK  01"
+                                    
+                                    If Not findByExpCoforInPle Is Nothing Then
+                                    
+                                        xadr1 = findByExpCoforInPle.Address
+                                    
+                                        tmp_x = _
+                                            findByExpCoforInPle.Offset(0, G_PLE_VEN_COFOR - G_PLE_SHIPPER_COFOR).Value & "_" & _
+                                            CStr(findByExpCoforInPle.Value)
+                                            
+                                        If tmp_x <> cofors1 Then
+                                        
+                                            Do
+                                                ' Debug.Print pleRng.Address
+                                            
+                                                Set findByExpCoforInPle = pleRng.FindNext(findByExpCoforInPle)
+                                                xadr2 = findByExpCoforInPle.Address
+                                            
+                                                tmp_x2 = _
+                                                    findByExpCoforInPle.Offset(0, G_PLE_VEN_COFOR - G_PLE_SHIPPER_COFOR).Value & "_" & _
+                                                    CStr(findByExpCoforInPle.Value)
+                                                    
+                                                If xadr1 = xadr2 Or tmp_x2 = cofors1 Then
+                                                    Exit Do
+                                                End If
+                                                    
+                                                
+                                            Loop Until xadr1 = xadr2
+                                            
+                                            If tmp_x2 <> cofors1 Then
+                                                Set findByExpCoforInPle = Nothing
+                                            End If
+                                            
+                                        End If
+                                    End If
+                                    
+                                    
                                     On Error Resume Next
                                     Set findByExpCoforInCloe = cloeRng.Find(expCofor)
+                                    
+                                    
+                                    ' Debug.Assert expCofor <> "A001KK  01"
+                                    
+                                    If Not findByExpCoforInCloe Is Nothing Then
+                                    
+                                        xadr1 = findByExpCoforInCloe.Address
+                                    
+                                        tmp_x = _
+                                            findByExpCoforInCloe.Offset(0, G_CLOE_COFORS - G_CLOE_SHIPPER_COFOR).Value
+                                            
+                                        If tmp_x <> cofors2 Then
+                                        
+                                            Do
+                                                ' Debug.Print pleRng.Address
+                                            
+                                                Set findByExpCoforInCloe = cloeRng.FindNext(findByExpCoforInCloe)
+                                                xadr2 = findByExpCoforInCloe.Address
+                                            
+                                                tmp_x2 = _
+                                                    findByExpCoforInCloe.Offset(0, G_CLOE_COFORS - G_CLOE_SHIPPER_COFOR).Value
+                                                    
+                                                If xadr1 = xadr2 Or tmp_x2 = cofors2 Then
+                                                    Exit Do
+                                                End If
+
+                                                
+                                            Loop Until xadr1 = xadr2
+                                            
+                                                    
+                                            If tmp_x2 <> cofors2 Then
+                                                Set findByExpCoforInCloe = Nothing
+                                            End If
+                                            
+                                        End If
+                                    End If
+                                    
+                                    
                                     On Error Resume Next
                                     Set findByExpCoforInMain = srcRng.Find(expCofor)
+                                    
+                                    ' Debug.Assert expCofor <> "A001KK  01"
+                                    
+                                    If Not findByExpCoforInMain Is Nothing Then
+                                    
+                                        xadr1 = findByExpCoforInMain.Address
+                                    
+                                        tmp_x = _
+                                            findByExpCoforInMain.Offset(0, G_FEED_MAIN_SH_VEN_COFOR - G_FEED_MAIN_SH_SHIPPER_COFOR).Value & "_" & _
+                                            CStr(findByExpCoforInMain.Value)
+                                            
+                                        If tmp_x <> cofors1 Then
+                                        
+                                            Do
+                                                ' Debug.Print pleRng.Address
+                                            
+                                                Set findByExpCoforInMain = srcRng.FindNext(findByExpCoforInMain)
+                                                xadr2 = findByExpCoforInMain.Address
+                                            
+                                                tmp_x2 = _
+                                                    findByExpCoforInMain.Offset(0, G_FEED_MAIN_SH_VEN_COFOR - G_FEED_MAIN_SH_SHIPPER_COFOR).Value & _
+                                                    "_" & _
+                                                    CStr(findByExpCoforInMain.Value)
+                                                    
+                                                If xadr1 = xadr2 Or tmp_x2 = cofors1 Then
+                                                    Exit Do
+                                                End If
+                                                    
+                                                
+                                            Loop Until xadr1 = xadr2
+                                            
+                                            If tmp_x2 <> cofors1 Then
+                                                Set findByExpCoforInMain = Nothing
+                                            End If
+                                            
+                                        End If
+                                    End If
+                                    
+                                    
+                                    
                                     On Error Resume Next
                                     Set findByCondiInUa = condiRng.Find(condi)
                                     
@@ -598,13 +733,14 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                                             
                                             Set li.sourceRng = findByExpCoforInMain
                                             On Error Resume Next
-                                            li.sourceRow = findByExpCoforInMain.Row
+                                            li.sourceRow = findByExpCoforInMain.row
                                                 
                                             ' main coping for pivot source!!
                                             ' ================================================================
                                             ''
                                             '
                                             insideCopyForSourcePivot_setupOrderDate li, linesIter, pleSheet
+                                            ' readjustDatesAgainIfThereIsDifferentInPusMaster li, linesIter, master
                                             mainCopyForPivotSource li, linesIter, ph
                                             '
                                             ''
@@ -647,7 +783,7 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
             
             operacja.makeMyFormulas ph.getPivotSource
             Set ph.proxy2 = operacja.makeLeanCopyOfPivotSource(ph.getPivotSource)
-            ph.proxy2.Name = ph.tryToRenameProxy2Worksheet(ph.proxy2)
+            ph.proxy2.name = ph.tryToRenameProxy2Worksheet(ph.proxy2)
             
             ' ===============================================================================
             
@@ -737,7 +873,7 @@ Public Sub copyData(sh As StatusHandler)
                         Else
                             li.found = True
                             Set li.sourceRng = f
-                            li.sourceRow = f.Row
+                            li.sourceRow = f.row
                             
                             
                             ' check if past
@@ -789,12 +925,38 @@ Private Sub insideCopyForSourcePivot_setupOrderDate(li As LineItem, ByRef linesI
     tmpS.orderDate = calculateOrderDate(li, pleSh)
 End Sub
 
+
+Private Sub readjustDatesAgainIfThereIsDifferentInPusMaster(li As LineItem, ByRef linesIter As Dictionary, pusSh As Worksheet)
+    
+    ' Debug.Print "inside readjustDatesAgainIfThereIsDifferentInPusMaster and pus nameL " & pusSh.name
+    ' Debug.Print li.wiersz & " " & li.sourceRow ' OK!
+    
+    Dim dhefInPus As Range
+    Dim dhasInPus As Range
+    
+    Set dhefInPus = pusSh.Cells(li.wiersz, EVO.E_MASTER_2_DHEF)
+    Set dhasInPus = pusSh.Cells(li.wiersz, EVO.E_MASTER_2_DHAS)
+    
+    Debug.Print "dhefInPus: " & dhefInPus.Value
+    Debug.Print "dhasInPus: " & dhasInPus.Value
+    
+    Debug.Print "suple: " & li.supplementForPivotSource.orderDate '& " " & li.supplementForPivotSource.orderTime
+    Debug.Print "pus del: " & li.delDate '& " " & li.delTime
+    Debug.Print "pus pu: " & li.puDate '& " " & li.puTime
+    
+    If IsDate(dhefInPus.Value) And IsDate(li.supplementForPivotSource.orderDate) Then
+        
+        Debug.Print "dhefInPus is date"
+    End If
+End Sub
+
+
 Private Function calculateOrderDate(li As LineItem, pleSh As Worksheet) As Date
 
 
     Dim cellWithProperValue As Range
     Set cellWithProperValue = _
-        pleSh.Cells(li.supplementForPivotSource.refRangeForPLE.Row, EVO.G_PLE_SUB_FOR_ORDER_COLUMN)
+        pleSh.Cells(li.supplementForPivotSource.refRangeForPLE.row, EVO.G_PLE_SUB_FOR_ORDER_COLUMN)
 
     Dim howManyDaysOfOffset As Integer
     
@@ -808,13 +970,54 @@ Private Function calculateOrderDate(li As LineItem, pleSh As Worksheet) As Date
     
     If howManyDaysOfOffset <> -1 Then
     
-        Dim tmpdate As Date
+        Dim tmpdate As Date, xo As Variant
         On Error Resume Next
-        tmpdate = CDate(li.delDate) - howManyDaysOfOffset
+        tmpdate = CDate(li.delDate) '  - howManyDaysOfOffset
+        
+        For xo = 1 To howManyDaysOfOffset
+        
+            tmpdate = tmpdate - 1
+            
+            If isSunday(tmpdate) Then
+                tmpdate = tmpdate - 2
+            ElseIf isSaturday(tmpdate) Then
+                tmpdate = tmpdate - 1
+            End If
+            
+        Next xo
         
         li.supplementForPivotSource.heoDecalageJX = Int(howManyDaysOfOffset)
-        calculateOrderDate = CDate(tmpdate)
+        
+        
+        If isSaturday(tmpdate) Then
+            calculateOrderDate = CDate(tmpdate) - 1
+        ElseIf isSunday(tmpdate) Then
+            calculateOrderDate = CDate(tmpdate) - 2
+        Else
+            calculateOrderDate = CDate(tmpdate)
+        End If
     End If
+End Function
+
+
+Private Function isSaturday(psd As Date) As Boolean
+    
+    If Weekday(psd, vbMonday) = 6 Then
+        isSaturday = True
+    Else
+        isSaturday = False
+    End If
+    
+End Function
+
+Private Function isSunday(psd As Date)
+
+    If Weekday(psd, vbMonday) = 7 Then
+        isSunday = True
+    Else
+        isSunday = False
+    End If
+
 End Function
 
 
@@ -832,7 +1035,7 @@ Private Sub mainCopyForPivotSource(li As LineItem, ByRef linesIter As Dictionary
         Dim sh As Worksheet, linia As Long, linia2 As Long
         Set sh = ph.getPivotSource()
         linia2 = li.wiersz
-        linia = ph.getRefRangeInSrcSheet().Row
+        linia = ph.getRefRangeInSrcSheet().row
         ' ------------------------------------------------------
         ci.D_copyIterationForPivotSource master, sh, li, ph, linia
         ' ------------------------------------------------------
@@ -892,7 +1095,7 @@ Private Sub mainCopyBasedOnRegisterData(li As LineItem, ByRef linesIter As Dicti
         If IsNumeric(od.Offset(0, 3).Value) Then
             
             'simple copy without X
-            If Trim(od.Offset(0, 5).Value) = "" Then
+            If CStr(od.Offset(0, 5).Value) = "" Then
             
                 If IsError(lsh.Cells(optSrcWiersz, kolumna2).Value) Then
                     ' msh.Cells(optWiersz, kolumna1).Value = "error n/a in source file"
@@ -917,7 +1120,7 @@ Private Sub mainCopyBasedOnRegisterData(li As LineItem, ByRef linesIter As Dicti
                         
                         
                     ' pus cell was empty so filling by source and some green
-                    ElseIf Trim(msh.Cells(optWiersz, kolumna1).Value) = "" Then
+                    ElseIf CStr(msh.Cells(optWiersz, kolumna1).Value) = "" Then
                         msh.Cells(optWiersz, kolumna1).Value = lsh.Cells(optSrcWiersz, kolumna2).Value
                         msh.Cells(optWiersz, kolumna1).Interior.Color = RGB(200, 255, 200)
                         'msh.Cells(optWiersz, 1).Interior.Color = RGB(200, 255, 200)
@@ -946,16 +1149,16 @@ Private Sub mainCopyBasedOnRegisterData(li As LineItem, ByRef linesIter As Dicti
                         
                     End If
                 End If
-            ElseIf Trim(od.Offset(0, 5).Value) = "X" Then
+            ElseIf CStr(od.Offset(0, 5).Value) = "X" Then
 
-                calculationForDH li, linesIter, Trim(od.Offset(0, 4).Value), lsh, msh, CLng(optWiersz)
+                calculationForDH li, linesIter, CStr(od.Offset(0, 4).Value), lsh, msh, CLng(optWiersz)
                 
             End If
         End If
 
     
         Set od = od.Offset(1, 0)
-    Loop Until Trim(od) = ""
+    Loop Until CStr(od) = ""
     
     '
     ''
@@ -1002,7 +1205,7 @@ Private Sub calculationForDH(li As LineItem, ByRef linesIter As Dictionary, dhTy
             
             operacja.recalculDatesIfSatOrSun li
             
-            If Trim(msh.Cells(optWiersz, G_DHEF_COL).Value) = "" Then
+            If CStr(msh.Cells(optWiersz, G_DHEF_COL).Value) = "" Then
                 msh.Cells(optWiersz, G_DHEF_COL).Value = li.puDate
                 msh.Cells(optWiersz, G_DHEF_COL).Interior.Color = RGB(200, 255, 200)
             Else
@@ -1010,7 +1213,7 @@ Private Sub calculationForDH(li As LineItem, ByRef linesIter As Dictionary, dhTy
                 msh.Cells(optWiersz, G_DHEF_COL).Interior.Color = RGB(255, 255, 150)
             End If
             
-            If Trim(msh.Cells(optWiersz, G_DHAS_COL).Value) = "" Then
+            If CStr(msh.Cells(optWiersz, G_DHAS_COL).Value) = "" Then
                 msh.Cells(optWiersz, G_DHAS_COL).Value = li.delDate
                 msh.Cells(optWiersz, G_DHAS_COL).Interior.Color = RGB(200, 255, 200)
             Else
@@ -1018,7 +1221,7 @@ Private Sub calculationForDH(li As LineItem, ByRef linesIter As Dictionary, dhTy
                 msh.Cells(optWiersz, G_DHAS_COL).Interior.Color = RGB(255, 255, 150)
             End If
                 
-            If Trim(msh.Cells(optWiersz, G_DHAS_COL + 1).Value) = "" Then
+            If CStr(msh.Cells(optWiersz, G_DHAS_COL + 1).Value) = "" Then
             
                 If IsNumeric(msh.Range("C" & CStr(optWiersz))) Then
                     If IsNumeric(msh.Range("Y" & CStr(optWiersz))) Then
@@ -1153,7 +1356,7 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
 
     If dwa = E_COPY_HANDLER_FOR_PIVOT_CREATION Then
     
-        Dim strTempExpCofor As String
+        Dim strTempExpCofor As String, strTempVenCofor As String
         Set expCofors = New Dictionary
     
         Do
@@ -1164,9 +1367,10 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                 ' main logic for dwa = 3 internal joke ;)
                 ' ------------------------------------------------------------
                 
-                strTempExpCofor = Trim(CStr(r.Offset(0, EVO.G_COFOR_EXPEDITEUR_COL - 1).Value))
+                strTempExpCofor = CStr(CStr(r.Offset(0, EVO.G_COFOR_EXPEDITEUR_COL - 1).Value))
+                strTempVenCofor = CStr(CStr(r.Offset(0, EVO.G_COFOR_VENDEUR_COL - 1).Value))
                 
-                If Not expCofors.Exists(strTempExpCofor) Then
+                If Not expCofors.Exists(strTempVenCofor & "_" & strTempExpCofor) Then
                 
                 
                     Set linesIter = Nothing
@@ -1174,14 +1378,15 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                     Set thisLine = New LineItem
                     
                     With thisLine
-                        .pn = Trim(r.Value)
+                        .pn = CStr(r.Value)
                         .cofor = strTempExpCofor
+                        .COFOR_COFOR = strTempVenCofor & "_" & strTempExpCofor
                         ' !!!
                         Set .masterRng = r
                         '
-                        .wiersz = CLng(r.Row)
-                        .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
-                        .yyyycw = CLng(operacja.calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .wiersz = CLng(r.row)
+                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         On Error Resume Next
                         .puDate = CDate(r.Offset(0, EVO.G_DHEF_COL - 1).Value)
@@ -1200,29 +1405,30 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                             .confirmedQty = r.Offset(0, EVO.E_MASTER_CQTY - 1).Value
                         End If
                         
-                        .condi = master.Cells(r.Row, EVO.G_CONDI_COL).Value
+                        .condi = master.Cells(r.row, EVO.G_CONDI_COL).Value
                         ' -------------------------------------------------------------------
                     End With
                     
-                    linesIter.Add r.Row, thisLine
-                    expCofors.Add strTempExpCofor, linesIter
+                    linesIter.Add r.row, thisLine
+                    expCofors.Add strTempVenCofor & "_" & strTempExpCofor, linesIter
                 
                 Else
                 
                     ' already exists
-                    Set linesIter = expCofors(strTempExpCofor)
+                    Set linesIter = expCofors(strTempVenCofor & "_" & strTempExpCofor)
                     Set thisLine = New LineItem
                 
                     With thisLine
-                        .pn = Trim(r.Value)
+                        .pn = CStr(r.Value)
                         .cofor = strTempExpCofor
+                        .COFOR_COFOR = strTempVenCofor & "_" & strTempExpCofor
                         ' !!!
                         Set .masterRng = r
                         '
-                        .wiersz = CLng(r.Row)
-                        .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .wiersz = CLng(r.row)
+                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
                         
-                        .yyyycw = CLng(operacja.calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         On Error Resume Next
                         .puDate = CDate(r.Offset(0, EVO.G_DHEF_COL - 1).Value)
@@ -1242,7 +1448,7 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                             .confirmedQty = r.Offset(0, EVO.E_MASTER_CQTY - 1).Value
                         End If
                         
-                        .condi = master.Cells(r.Row, EVO.G_CONDI_COL).Value
+                        .condi = master.Cells(r.row, EVO.G_CONDI_COL).Value
                         ' -------------------------------------------------------------------
                         
                     End With
@@ -1250,7 +1456,7 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                     
                     ' just to add inner dictionary
                     ' because linesIter is already a ref inside dictionary!
-                    linesIter.Add r.Row, thisLine
+                    linesIter.Add r.row, thisLine
                 
                 
                 End If
@@ -1258,7 +1464,7 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                 ' ------------------------------------------------------------
             End If
             Set r = r.Offset(1, 0)
-        Loop Until Trim(r) = ""
+        Loop Until CStr(r) = ""
     
         
 
@@ -1274,8 +1480,8 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                 ' no operation req for filter out data!
             Else
             
-                strTempPn = Trim(r.Value)
-                strTempCoforInner = Trim(CStr(r.Offset(0, EVO.G_COFOR_VENDEUR_COL - 1).Value))
+                strTempPn = CStr(r.Value)
+                strTempCoforInner = CStr(CStr(r.Offset(0, EVO.G_COFOR_VENDEUR_COL - 1).Value))
                 strTempCoforInner = operacja.adjustStringCofor(CStr(strTempCoforInner))
                 
                 strTempPnAndCofor = strTempPn & "_" & strTempCoforInner
@@ -1293,9 +1499,9 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                         ' !!!
                         Set .masterRng = r
                         '
-                        .wiersz = CLng(r.Row)
-                        .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
-                        .yyyycw = CLng(operacja.calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .wiersz = CLng(r.row)
+                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         On Error Resume Next
                         .puDate = CDate(r.Offset(0, EVO.G_DHEF_COL - 1).Value)
@@ -1305,7 +1511,7 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                         
                     End With
                     
-                    linesIter.Add r.Row, thisLine
+                    linesIter.Add r.row, thisLine
                     pns2.Add strTempPnAndCofor, linesIter
                 Else
                 
@@ -1318,10 +1524,10 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                         ' !!!
                         Set .masterRng = r
                         '
-                        .wiersz = CLng(r.Row)
-                        .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .wiersz = CLng(r.row)
+                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
                         
-                        .yyyycw = CLng(operacja.calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         On Error Resume Next
                         .puDate = CDate(r.Offset(0, EVO.G_DHEF_COL - 1).Value)
@@ -1331,13 +1537,13 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                         
                     End With
                     
-                    linesIter.Add r.Row, thisLine
+                    linesIter.Add r.row, thisLine
                     
                 End If
             End If
             
             Set r = r.Offset(1, 0)
-        Loop Until Trim(r) = ""
+        Loop Until CStr(r) = ""
 
     ElseIf dwa = E_COPY_HANDLER_COPY_ONE Then
 
@@ -1353,7 +1559,7 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
             Else
         
         
-                strTempCofor = Trim(CStr(r.Offset(0, EVO.E_MASTER_cofor - 1).Value))
+                strTempCofor = CStr(CStr(r.Offset(0, EVO.E_MASTER_cofor - 1).Value))
             
                 If Not cofors.Exists(strTempCofor) Then
                 
@@ -1365,19 +1571,19 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                     
                     With thisLine
                         .cofor = strTempCofor
-                        .pn = Trim(CStr(r.Offset(0, EVO.E_MASTER_Reference - 1).Value))
+                        .pn = CStr(CStr(r.Offset(0, EVO.E_MASTER_Reference - 1).Value))
                         ' !!!
                         Set .masterRng = r
                         '
-                        .wiersz = CLng(r.Row)
-                        .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
-                        .yyyycw = CLng(operacja.calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .wiersz = CLng(r.row)
+                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         .isPast = CBool(operacja.isThisLineIsPast(CLng(.yyyycw)))
                         
                     End With
                     
-                    linesIter.Add r.Row, thisLine
+                    linesIter.Add r.row, thisLine
                     cofors.Add strTempCofor, linesIter
                 Else
                 
@@ -1390,27 +1596,27 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                     
                     With thisLine
                         .cofor = strTempCofor
-                        .pn = Trim(CStr(r.Offset(0, EVO.E_MASTER_Reference - 1).Value))
+                        .pn = CStr(CStr(r.Offset(0, EVO.E_MASTER_Reference - 1).Value))
                         ' !!!
                         Set .masterRng = r
                         '
-                        .wiersz = CLng(r.Row)
-                        .tmc = Trim(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
-                        .yyyycw = CLng(operacja.calculateYYYYCW(Trim(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .wiersz = CLng(r.row)
+                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         .isPast = CBool(operacja.isThisLineIsPast(CLng(.yyyycw)))
                         
                     End With
                     
                     
-                    linesIter.Add r.Row, thisLine
+                    linesIter.Add r.row, thisLine
                     
                     
                 End If
             End If
         
             Set r = r.Offset(1, 0)
-        Loop Until Trim(r) = ""
+        Loop Until CStr(r) = ""
         
         
         
@@ -1431,7 +1637,7 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
         Next
         
         ' -1 for loop -2 for labels
-        Debug.Print "checksum on all lines: " & xl & " rows in file: " & (r.Row - 1 - 2)
+        Debug.Print "checksum on all lines: " & xl & " rows in file: " & (r.row - 1 - 2)
     
         
         ' for now without this checking!

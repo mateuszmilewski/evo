@@ -35,9 +35,9 @@ Public Sub deleteThisSheet(ictrl As IRibbonControl)
     Set sh = ThisWorkbook.ActiveSheet
     
     
-    If sh.Name <> "register" Then
+    If sh.name <> "register" Then
         
-        If sh.Name = "forValidation" Then
+        If sh.name = "forValidation" Then
             MsgBox "You can not remove forValidation sheet!", vbExclamation
         Else
             Application.DisplayAlerts = False
@@ -77,11 +77,11 @@ End Sub
 Private Function checkIfYouCanDelete(sh As Worksheet) As Boolean
     checkIfYouCanDelete = True
     
-    If sh.Name = "forValidation" Then
+    If sh.name = "forValidation" Then
         Exit Function
     End If
     
-    If sh.Name = "register" Then
+    If sh.name = "register" Then
         Exit Function
     End If
     

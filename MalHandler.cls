@@ -59,8 +59,8 @@ Private Sub Class_Initialize()
     doKogo = CStr(defineDoKoGoList())
     
     
-    preBody = "Dear XXX team, new NOKs are waiting for feedback, " & Chr(10) & _
-        "please visit: URL" & Chr(10)
+    preBody = "Dear all, new NOKs charts are waiting for feedback, " & Chr(10) & _
+        "please check attached excelfile." & Chr(10)
 
 End Sub
 
@@ -75,8 +75,47 @@ Private Function defineDoKoGoList() As String
     Do
         defineDoKoGoList = defineDoKoGoList & CStr(r) & " ; "
         Set r = r.Offset(1, 0)
-    Loop Until Trim(r) = vbNullString
+    Loop Until CStr(r) = vbNullString
 End Function
+
+
+Public Sub attachFileWithDataFromActiveSheet()
+
+
+    If Not mi Is Nothing Then
+    
+        Dim kpiSh As Worksheet
+        Set kpiSh = ActiveSheet
+        
+        If kpiSh.name Like "KPI_*" And kpiSh.Cells(2, 2).Value = "all data lines: " Then
+        
+            
+            kpiSh.Copy
+            
+            Set kpiSh = ActiveSheet
+            
+            
+            Dim wb As Workbook
+            Set wb = ActiveWorkbook
+            wb.Save
+            
+            Debug.Print "attachment from: " & wb.FullName
+            mi.Attachments.Add wb.FullName
+            
+            DoEvents
+            wb.Close False
+        Else
+            MsgBox "You cant add this sheet as attachment in your email!", vbCritical
+        End If
+        
+        
+        
+        
+    
+        
+    End If
+
+End Sub
 
 Public Sub displayMail()
     
@@ -104,6 +143,8 @@ Private Sub innerProc(mailItem As Outlook.mailItem, mSubject As String, mBody As
             .subject = mSubject
             .body = preBody & mBody
             .Recipients.Add mDoKogo
+            
+            
         End With
     
     End If

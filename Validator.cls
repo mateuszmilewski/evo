@@ -61,6 +61,16 @@ Public Function getWorksheetForValidation(pusWrkName As String, fileType As E_FI
         
         shName = CStr(ThisWorkbook.Sheets("forValidation").Range("A2").Value)
         rowLabel = Int(ThisWorkbook.Sheets("forValidation").Range("C2").Value)
+    ElseIf fileType = E_TP04_01 Then
+        Set refR = ThisWorkbook.Sheets("forValidation").Range("D10")
+        
+        shName = CStr(ThisWorkbook.Sheets("forValidation").Range("A10").Value)
+        rowLabel = Int(ThisWorkbook.Sheets("forValidation").Range("C10").Value)
+    ElseIf fileType = E_SQ01 Then
+        Set refR = ThisWorkbook.Sheets("forValidation").Range("D14")
+        
+        shName = CStr(ThisWorkbook.Sheets("forValidation").Range("A14").Value)
+        rowLabel = Int(ThisWorkbook.Sheets("forValidation").Range("C14").Value)
     Else
         shName = ""
         rowLabel = -1
@@ -71,11 +81,18 @@ Public Function getWorksheetForValidation(pusWrkName As String, fileType As E_FI
     getWorksheetForValidation = True
 
     Dim wrk As Workbook
-    Set wrk = Workbooks(CStr(pusWrkName))
+    
     Dim mainSh As Worksheet, main As Worksheet
     Set main = Nothing
-    On Error Resume Next
-    Set main = wrk.Sheets(shName)
+    
+    If fileType <> E_SQ01 Then
+        Set wrk = Workbooks(CStr(pusWrkName))
+        On Error Resume Next
+        Set main = wrk.Sheets(shName)
+    ElseIf fileType = E_SQ01 Then
+        
+        Set main = ThisWorkbook.Sheets(CStr(pusWrkName))
+    End If
     
     If main Is Nothing Then
         getWorksheetForValidation = False

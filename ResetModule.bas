@@ -1,12 +1,4 @@
-VERSION 1.0 CLASS
-BEGIN
-  MultiUse = -1  'True
-END
-Attribute VB_Name = "LineItemPivotSrouceSupplement"
-Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Name = "ResetModule"
 Option Explicit
 
 'The MIT License (MIT)
@@ -35,15 +27,17 @@ Option Explicit
 '
 ' THE EVO TOOL
 
-Public orderDate As Date
-Public orderTime As Date
 
-Public heoDecalageJX As Integer
+Public Sub reset(ictrl As IRibbonControl)
 
-
-
-Public refRangeForCloe As Range
-Public refRangeForPLE As Range
-Public refRaneForCondi As Range
+    innerReset
+End Sub
 
 
+Public Sub innerReset()
+
+
+    Application.ScreenUpdating = True
+    Application.EnableEvents = True
+    Application.Calculation = xlCalculationAutomatic
+End Sub

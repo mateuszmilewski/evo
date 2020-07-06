@@ -73,7 +73,7 @@ Public Sub innerformatDHEFandDHAS()
                 
                 If IsDate(dh) Then
                     
-                    ' dh.Value = CStr(Trim(Format(dh, "dd/mm/yyyy  hh:mm:ss")))
+                    ' dh.Value = CStr(Cstr(Format(dh, "dd/mm/yyyy  hh:mm:ss")))
                     iterDate = CDate(dh)
                     dh.Value = CStr(parseStdDateToStrangeFormat(iterDate))
                     
@@ -81,14 +81,14 @@ Public Sub innerformatDHEFandDHAS()
                 
                 If IsDate(dh.Offset(0, 1)) Then
                 
-                    ' dh.Offset(0, 1).Value = CStr(Trim(Format(dh.Offset(0, 1), "dd/mm/yyyy  hh:mm:ss")))
+                    ' dh.Offset(0, 1).Value = CStr(Cstr(Format(dh.Offset(0, 1), "dd/mm/yyyy  hh:mm:ss")))
                     iterDate = CDate(dh.Offset(0, 1))
                     dh.Offset(0, 1).Value = CStr(parseStdDateToStrangeFormat(iterDate))
                 End If
             
             
                 Set r = r.Offset(1, 0)
-            Loop Until Trim(r) = ""
+            Loop Until CStr(r) = ""
         Else
             MsgBox "Wrong file!", vbCritical
         End If
@@ -111,7 +111,7 @@ Private Function parseStdDateToStrangeFormat(iterDate As Date) As String
     Dim dd As String
     Dim hh As String
     Dim mmm As String
-    Dim sS As String
+    Dim ss As String
     
     yyyy = CStr(Year(iterDate))
     mm = CStr(Month(iterDate))
@@ -139,13 +139,13 @@ Private Function parseStdDateToStrangeFormat(iterDate As Date) As String
         mmm = "0" & mmm
     End If
     
-    sS = CStr(Second(iterDate))
+    ss = CStr(Second(iterDate))
     
-    If Len(sS) = 1 Then
-        sS = "0" & sS
+    If Len(ss) = 1 Then
+        ss = "0" & ss
     End If
     
     parseStdDateToStrangeFormat = "" & CStr(dd) & "/" & CStr(mm) & "/" & CStr(yyyy) & "  " & _
-        CStr(hh) & ":" & CStr(mmm) & ":" & CStr(sS)
+        CStr(hh) & ":" & CStr(mmm) & ":" & CStr(ss)
     
 End Function

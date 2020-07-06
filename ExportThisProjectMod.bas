@@ -46,17 +46,17 @@ Private Sub export_this_project()
     For Each VBComp In VBComps
         
         If VBComp.Type = vbext_ct_StdModule Then
-            txt = VBComp.Name & ".bas"
+            txt = VBComp.name & ".bas"
             VBComp.Export CStr(REPO_PATH) & txt
             Debug.Print txt
             
         ElseIf VBComp.Type = vbext_ct_ClassModule Then
-            txt = VBComp.Name & ".cls"
+            txt = VBComp.name & ".cls"
             VBComp.Export CStr(REPO_PATH) & txt
             Debug.Print txt
             
         ElseIf VBComp.Type = vbext_ct_MSForm Then
-            txt = VBComp.Name & ".frm"
+            txt = VBComp.name & ".frm"
             VBComp.Export CStr(REPO_PATH) & txt
             Debug.Print txt
             
@@ -91,9 +91,9 @@ Private Sub import_this_project()
         ' body
         ' ==============================================================
         
-        If (objFSO.GetExtensionName(objFile.Name) = "cls") Or _
-            (objFSO.GetExtensionName(objFile.Name) = "frm") Or _
-            (objFSO.GetExtensionName(objFile.Name) = "bas") Then
+        If (objFSO.GetExtensionName(objFile.name) = "cls") Or _
+            (objFSO.GetExtensionName(objFile.name) = "frm") Or _
+            (objFSO.GetExtensionName(objFile.name) = "bas") Then
             VBComps.Import objFile.Path
         End If
         
@@ -121,15 +121,15 @@ Private Sub remove_current_implementation()
     For Each VBComp In VBComps
         
         If VBComp.Type = vbext_ct_Document Then
-            txt = VBComp.Name
+            txt = VBComp.name
             Debug.Print txt & " zostaje"
             
         ElseIf VBComp.Type = vbext_ct_ActiveXDesigner Then
-            txt = VBComp.Name
+            txt = VBComp.name
             Debug.Print txt & " zostaje"
 
-        ElseIf CStr(VBComp.Name) = "ExportThisProjectMod" Then
-            txt = VBComp.Name
+        ElseIf CStr(VBComp.name) = "ExportThisProjectMod" Then
+            txt = VBComp.name
             Debug.Print txt & " zostaje"
         Else
             

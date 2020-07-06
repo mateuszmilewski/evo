@@ -35,7 +35,8 @@ Public Sub runMail(ictrl As IRibbonControl)
     Dim mh As MalHandler
     Set mh = New MalHandler
     
-    mh.procOnMailItem "TEST", ""
+    mh.procOnMailItem "EVO: NOK Chart", ""
+    mh.attachFileWithDataFromActiveSheet
     mh.displayMail
     
     Set mh = Nothing

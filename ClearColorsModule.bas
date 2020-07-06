@@ -56,7 +56,7 @@ Attribute innerClearColors.VB_ProcData.VB_Invoke_Func = " \n14"
         Dim lastRow As Long
         Set rng = wrk.Sheets("BASE").Range("a2")
         Set rng = rng.End(xlDown).End(xlDown).End(xlUp)
-        lastRow = CLng(rng.Row)
+        lastRow = CLng(rng.row)
         
         Set rng = wrk.Sheets("BASE").Range("A3:AV" & CStr(lastRow))
         
@@ -103,7 +103,7 @@ Sub innerRemoveAllComments()
         Dim lastRow As Long
         Set rng = wrk.Sheets("BASE").Range("a2")
         Set rng = rng.End(xlDown).End(xlDown).End(xlUp)
-        lastRow = CLng(rng.Row)
+        lastRow = CLng(rng.row)
         
         
         Dim b As Worksheet

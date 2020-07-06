@@ -219,3 +219,177 @@ Option Explicit
 ' runMainLogicForCreationPivotTable in PivotHandler
 ' runMainLogicForCreationTheoreticPivotTable in PivotHandler
 ' ==============================================================
+
+
+' 0.22
+' ==============================================================
+' init kpi feature
+' KPI module
+' kpi class with (KpiHandler):
+' set master
+' fillPartNumberDictionary (and some components)
+' new class as component PartNumberItemForKpi for KPI logic
+' ==============================================================\
+
+
+' 0.23
+' ==============================================================
+' slight change on KPI logic from TRUE and FALSE into 1 and 0
+' for more lean data for final kpi table
+' as source for the charts
+' ==============================================================
+
+
+' 0.24
+' ==============================================================
+' pivot showing current week by default by if data is future
+' there will be error that is why i added on error resume next:
+' subs like: runMainLogicForCreationTheoreticPivotTable
+' on err... before trying to add current yyyycw
+' ==============================================================
+
+
+' 0.25
+' ==============================================================
+' pivot coping pivot
+' tcam report
+' ==============================================================
+
+
+' 0.26
+' ==============================================================
+' go from tcam report to proxy2
+' ==============================================================
+
+
+' 0.27
+' ==============================================================
+' first test with real price data on CLOE from control tower
+' database - standard on col E is number 100%, but
+' please check if there is some problem!
+' ==============================================================
+
+
+' 0.28
+' ==============================================================
+'
+' isSat and isSun for clac DHxx for tcam logic - extra
+' inside class CopyHandler inside LINE: 820! !!!
+' ==============================================================
+
+
+
+' 0.28
+' ==============================================================
+'
+' AK - nie liczymy weekendow!
+' dodatkowa implementacja:
+'        For xo = 1 To howManyDaysOfOffset
+'
+'            tmpdate = tmpdate - 1
+'
+'            If isSunday(tmpdate) Then
+'                tmpdate = tmpdate - 2
+'            ElseIf isSaturday(tmpdate) Then
+'                tmpdate = tmpdate - 1
+'            End If
+'
+'        Next xo
+' ==============================================================
+
+
+
+
+' 0.30
+' ==============================================================
+'
+' jest problem z COFOR EXPEDITEUR
+' moze sie okazac, ze pomimo spasowania coforow i tak nie bedzie
+' cos dzialac poprawnie zatem nalezalo by dodatkowo sprawdzic jeszcze
+' matchi matchi rowniez po COFOR VENDEUR
+' ==============================================================
+
+
+' 0.31
+' ==============================================================
+'
+' next feature for the prices and matching stuff...
+' still.. this version have some gaps on tcam logic
+' the dates DHxx for copy handler
+' and dates in tcam pivot
+' can be differently calculated - 1st prio to fix it!
+' should for sure only one logic and some double check
+' if its possible!
+
+
+' new module and new class connected with TP04 logic!
+
+
+
+' line 734 : copy handler
+' readjustDatesAgainIfThereIsDifferentInPusMaster li, linesIter, master
+' thing about TCAM logic!
+
+' ==============================================================
+
+
+' 0.32
+' ==============================================================
+'
+' big refractorisation stuff with implementation from
+' sq01 tool - new class SAP_Handler! - be careful - some
+' side effects :'(
+
+' ==============================================================
+
+
+' 0.33
+' ==============================================================
+'
+' predefined run for sq01 logic - to be a little bit faster
+' in register: PRE_DEF_RUN_FOR_SQ01
+' new button: getSq01DataWithPreDefParams
+
+' ==============================================================
+
+' 0.34
+' ==============================================================
+'
+' small fixes on prev logic
+' copy and paste special for removing starge working on
+' Range().FIND() and FINDNEXT()
+
+' ==============================================================
+
+
+
+' 0.35
+' ==============================================================
+'
+' massive trim into cstr!!! be careful now!
+
+' ==============================================================
+
+
+
+' 0.36
+' ==============================================================
+'
+' register sheet removal on redundant column before T - was
+' problem with TCAM
+'
+'
+' SAP library EVO not working if somebody do not have access to
+' SAP
+
+' ==============================================================
+
+
+
+' 0.37
+' ==============================================================
+'
+' wykorzystanie UNITE 2 pod recalcul - osobna formula przeliczajaca
+' z perspektywy pckg
+
+' ==============================================================

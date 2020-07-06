@@ -38,6 +38,9 @@ Option Explicit
 
 
 
+' TYPE_DE_PIECE handler for offset
+Private diffE As Integer
+
 
 Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, ByRef li As LineItem, ByRef ph As PivotHandler, linia As Long)
 
@@ -58,11 +61,18 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
     
     sh.Cells(linia, EVO.E_PIVOT_SRC_WIERSZ).Value = li.wiersz
     sh.Cells(linia, EVO.E_PIVOT_SRC_REF).Value = li.pn
-    sh.Cells(linia, EVO.E_PIVOT_SRC_COFOR_VENDEUR).Value = _
-        li.sourceRng.Offset(0, -1).Value
+    sh.Cells(linia, EVO.E_PIVOT_SRC_COFOR_VENDEUR).Value = Split(li.COFOR_COFOR, "_")(0)
     sh.Cells(linia, EVO.E_PIVOT_SRC_COFOR_EXPEDITEUR).Value = li.cofor
     sh.Cells(linia, EVO.E_PIVOT_SRC_SUPPLIER_NAME).Value = _
         li.supplementForPivotSource.refRangeForPLE.Offset(0, -2).Value
+        
+        
+
+    
+    ' Debug.Print li.sourceRng.Offset(0, diffE).Value ' OK!
+    
+    sh.Cells(linia, EVO.E_PIVOT_SRC____TYPE_DE_PIECE).Value = _
+        li.sourceRng.Offset(0, diffE).Value
         
     ' DEL DATE
     If IsDate(li.delDate) Then
@@ -76,8 +86,8 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
             sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_WEEK).Value = _
                 Application.WorksheetFunction.IsoWeekNum(li.delDate)
                 
-            sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_YYYYCW).Value = CLng(Year(li.delDate)) * 100 + _
-                CLng(sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_WEEK).Value)
+            sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_YYYYCW).Value = CLng(Year(li.delDate)) * 10000 + _
+                CLng(sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_WEEK).Value) * 100 + CLng(Weekday(li.delDate, vbMonday))
                 
                 
             ' here quickly short date
@@ -103,7 +113,7 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
     sh.Cells(linia, EVO.E_PIVOT_SRC_ID).Value = _
         CStr(li.pn) & _
         "-" & CStr(li.cofor) & _
-        "-" & Trim(sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_YYYYCW).Value)
+        "-" & CStr(sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_YYYYCW).Value)
     ' -------------------------------------------------------------------------------------------------
     
     
@@ -145,6 +155,24 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
         li.supplementForPivotSource.refRangeForCloe.Offset(0, 2).Value
     sh.Cells(linia, EVO.E_PIVOT_SRC_PILOT).Value = _
         li.supplementForPivotSource.refRangeForCloe.Offset(0, 3).Value
+        
+    ' CLOE PRICE
+    ' -------------------------------------------------------------------------------------------------------------
+    ' -------------------------------------------------------------------------------------------------------------
+    sh.Cells(linia, EVO.E_PIVOT_SRC____CLOE_COL_E_PRICE).Value = 0
+    If Application.WorksheetFunction.IsErr(li.supplementForPivotSource.refRangeForCloe.Offset(0, 4).Value) Then
+        On Error Resume Next
+        sh.Cells(linia, EVO.E_PIVOT_SRC____CLOE_COL_E_PRICE).Value = 0
+    ElseIf IsNumeric(li.supplementForPivotSource.refRangeForCloe.Offset(0, 4).Value) Then
+        sh.Cells(linia, EVO.E_PIVOT_SRC____CLOE_COL_E_PRICE).Value = _
+            li.supplementForPivotSource.refRangeForCloe.Offset(0, 4).Value
+    Else
+        On Error Resume Next
+        sh.Cells(linia, EVO.E_PIVOT_SRC____CLOE_COL_E_PRICE).Value = 0
+    End If
+    ' -------------------------------------------------------------------------------------------------------------
+    ' -------------------------------------------------------------------------------------------------------------
+        
         
     sh.Cells(linia, EVO.E_PIVOT_SRC_ROUTE_AND_PILOT).Value = "" & _
         li.supplementForPivotSource.refRangeForCloe.Offset(0, 2).Value & _
@@ -189,7 +217,7 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
     
     ' Debug.Assert li.wiersz <> 2866
     
-    If Trim(li.condi) <> "" Then
+    If CStr(li.condi) <> "" Then
     
         sh.Cells(linia, EVO.E_PIVOT_SRC_CONDI).Value = li.condi
         
@@ -215,4 +243,9 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
 
         
         
+End Sub
+
+Private Sub Class_Initialize()
+    ' TYPE_DE_PIECE
+    diffE = EVO.E_MASTER_2_TYPE_DE_PIECE - EVO.E_MASTER_2_COFOR_EXPEDITEUR
 End Sub

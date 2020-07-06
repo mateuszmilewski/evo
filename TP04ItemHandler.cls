@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "LineItemPivotSrouceSupplement"
+Attribute VB_Name = "TP04ItemHandler"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -35,15 +35,20 @@ Option Explicit
 '
 ' THE EVO TOOL
 
-Public orderDate As Date
-Public orderTime As Date
+' name as article + cofor
+Public name As String
 
-Public heoDecalageJX As Integer
+Public thisLine As TP04ItemPrimitive
+Public baseLine As TP04ItemPrimitive
 
+Private Sub Class_Initialize()
+    Set thisLine = New TP04ItemPrimitive
+    Set baseLine = New TP04ItemPrimitive
+End Sub
 
-
-Public refRangeForCloe As Range
-Public refRangeForPLE As Range
-Public refRaneForCondi As Range
+Private Sub Class_Terminate()
+    Set thisLine = Nothing
+    Set baseLine = Nothing
+End Sub
 
 

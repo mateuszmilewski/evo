@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "LineItemPivotSrouceSupplement"
+Attribute VB_Name = "PartNumberItemForKpi"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -35,15 +35,31 @@ Option Explicit
 '
 ' THE EVO TOOL
 
-Public orderDate As Date
-Public orderTime As Date
 
-Public heoDecalageJX As Integer
+Public pn As String
+Public noDataAvail As Boolean
+Public isDap As Boolean
+Public TYPE_DE_PIECE As String
+Public COFOR_VENDEUR As String
+Public COFOR_EXPEDITEUR As String
+Public NOM_FOURNISSEUR As String
 
 
 
-Public refRangeForCloe As Range
-Public refRangeForPLE As Range
-Public refRaneForCondi As Range
+' general boolean for checking
+Public uaData As Boolean
+Public pleData As Boolean
+
+
+
+' color flags
+Public isGreen As Boolean
+Public isYellow As Boolean
+Public isBlue As Boolean
+Public isRed As Boolean
+
+
+
+
 
 

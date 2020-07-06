@@ -92,7 +92,7 @@ Public Sub innerCatchDocInfoFiles()
             r.Offset(0, -1).Value = ""
             r.Offset(0, -2).Value = ""
         
-            If Trim(r.Value) Like "*docinfogroupe*" Then
+            If CStr(r.Value) Like "*docinfogroupe*" Then
             
                 
                 
@@ -113,7 +113,7 @@ Public Sub innerCatchDocInfoFiles()
             
             Set r = r.Offset(1, 0)
             
-        Loop Until Trim(r) = ""
+        Loop Until CStr(r) = ""
     Else
     
         logMsg = logMsg & "YOU ARE IN PRE-PROD! " & Chr(10) & Chr(10)
@@ -125,7 +125,7 @@ Public Sub innerCatchDocInfoFiles()
             r.Offset(0, -1).Value = ""
             r.Offset(0, -2).Value = ""
         
-            If Trim(r.Value) Like "C:\*" Then
+            If CStr(r.Value) Like "C:\*" Then
             
                 
                 
@@ -146,7 +146,7 @@ Public Sub innerCatchDocInfoFiles()
             
             Set r = r.Offset(1, 0)
             
-        Loop Until Trim(r) = ""
+        Loop Until CStr(r) = ""
     
     
     End If
@@ -161,7 +161,7 @@ Public Sub innerCatchDocInfoFiles()
     For Each w In Workbooks
         
         On Error Resume Next
-        Debug.Print CStr(w.Name) & " " & Chr(10) & _
+        Debug.Print CStr(w.name) & " " & Chr(10) & _
             CStr(w.FullName) & " " * Chr(10) & _
             CStr(w.Path) & _
             Chr(10) & Chr(10)
@@ -199,7 +199,7 @@ Public Sub innerVerifyDocInfoFiles()
         
         For Each iterWrk In Workbooks
             
-            If Trim(iterWrk.FullName) = Trim(r.Value) Then
+            If CStr(iterWrk.FullName) = CStr(r.Value) Then
                 Set wrk = iterWrk
                 Exit For
             End If
@@ -215,7 +215,7 @@ Public Sub innerVerifyDocInfoFiles()
         End If
         
         Set r = r.Offset(1, 0)
-    Loop Until Trim(r) = ""
+    Loop Until CStr(r) = ""
     
     
     ' ---------------------------------------------------
@@ -248,11 +248,11 @@ Private Sub verifyThisFile(w As Workbook, typeOfFile As String, ByRef logMsg As 
         If Not sh Is Nothing Then
         
             ' wacky check on 3 columns labels
-            If Trim(sh.Cells(1, 1).Value) Like "Num?ro produit" Then
-                If Trim(sh.Range("I1").Value) Like "D?signation longue" Then
+            If CStr(sh.Cells(1, 1).Value) Like "Num?ro produit" Then
+                If CStr(sh.Range("I1").Value) Like "D?signation longue" Then
                 
                     ' and some from far away
-                    If Trim(sh.Range("BX1").Value) = "DA COFOR VENDEDOR" Then
+                    If CStr(sh.Range("BX1").Value) = "DA COFOR VENDEDOR" Then
                     Else
                         toBeTrue = False
                     End If
@@ -292,7 +292,7 @@ Private Sub verifyThisFile(w As Workbook, typeOfFile As String, ByRef logMsg As 
                 If sh.Cells(2, 1).Value = "REFERENCE" Then
                 
                     ' and some from far away
-                    If Trim(sh.Range("AR2").Value) = "DHEF" Then
+                    If CStr(sh.Range("AR2").Value) = "DHEF" Then
                     Else
                         toBeTrue = False
                     End If

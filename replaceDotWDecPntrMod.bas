@@ -1,13 +1,6 @@
-VERSION 1.0 CLASS
-BEGIN
-  MultiUse = -1  'True
-END
-Attribute VB_Name = "LineItemPivotSrouceSupplement"
-Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Name = "replaceDotWDecPntrMod"
 Option Explicit
+
 
 'The MIT License (MIT)
 '
@@ -35,15 +28,12 @@ Option Explicit
 '
 ' THE EVO TOOL
 
-Public orderDate As Date
-Public orderTime As Date
-
-Public heoDecalageJX As Integer
-
-
-
-Public refRangeForCloe As Range
-Public refRangeForPLE As Range
-Public refRaneForCondi As Range
-
-
+Public Function replaceDotWithDecimalPointer(arg As Variant) As Double
+    
+    If Not IsError(arg) Then
+        
+        replaceDotWithDecimalPointer = CDbl(Replace(arg, ".", ","))
+    Else
+        replaceDotWithDecimalPointer = 1#
+    End If
+End Function

@@ -83,9 +83,30 @@ Public Function validateSearching(pleRng As Range, cloeRng As Range, mainRng As 
             If Not mainRng Is Nothing Then
                 If Not condiRng Is Nothing Then
                     validateSearching = True
+                Else
+                    On Error Resume Next
+                    MsgBox "condi data missing for cofor exp: " & mainRng.Value, vbCritical
+                    MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+                    End
                 End If
+            Else
+                On Error Resume Next
+                MsgBox "main data missing for cofor exp: " & mainRng.Value, vbCritical
+                MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+                End
             End If
+        Else
+            On Error Resume Next
+            MsgBox "cloe data missing for cofor exp: " & mainRng.Value, vbCritical
+            MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+            End
+            
         End If
+    Else
+        On Error Resume Next
+        MsgBox "PLE missing for cofor exp: " & mainRng.Value, vbCritical
+        MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+        End
     End If
 End Function
 
@@ -466,7 +487,7 @@ Private Function calcLastRowInThisPivotSource(sh As Worksheet) As Long
     Set r = sh.Cells(1, 1)
     If sh.Cells(2, 1).Value <> "" Then
         Set r = r.End(xlDown)
-        calcLastRowInThisPivotSource = CLng(r.Row)
+        calcLastRowInThisPivotSource = CLng(r.row)
     End If
     
 End Function
@@ -529,7 +550,7 @@ Public Sub makePivot(ByRef ph As PivotHandler)
     Set r = sh.UsedRange
     ' Looks like it is OK!
     Debug.Print r.Address
-    Debug.Print localPivotSh.Name
+    Debug.Print localPivotSh.name
     
     ph.setRangeDataFromProxy2ForPivot r
     ' ==================================================
@@ -558,12 +579,366 @@ Public Sub makeTPivot(ByRef ph As PivotHandler)
     Set r = sh.UsedRange
     ' Looks like it is OK!
     Debug.Print r.Address
-    Debug.Print localPivotSh.Name
+    Debug.Print localPivotSh.name
     
     ph.setRangeDataFromProxy2ForPivot r
     ' ==================================================
     ph.runMainLogicForCreationTheoreticPivotTable
     ' ==================================================
     
+    
+End Sub
+
+
+Public Sub copyThisPivotToTcamReport(ByRef ph As PivotHandler)
+
+    
+    ph.tcamSheet.Cells(1, 1).Value = "TCAM REPORT"
+    ph.tcamSheet.Cells(2, 1).Value = CStr(Now)
+    
+    ph.tcamSheet.Cells(1, 4).Value = "PROXY2"
+    ph.tcamSheet.Cells(1, 5).Value = ph.proxy2.name
+    
+    ph.tcamSheet.Cells(2, 4).Value = "PIVOT"
+    ph.tcamSheet.Cells(2, 5).Value = ph.getPivot.name
+    
+    
+    
+
+    With ph.tcamSheet
+        .Range("A1:A2").Interior.Color = RGB(221, 235, 247)
+        .Range("D1:E2").Interior.Color = RGB(221, 235, 247)
+        .Range("D1:E2").Font.Size = 8
+        
+        .Range("G1").Value = "starting point data: "
+        .Range("G2").Value = "columns: "
+        .Range("G1:H2").Interior.Color = RGB(221, 235, 247)
+        .Range("G1:H2").Font.Size = 8
+    End With
+    
+    
+    Dim ileMamyKolumn As Long
+    Dim ostatniWiersz As Long
+    Dim startingPointData As Range
+    Dim r1 As Range, xtraLabelsMountPoint As Range
+    Set r1 = ph.getPivot().Cells(1, 1)
+    
+    Dim x As Integer
+    x = 4
+    
+    
+    ' FILTER
+    ' --------------------------------------------------------------------
+    ' --------------------------------------------------------------------
+    Do
+        With ph.tcamSheet
+            .Cells(x, 1).Value = r1.Value
+            .Cells(x, 1).Font.Bold = True
+            .Cells(x, 1).Interior.Color = RGB(221, 235, 247)
+            .Cells(x, 2).Value = r1.Offset(0, 1).Value
+            .Cells(x, 2).Font.Bold = True
+            .Cells(x, 2).Interior.Color = RGB(221, 235, 247)
+        End With
+        x = x + 1
+        Set r1 = r1.Offset(1, 0)
+    Loop Until CStr(r1) = ""
+    ' --------------------------------------------------------------------
+    ' --------------------------------------------------------------------
+    
+    ' data main body
+    ' --------------------------------------------------------------------
+    ' --------------------------------------------------------------------
+    ' --------------------------------------------------------------------
+    x = x + 2
+    Set r1 = ph.getPivot().Cells(5, 1)
+    
+    With ph.tcamSheet
+        r1.Copy .Cells(x, 1)
+        x = x + 1
+        Set r1 = r1.Offset(1, 0)
+        
+        Set startingPointData = .Cells(x, 1)
+        Debug.Print "startingPointData: " & startingPointData.Address
+        .Range("H1").Value = startingPointData.row
+        
+        Set r1 = ph.getPivot().Range(r1, r1.End(xlToRight).Offset(0, -1))
+        ' first - copy labels!
+        r1.Copy .Cells(x, 1)
+        Set xtraLabelsMountPoint = .Cells(x, 1)
+        Set xtraLabelsMountPoint = xtraLabelsMountPoint.End(xlToRight).Offset(0, 1)
+        addXtraLabelsInTcamReport xtraLabelsMountPoint
+        
+        ileMamyKolumn = CLng(xtraLabelsMountPoint.Offset(0, 3).Column)
+        'kolumny
+        .Range("H2").Value = ileMamyKolumn
+        
+        
+        x = x + 1
+        Set r1 = r1.Offset(1, 0)
+        
+        
+        ' DATA
+        If CStr(r1.Cells(1, 1).Value) <> "" Then
+        
+            Do
+                r1.Copy .Cells(x, 1)
+                x = x + 1
+                Set r1 = r1.Offset(1, 0)
+            Loop Until CStr(r1.Cells(1, 1).Value) = ""
+        End If
+        
+        ostatniWiersz = x - 1
+        
+        
+        
+        ' still in tcam but now we need to beautify data
+        ' czyli some dekoracjon
+        
+        ' zaczynamy od:
+        Dim deco_r As Range
+        
+        Set deco_r = startingPointData
+        
+        Do
+            ' ------------------------------------------------------------------------
+            
+            If deco_r.row < ostatniWiersz Then
+                If IsDate(deco_r) Then
+                    usun_sumy_dla_dat_bo_to_bez_sensu deco_r, deco_r.Offset(0, 1), ileMamyKolumn
+                ElseIf CStr(deco_r) <> "" Then
+                    zaokragliWartosci startingPointData, deco_r, deco_r.Offset(0, 1), ileMamyKolumn
+                Else
+                    ' nop ?
+                End If
+            Else
+                'ostatniWiersz
+                deco_r.Value = "SUM: "
+                wsadzFormulySumy deco_r, deco_r.Offset(0, 1), startingPointData, ileMamyKolumn
+                wsadzFormulyDlaCloeData ph.tcamSheet, deco_r, deco_r.Offset(0, 1), startingPointData, ileMamyKolumn
+            End If
+            ' ------------------------------------------------------------------------
+            Set deco_r = deco_r.Offset(1, 0)
+        Loop Until CStr(deco_r) = ""
+        
+    End With
+    
+    
+    ' --------------------------------------------------------------------
+    ' --------------------------------------------------------------------
+    ' --------------------------------------------------------------------
+End Sub
+
+
+Private Sub usun_sumy_dla_dat_bo_to_bez_sensu(dateRange As Range, tmpDecoRange As Range, imk As Long)
+
+
+    
+    ' imk stands for copy from ileMamyKolumn
+    
+    
+    Do
+        
+        If IsDate(dateRange) And IsNumeric(tmpDecoRange) Then
+            
+            tmpDecoRange.Value = ""
+        End If
+        
+        Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+    Loop While tmpDecoRange.Column <= imk
+End Sub
+
+
+Private Sub zaokragliWartosci(sp As Range, dataRange As Range, tmpDecoRange As Range, imk As Long)
+
+
+    ' imk stands for copy from ileMamyKolumn
+    
+    Dim tmpValue As Double
+    
+    
+    Do
+    
+        If tmpDecoRange.row > sp.row Then
+        
+            If IsNumeric(tmpDecoRange) Then
+                
+                ' tmpDecoRange.Value = ""
+                
+                If CStr(tmpDecoRange) <> "" Then
+                    With tmpDecoRange
+                        tmpValue = CDbl(.Value)
+                        .AddComment CStr(tmpValue)
+                        .Value = CStr(Application.WorksheetFunction.RoundUp(tmpValue, 0))
+                    End With
+                End If
+            End If
+        End If
+        
+        Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+    Loop While tmpDecoRange.Column <= imk
+End Sub
+
+
+Private Sub wsadzFormulySumy(fstSumRange As Range, tmpDecoRange As Range, sp As Range, imk As Long)
+
+
+    ' sp stands for starting point
+    ' imk stands for copy from ileMamyKolumn
+    
+    Dim tmpValue As Double, tmpFromFormula As String, adr1 As String, adr2 As String
+    Dim columnDiff As Long
+    Dim formulaFromRegister As Range
+    Set formulaFromRegister = ThisWorkbook.Sheets("register").Range("Z9")
+    
+    
+    
+    
+    Do
+        
+        If IsNumeric(tmpDecoRange) Then
+            
+            ' tmpDecoRange.Value = ""
+            
+            If CStr(tmpDecoRange) <> "" Then
+            
+                tmpFromFormula = CStr(formulaFromRegister.Formula)
+                
+                columnDiff = tmpDecoRange.Column - sp.Column
+                
+                adr1 = CStr(sp.Offset(1, columnDiff).Address)
+                adr2 = CStr(tmpDecoRange.Offset(-1, 0).Address)
+                tmpFromFormula = Replace(tmpFromFormula, "X", adr1 & ":" & adr2)
+            
+            
+            
+            
+                With tmpDecoRange
+                    tmpValue = CDbl(.Value)
+                    .AddComment CStr(tmpValue)
+                    .Formula = CStr(tmpFromFormula)
+                End With
+            End If
+        End If
+        
+        Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+    Loop While tmpDecoRange.Column <= imk
+    
+    
+    ' troche glupie, ale napewno 4 kolumny sa statyczne na bank!
+    Set tmpDecoRange = tmpDecoRange.Offset(0, -4)
+    
+    
+    fstSumRange.Copy tmpDecoRange
+    tmpDecoRange.Value = "TRANS"
+    
+    
+    Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+    
+    tmpFromFormula = CStr(formulaFromRegister.Formula)
+                
+    columnDiff = tmpDecoRange.Column - sp.Column
+            
+    adr1 = CStr(sp.Offset(1, columnDiff).Address)
+    adr2 = CStr(tmpDecoRange.Offset(-1, 0).Address)
+    tmpFromFormula = Replace(tmpFromFormula, "X", adr1 & ":" & adr2)
+    tmpDecoRange.Formula = CStr(tmpFromFormula)
+    tmpDecoRange.Interior.Color = RGB(221, 235, 247)
+    tmpDecoRange.Font.Bold = True
+    
+    
+    Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+    fstSumRange.Copy tmpDecoRange
+    tmpDecoRange.Value = "INC"
+    
+    
+    Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+    
+    tmpFromFormula = CStr(formulaFromRegister.Formula)
+                
+    columnDiff = tmpDecoRange.Column - sp.Column
+            
+    adr1 = CStr(sp.Offset(1, columnDiff).Address)
+    adr2 = CStr(tmpDecoRange.Offset(-1, 0).Address)
+    tmpFromFormula = Replace(tmpFromFormula, "X", adr1 & ":" & adr2)
+    tmpDecoRange.Formula = CStr(tmpFromFormula)
+    tmpDecoRange.Interior.Color = RGB(221, 235, 247)
+    tmpDecoRange.Font.Bold = True
+    
+    
+End Sub
+
+
+
+
+Private Sub wsadzFormulyDlaCloeData(tcamSh As Worksheet, fstSumRange As Range, tmpDecoRange As Range, sp As Range, imk As Long)
+
+
+    ' sp stands for starting point
+    ' imk stands for copy from ileMamyKolumn
+    
+    Dim tmpValue As Double, tmpFromFormula As String, adr1 As String, adr2 As String
+    Dim columnMount As Long, columnDiff As Long
+    Dim formulaFromRegister As Range, rangeForCloeFormula As Range
+    Set formulaFromRegister = ThisWorkbook.Sheets("register").Range("Z10")
+    Set rangeForCloeFormula = Nothing
+    
+    columnMount = CLng(imk - 4)
+    
+    tmpFromFormula = CStr(formulaFromRegister.FormulaR1C1Local)
+    
+    Set tmpDecoRange = tmpDecoRange.Offset(0, columnMount - 1)
+    
+    adr1 = CStr(sp.Offset(1, columnMount).Address)
+    adr2 = CStr(tmpDecoRange.Offset(-1, 0).Address)
+    
+    Debug.Print "adrs: " & adr1 & ":" & adr2
+    
+    With tcamSh.Range("" & adr1 & ":" & adr2).Validation
+        .Delete
+        .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:=xlBetween, Formula1:="=register!$T$1:$T$" & _
+            CStr(ThisWorkbook.Sheets("register").Range("T1").End(xlDown).row)
+        .IgnoreBlank = True
+        .InCellDropdown = True
+        .InputTitle = ""
+        .ErrorTitle = ""
+        .InputMessage = ""
+        .ErrorMessage = ""
+        .ShowInput = True
+        .ShowError = True
+    End With
+    
+    
+    Set rangeForCloeFormula = tcamSh.Range("" & adr1 & ":" & adr2).Offset(0, 1)
+    tmpFromFormula = Replace(tmpFromFormula, "X", "1")
+    rangeForCloeFormula.FormulaR1C1Local = tmpFromFormula
+
+End Sub
+
+
+
+
+Private Sub addXtraLabelsInTcamReport(lr As Range)
+    
+    lr.Value = "TRANSPORT"
+    
+    lr.Offset(0, 1).Value = "COST"
+    lr.Offset(0, 2).Value = "INCIDENT"
+    lr.Offset(0, 3).Value = "INCIDENT COST"
+    
+    With lr.Parent.Range(lr, lr.Offset(0, 3))
+        .Font.Bold = True
+        .Interior.Color = CLng(lr.Offset(0, -1).Interior.Color)
+        .EntireColumn.ColumnWidth = 20
+    End With
+    
+    
+    lr.Parent.Cells(lr.row, 1).EntireColumn.ColumnWidth = 40
+    
+    Dim leftLabels As Range
+    Set leftLabels = lr.Parent.Cells(lr.row, 2)
+    Do
+        leftLabels.EntireColumn.ColumnWidth = 12
+        Set leftLabels = leftLabels.Offset(0, 1)
+    Loop Until leftLabels.Address = lr.Address
     
 End Sub

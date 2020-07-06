@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "LineItemPivotSrouceSupplement"
+Attribute VB_Name = "NumberHandler"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -31,19 +31,27 @@ Option Explicit
 'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 'SOFTWARE.
-'
-'
-' THE EVO TOOL
 
-Public orderDate As Date
-Public orderTime As Date
-
-Public heoDecalageJX As Integer
+Private separator As String
+Private sigappSeparator As String
+Private s As String
+Private ss As String
 
 
 
-Public refRangeForCloe As Range
-Public refRangeForPLE As Range
-Public refRaneForCondi As Range
+Private Sub Class_Initialize()
+    separator = Application.DecimalSeparator
+    s = separator
+    sigappSeparator = ","
+    ss = sigappSeparator
+End Sub
 
+Public Sub parseStringProperlyToNum(ByRef r As Range)
+    
+    Dim tmpString As String
+    tmpString = CStr(r.Value)
 
+    tmpString = Replace(tmpString, ".", "")
+    r.Value = CDbl(tmpString)
+    
+End Sub

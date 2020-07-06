@@ -435,3 +435,28 @@ Private Sub testRemoveTotals()
 End Sub
 
 
+
+
+Sub ListInCellRec()
+'
+' ListInCellRec Macro
+'
+
+'
+    Range("G11:G60").Select
+    With Selection.Validation
+        .Delete
+        .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
+        xlBetween, Formula1:="=register!$T$1:$T$10"
+        .IgnoreBlank = True
+        .InCellDropdown = True
+        .InputTitle = ""
+        .ErrorTitle = ""
+        .InputMessage = ""
+        .ErrorMessage = ""
+        .ShowInput = True
+        .ShowError = True
+    End With
+    Sheets("register").Select
+    Range("T1").Select
+End Sub
