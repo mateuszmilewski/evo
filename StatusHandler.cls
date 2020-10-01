@@ -56,6 +56,13 @@ Private time_flag As Double
 
 Private collection_of_avr_on_pn As Collection
 
+Public Sub simplifyStatusBar()
+    
+    StatusForm.LabelAverageTime.Caption = ""
+    StatusForm.LabelEstimatedTime.Caption = ""
+    
+End Sub
+
 Public Sub init_statusbar(m_max, Optional m_min)
 
     Dim x As Integer
@@ -145,6 +152,9 @@ Public Sub progress_increase()
         macro_starts = time_flag
         
         StatusForm.Repaint
+    Else
+        act = 0
+        StatusForm.PasekPostepu.Width = 0
     End If
 End Sub
 

@@ -27,6 +27,138 @@ Option Explicit
 '
 ' THE EVO TOOL
 
+
+' concatenate domains (the output worksheet)
+' ==============================================
+
+
+
+
+Public Sub concatDataFromSq01(ictrl As IRibbonControl)
+    concatAndStd
+End Sub
+
+Public Sub concatAndStd()
+
+
+    Dim whatToConcat As Collection
+    Set whatToConcat = Nothing
+    
+    SQ01ConfigForm.ListBox1.Clear
+    SQ01ConfigForm.ListBox1.MultiSelect = fmMultiSelectMulti
+    
+    Dim sh1 As Worksheet
+    For Each sh1 In ThisWorkbook.Sheets
+        If isInSq01OutputStd(sh1) Then
+            SQ01ConfigForm.ListBox1.addItem sh1.name
+        End If
+    Next sh1
+    
+    SQ01ConfigForm.show
+    
+    If SQ01ConfigForm.coll Is Nothing Then
+        MsgBox "You do not choose anything!", vbCritical
+        End
+    Else
+        
+        If SQ01ConfigForm.coll.Count = 1 Then
+            MsgBox "You choose only one worksheet - so nothing to do - nothing to concatenate", vbInformation
+        Else
+            Set whatToConcat = SQ01ConfigForm.coll
+        End If
+    End If
+    
+    
+    
+    ' and of form section
+    ' whatToConcat is collection check if form give some data
+    
+    If Not whatToConcat Is Nothing Then
+    
+        ' test OK
+        'Dim el As Variant
+        'For Each el In whatToConcat
+        '    Debug.Print CStr(el)
+        'Next el
+        
+        Dim concatSh As Worksheet
+        Set concatSh = ThisWorkbook.Sheets.Add
+        concatSh.name = EVO.TryToRenameModule.tryToRenameWorksheet(concatSh, "CONCAT_")
+        fillLabels concatSh.Range("A1")
+        
+        ' concat ref
+        Dim cr As Range
+        Set cr = concatSh.Range("A2")
+        
+        Dim leftRng As Range, rightRng As Range
+        
+        Dim el As Variant, tmpSrcSh As Worksheet, lastRow As Long, x1 As Variant
+        For Each el In whatToConcat
+            
+            Set tmpSrcSh = ThisWorkbook.Sheets(CStr(el))
+            
+            lastRow = CLng(tmpSrcSh.Range("A1048576").End(xlUp).row)
+            
+            For x1 = 2 To lastRow
+                
+                ' EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN , EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY
+                'concatSh.Range( _
+                '    concatSh.Cells(cr.row, EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN), concatSh.Cells(cr.row, EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY)).Value = _
+                'tmpSrcSh.Range( _
+                '    tmpSrcSh.Cells(x1, EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN), concatSh.Cells(x1, EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY)).Value
+                
+                Set leftRng = concatSh.Range( _
+                    concatSh.Cells(cr.row, EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN), concatSh.Cells(cr.row, EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY))
+                Set rightRng = tmpSrcSh.Range( _
+                    tmpSrcSh.Cells(x1, EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN), tmpSrcSh.Cells(x1, EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY))
+                
+                leftRng.Value = rightRng.Value
+                
+                    
+                Set cr = cr.Offset(1, 0)
+
+            Next x1
+            
+            
+            
+        Next el
+        
+        MsgBox "READY!", vbInformation
+    Else
+        MsgBox "list of concat is empty!", vbCritical
+        End
+    End If
+    
+    
+End Sub
+
+
+Private Function isInSq01OutputStd(refSh As Worksheet) As Boolean
+
+
+    isInSq01OutputStd = True
+    
+    Dim lr As Range, x As Variant
+    Set lr = refSh.Cells(1, 1)
+    
+    Dim refVal As Range
+    Set refVal = ThisWorkbook.Sheets("forValidation").Range(EVO.G_REF_MOUNT_SQ1_OUT)
+    
+    For x = EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN To EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY
+        If lr.Offset(0, x - 1).Value = refVal.Offset(0, x - 1).Value Then
+        Else
+            isInSq01OutputStd = False
+            Exit For
+        End If
+            
+    Next x
+    
+End Function
+
+' ==============================================
+
+
+
 Public Sub getSq01DataWithPreDefParams(ictrl As IRibbonControl)
     getDataFromSq01WithPreDefinedParams
 End Sub
@@ -38,17 +170,23 @@ Public Sub getDataFromSq01WithPreDefinedParams()
     Dim refReg As Range, ctrl As TextBox, x As Variant
     Set refReg = ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01")
     
+    Dim refStringForDomain As String
+    refStringForDomain = ""
+    
     With SQ01PreDefForm
         For x = 1 To 5
             On Error Resume Next
-            .Controls("TextBox" & CStr(x)).Value = refReg.Offset(0, x - 1).Value
+            .Controls("TextBox1" & CStr(x)).Value = CStr(refReg.Offset(0, x - 1).Value)
+            
+            On Error Resume Next
+            .Controls("TextBox2" & CStr(x)).Value = CStr(refReg.Offset(1, x - 1).Value)
         Next x
         
         .show
     End With
     
     ' try to run with those predefs
-    innerMainForSq01 True
+    innerMainForSq01 True, SQ01PreDefForm.TextBox13.Value, SQ01PreDefForm.TextBox23.Value
 End Sub
 
 Public Sub getDataFromSq01(ictrl As IRibbonControl)
@@ -59,7 +197,7 @@ Public Sub getDataFromSq01(ictrl As IRibbonControl)
 End Sub
 
 
-Private Sub innerMainForSq01(Optional preDef As Boolean)
+Private Sub innerMainForSq01(Optional preDef As Boolean, Optional tbx13_Str As String, Optional tbx23_Str As String)
 
 
     '---------------------------------------------------------------------------------
@@ -78,31 +216,71 @@ Private Sub innerMainForSq01(Optional preDef As Boolean)
     delegacjaDlaProgresu st_h, xStHelper, 20
     
     
-    Dim ish As Worksheet, osh As Worksheet, irng As Range, orng As Range
+    ' inter4sh stands for internal suppliers list worksheet
+    Dim ish As Worksheet, ish2 As Worksheet
+    Dim osh As Worksheet, osh2 As Worksheet
+    ' dim inter4Sh As Worksheet,
+    Dim irng As Range, orng As Range
     Set ish = ThisWorkbook.Sheets.Add
     Set osh = ThisWorkbook.Sheets.Add
-    ish.name = EVO.TryToRenameModule.tryToRenameWorksheet(ish, "input_sq01")
-    osh.name = EVO.TryToRenameModule.tryToRenameWorksheet(osh, "ouput_sq01")
+
+    
+    If tbx23_Str <> "" Then
+        Set ish2 = ThisWorkbook.Sheets.Add
+        Set osh2 = ThisWorkbook.Sheets.Add
+    Else
+        Set ish2 = Nothing
+        Set osh2 = Nothing
+    End If
+    ' Set inter4Sh = ThisWorkbook.Sheets.Add
+    ish.name = EVO.TryToRenameModule.tryToRenameWorksheet(ish, "IN1_" & CStr(tbx13_Str) & "_")
+    osh.name = EVO.TryToRenameModule.tryToRenameWorksheet(osh, "OUT1_" & CStr(tbx13_Str) & "_")
+    
+    If Not ish2 Is Nothing And Not osh2 Is Nothing Then
+        ish2.name = EVO.TryToRenameModule.tryToRenameWorksheet(ish2, "IN2_" & CStr(tbx23_Str) & "_")
+        osh2.name = EVO.TryToRenameModule.tryToRenameWorksheet(osh2, "OUT2_" & CStr(tbx23_Str) & "_")
+    End If
+    
+    
+    ' inter4Sh.name = EVO.TryToRenameModule.tryToRenameWorksheet(inter4Sh, "N_" & CStr(tbx3_Str) & "_")
     
     
     ' LABLES ------------------------------------------------
     
     fillLabels osh.Range("A1")
+    If Not osh2 Is Nothing Then fillLabels osh2.Range("A1")
+    
+    ' fillLabels inter4Sh.Range("A1")
     
     ' -------------------------------------------------------
     
     Dim sap__handler As New SAP_Handler
     If preDef Then
-        sap__handler.runMainLogicForSQ01__with_preDef E_SQ01_CONFIG_MAKE_ALL, ish, osh, st_h, xStHelper
+        sap__handler.runMainLogicForSQ01__with_preDef E_SQ01_CONFIG_MAKE_ALL, ish, osh, st_h, xStHelper, 1
+        
+        If Not ish2 Is Nothing And Not osh2 Is Nothing Then
+            sap__handler.runMainLogicForSQ01__with_preDef E_SQ01_CONFIG_MAKE_ALL, ish2, osh2, st_h, xStHelper, 2
+        End If
     Else
-        sap__handler.runMainLogicForSQ01 E_SQ01_CONFIG_MAKE_ALL, ish, osh, st_h, xStHelper
+        sap__handler.runMainLogicForSQ01 E_SQ01_CONFIG_MAKE_ALL, ish, osh, st_h, xStHelper, 1
     End If
+    
+    ' automatisation on sigapp for internal suppliers - no matter what!
+    ' sap__handler.runMainLogicFor__Y_PI1_80000391 inter4Sh, st_h, xStHelper
+    
+    
+    
     
     ' COPY AND PASTE AS VALUES ------------------------------
     
-    copyAndPasteAsValues osh.Range("A1").Offset(0, E_FROM_SQ01_QUASI_TP04_ARTICLE - 1)
+    ' ???
+    ' copyAndPasteAsValues osh.Range("A1").Offset(0, E_FROM_SQ01_QUASI_TP04_ARTICLE - 1)
     
     ' -------------------------------------------------------
+    
+    ' data ready - change string price into normal num
+    changePricesIntoDouble osh
+    changePricesIntoDouble osh2
     
     
     
@@ -131,6 +309,31 @@ Private Sub innerMainForSq01(Optional preDef As Boolean)
 End Sub
 
 
+
+
+
+Private Sub changePricesIntoDouble(sh1 As Worksheet)
+    
+    Dim r As Range, tmpstrv As String, doubleValue As String
+    Set r = sh1.Range("A1048576").End(xlUp) ' to jest ostatni
+    
+    Set r = sh1.Range(sh1.Range("A1"), r)
+    
+    Dim ir As Range, priceRng As Range
+    For Each ir In r
+        Set priceRng = ir.Offset(0, EVO.E_FROM_SQ01_QUASI_TP04_SUM - 1)
+        
+        If priceRng.Value Like "*.*,??" Or priceRng.Value Like "*,??" Then
+            tmpstrv = Replace(Replace(priceRng.Value, ".", ""), ",", "")
+            
+            If IsNumeric(tmpstrv) Then
+                doubleValue = CDbl(tmpstrv) / 100#
+                
+                priceRng.Value = doubleValue
+            End If
+        End If
+    Next ir
+End Sub
 
 Private Sub copyAndPasteAsValues(refRng As Range)
 
@@ -169,21 +372,37 @@ Public Sub delegacjaDlaProgresu(s1 As StatusHandler, ByRef h1 As Integer, lm As 
 End Sub
 
 
-Private Sub fillLabels(labelRefRange As Range)
+Public Sub fillLabels(labelRefRange As Range)
 
 
     Dim refLabelInRegister As Range, x As Variant
-    Set refLabelInRegister = ThisWorkbook.Sheets("forValidation").Range(G_REF_MOUNT_SQ1_OUT)
+    
 
 
-    With labelRefRange
-        
-        For x = EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN To EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY
+    If labelRefRange.Parent.name Like "OUT1_*" Or _
+        labelRefRange.Parent.name Like "OUT2_*" Or _
+        labelRefRange.Parent.name Like "CONCAT_*" Then
+    
+        Set refLabelInRegister = ThisWorkbook.Sheets("forValidation").Range(G_REF_MOUNT_SQ1_OUT)
+        With labelRefRange
             
-            .Offset(0, x - 1).Value = refLabelInRegister.Offset(0, x - 1).Value
-        Next x
+            For x = EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN To EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY
+                
+                .Offset(0, x - 1).Value = refLabelInRegister.Offset(0, x - 1).Value
+            Next x
+        End With
+    
+    ElseIf labelRefRange.Parent.name Like "N_*" Then
+    
+        Set refLabelInRegister = ThisWorkbook.Sheets("forValidation").Range(G_REF_MOUNT_N_SUPPLIERS_OUT)
+        With labelRefRange
         
-        
-    End With
+            For x = EVO.E_N_SUPPLIERS_COFOR To EVO.E_N_SUPPLIERS_INT_EXT_VEN
+                .Offset(0, x - 1).Value = refLabelInRegister.Offset(0, x - 1).Value
+            Next x
+        End With
+    
+    Else
+    End If
     
 End Sub

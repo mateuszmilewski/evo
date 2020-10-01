@@ -60,14 +60,14 @@ Public Sub makeRepFromPns()
         stHndlr.progress_increase
         
         ' make some rep here
-        Dim repSh As Worksheet, refRange As Range
-        Set repSh = ThisWorkbook.Sheets.Add
-        repSh.name = tryToRenameWorksheet(repSh)
+        Dim repsh As Worksheet, refRange As Range
+        Set repsh = ThisWorkbook.Sheets.Add
+        repsh.name = tryToRenameWorksheet(repsh)
         
-        makeSomeLabelsInNewRepSh repSh
+        makeSomeLabelsInNewRepSh repsh
         
         
-        Set refRange = repSh.Cells(2, 1)
+        Set refRange = repsh.Cells(2, 1)
         
         Dim key As Variant, pi As PartNumberItemForKpi
         For Each key In pns.Keys

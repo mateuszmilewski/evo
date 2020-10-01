@@ -58,12 +58,15 @@ Global Const G_COD_TRANSPORT_COLUMN = 36
 Global Const G_PU_TIME_COLUMN = 37
 Global Const G_T_TIME_COLUMN = 38
 Global Const G_DEL_TIME_COLUMN = 39
+Global Const G_SRC_DHEF_COL = 30
+Global Const G_SRC_DHAS_COL = 31
 
 Global Const G_PLE_SUB_FOR_ORDER_COLUMN = 37
 
 Global Const G_TXT_IN_CELL = "transport by supplier (serial logistic in DAP)"
 Global Const G_TXT_IN_CELL_II = "transport by supplier"
 Global Const G_DAP = "DAP"
+Global Const G_DDP = "DDP"
 Global Const G_NON_TMC = "non"
 
 
@@ -119,5 +122,10 @@ Global Const G_TP04_TP04_01 = "TP04_"
 
 ' SQ01
 Global Const G_REF_MOUNT_SQ1_OUT = "D14"
+Global Const G_REF_MOUNT_N_SUPPLIERS_OUT = "D17"
+
+
+Global Const G_COL_IS_INTERNAL_GREEN_LIGHT = 21
+Global Const G_COL_IS_TANGO_GREEN_LIGHT = 22
 
 

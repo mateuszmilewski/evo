@@ -35,17 +35,13 @@ Public Sub deleteThisSheet(ictrl As IRibbonControl)
     Set sh = ThisWorkbook.ActiveSheet
     
     
-    If sh.name <> "register" Then
+    If checkIfYouCanDelete(sh) Then
+        MsgBox "You can not remove this sheet!", vbExclamation
         
-        If sh.name = "forValidation" Then
-            MsgBox "You can not remove forValidation sheet!", vbExclamation
-        Else
-            Application.DisplayAlerts = False
-            sh.Delete
-            Application.DisplayAlerts = True
-        End If
     Else
-        MsgBox "Critical! You can not remove register sheet!", vbExclamation
+        Application.DisplayAlerts = False
+        sh.Delete
+        Application.DisplayAlerts = True
     End If
 End Sub
 
@@ -82,6 +78,10 @@ Private Function checkIfYouCanDelete(sh As Worksheet) As Boolean
     End If
     
     If sh.name = "register" Then
+        Exit Function
+    End If
+    
+    If sh.name = "EVO" Then
         Exit Function
     End If
     

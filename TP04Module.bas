@@ -68,9 +68,20 @@ Public Sub innerAfterSQ01Logic(masterFileName As String, feedFileName As String,
     Dim instance_of_tp04 As TP04
     Set instance_of_tp04 = New TP04
     
+    Dim ans As Variant, byUnit As Boolean
+    ' ans = MsgBox("Choose YES if you want to see price by UNIT", vbInformation + vbYesNo)
+    ' by default
+    ans = vbNo ' so we calc later by packaging size!
+    
+    If ans = vbYes Then
+        byUnit = True
+    Else
+        byUnit = False
+    End If
+    
     With instance_of_tp04
         .setStatusHandler sh
-        .init m, f
+        .init m, f, byUnit
     End With
     ' ====================================================================
     
@@ -119,9 +130,18 @@ Public Sub innerAfterTP04Logic(masterFileName As String, feedFileName As String,
     Dim instance_of_tp04 As TP04
     Set instance_of_tp04 = New TP04
     
+    
+    Dim ans As Variant, byUnit As Boolean
+    ans = MsgBox("Choose YES if you want to see price by UNIT", vbInformation + vbYesNo)
+    If ans = vbYes Then
+        byUnit = True
+    Else
+        byUnit = False
+    End If
+    
     With instance_of_tp04
         .setStatusHandler sh
-        .init m, f
+        .init m, f, byUnit
     End With
     ' ====================================================================
     

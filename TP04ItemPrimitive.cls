@@ -47,3 +47,9 @@ Public pckgDiv As Double
 
 ' priceInEur / pckgDiv
 Public finalPrice As Double
+
+
+' new from 060
+Public domain As String
+Public ru As String
+Public div As String

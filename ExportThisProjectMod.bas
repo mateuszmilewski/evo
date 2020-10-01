@@ -76,7 +76,7 @@ Private Sub import_this_project()
     
     
     Dim objFSO As Scripting.FileSystemObject
-    Dim objFile As Scripting.File
+    Dim objFile As Scripting.file
     Set objFSO = New Scripting.FileSystemObject
     
     Dim VBProj As VBIDE.VBProject

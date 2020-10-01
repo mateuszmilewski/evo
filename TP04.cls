@@ -54,7 +54,7 @@ End Sub
 
 
 
-Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet)
+Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Boolean)
 
 
     If (Not pusSh Is Nothing) And (Not tp04Sh Is Nothing) Then
@@ -96,6 +96,13 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet)
                 If Not r.EntireRow.Hidden Then
                     ' make logic only for visible data
                     ' --------------------------------------------------
+                    
+                    
+                    ' we are working here from PUS perspective data
+                    ' so 2 sheets
+                    '
+                    ' searching 1 pl : wynikSzukania1: with index
+                    ' searching 2 pl : wynikSzukania2: base article without index
                     
                     ' Debug.Print r.row
                     
@@ -227,13 +234,38 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet)
                             Set pt04Item = Nothing
                             Set pt04Item = New TP04ItemHandler
                             With pt04Item
+                            
                                 .name = CStr(r.Value & "_" & r.Offset(0, EVO.E_MASTER_cofor - 1).Value)
                                 
                                 If bMatched1 Then
                                     .thisLine.article = r.Value
+                                    
+                                    ' Debug.Assert Trim(r.Value) <> "9677602580-03"
+                                    
+                                    
+                                    ' new from 060
+                                    .thisLine.domain = _
+                                        CStr(wynikSzukania1.Offset(0, _
+                                            EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value)
+                                            
+                                    .thisLine.ru = _
+                                        CStr(wynikSzukania1.Offset(0, _
+                                            EVO.E_FROM_SQ01_QUASI_TP04_RU - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value)
+                                            
+                                    .thisLine.div = _
+                                        CStr(wynikSzukania1.Offset(0, _
+                                            EVO.E_FROM_SQ01_QUASI_TP04_DIV - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value)
+                                    
+                                    
                                     .thisLine.cofor = r.Offset(0, EVO.E_MASTER_cofor - 1).Value
-                                    .thisLine.price = wynikSzukania1.Offset(0, EVO.E_TP04_01_PRIX - EVO.E_TP04_01_ARTICLE).Value
-                                    .thisLine.curr = wynikSzukania1.Offset(0, EVO.E_TP04_01_DEV - EVO.E_TP04_01_ARTICLE).Value
+                                    
+                                    .thisLine.price = _
+                                        parsePriceAgain(wynikSzukania1.Offset(0, _
+                                            EVO.E_FROM_SQ01_QUASI_TP04_SUM - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value)
+                                            
+                                    .thisLine.curr = _
+                                        wynikSzukania1.Offset(0, _
+                                            EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value
                                     
                                     .thisLine.rate = 1
                                     On Error Resume Next
@@ -255,7 +287,7 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet)
                                 If bMatched2 Then
                                     .baseLine.article = wynikSzukania2.Value
                                     .baseLine.cofor = r.Offset(0, EVO.E_MASTER_cofor - 1).Value
-                                    .baseLine.price = wynikSzukania2.Offset(0, EVO.E_TP04_01_PRIX - EVO.E_TP04_01_ARTICLE).Value
+                                    .baseLine.price = parsePriceAgain(wynikSzukania2.Offset(0, EVO.E_TP04_01_PRIX - EVO.E_TP04_01_ARTICLE).Value)
                                     .baseLine.curr = wynikSzukania2.Offset(0, EVO.E_TP04_01_DEV - EVO.E_TP04_01_ARTICLE).Value
                                     
                                     .baseLine.rate = 1
@@ -303,12 +335,13 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet)
             
             If pt04ItemDictionary.Count > 0 Then
             
-                Dim repSh As Worksheet, repRng As Range, outputIter As Variant
+                Dim repsh As Worksheet, repRng As Range, outputIter As Variant
             
-                Set repSh = ThisWorkbook.Sheets.Add
-                tryToRename repSh
-                addLabelsToPT04Report repSh, pusMasterSheet
-                Set repRng = repSh.Cells(2, 1)
+                Set repsh = ThisWorkbook.Sheets.Add
+                ' tryToRename repSh
+                repsh.name = EVO.TryToRenameModule.tryToRenameWorksheet(repsh, "TP04_")
+                addLabelsToPT04Report repsh, pusMasterSheet
+                Set repRng = repsh.Cells(2, 1)
             
                 Do
                     If Not r.EntireRow.Hidden Then
@@ -320,29 +353,89 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet)
                         
                         
                         If Not pt04Item Is Nothing Then
+                        
+                            If r.Offset(0, EVO.E_MASTER_Reference - 1).Value Like "*-??" Then
                             
-                            For outputIter = EVO.E_MASTER_Reference To E_MASTER_TMC
-                                repRng.Offset(0, outputIter - 1).Value = r.Offset(0, outputIter - 1).Value
-                            Next outputIter
                             
-                            'For outputIter = E_TP04_OUTPUT_REP_PART_PRESERIAL To EVO.E_TP04_OUTPUT_REP_PART_OKNOK
-                            'Next outputIter
-                            
-                            repRng.Offset(0, E_TP04_OUTPUT_REP_PART_PRESERIAL - 1).Value = _
-                                pt04Item.thisLine.finalPrice
-                            repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_INIT_SERIAL_PRICE - 1).Value = _
-                                pt04Item.baseLine.finalPrice
+                                ' Debug.Assert Trim(r.Value) <> "9677602580-03"
                                 
-                            repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1).Value = _
-                                CDbl(pt04Item.thisLine.finalPrice / pt04Item.baseLine.finalPrice)
+                                ' new 060
+                                ' two ENUMS!!!
+                                ' E_TP04_OUTPUT_REP_ - just part after blue columns from PUS!
+                                ' evo.E_ADJUSTED_SQ01 - all the table!
+                                repRng.Offset(0, EVO.E_ADJUSTED_SQ01_DOMAIN - 1).Value = _
+                                    pt04Item.thisLine.domain
+                                    
+                                repRng.Offset(0, EVO.E_ADJUSTED_SQ01_DIV - 1).Value = _
+                                    pt04Item.thisLine.div
+                                    
+                                repRng.Offset(0, EVO.E_ADJUSTED_SQ01_RU - 1).Value = _
+                                    pt04Item.thisLine.ru
+                                
                             
                             
-                            repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = defineOKNOKon(repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1))
-                            If repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK" Then
-                                repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Interior.Color = RGB(245, 0, 0)
+                                For outputIter = EVO.E_MASTER_Reference To E_MASTER_TMC
+                                    repRng.Offset(0, outputIter - 1).Value = r.Offset(0, outputIter - 1).Value
+                                Next outputIter
+                                
+                                'For outputIter = E_TP04_OUTPUT_REP_PART_PRESERIAL To EVO.E_TP04_OUTPUT_REP_PART_OKNOK
+                                'Next outputIter
+                                
+                                If byUnit Then
+                                    ' tbd
+                                    
+                                    repRng.Offset(0, E_TP04_OUTPUT_REP_PART_PRESERIAL - 1).Value = _
+                                        pt04Item.thisLine.priceInEur
+                                    repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_INIT_SERIAL_PRICE - 1).Value = _
+                                        pt04Item.baseLine.priceInEur
+                                        
+                                    repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1).Value = _
+                                        CDbl(pt04Item.thisLine.priceInEur / pt04Item.baseLine.priceInEur)
+                                    
+                                    
+                                    If CDbl(pt04Item.baseLine.priceInEur) = 0# And CDbl(pt04Item.thisLine.priceInEur) = 0# Then
+                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK"
+                                    Else
+                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = defineOKNOKon(repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1))
+                                    End If
+        
+                                    
+                                    If repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK" Then
+                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Interior.Color = RGB(245, 0, 0)
+                                    End If
+                                Else
+                                
+                                    ' byUnit = false is default!
+                                    ' so taking final price after div on size of the packaging!
+                                
+                                    repRng.Offset(0, E_TP04_OUTPUT_REP_PART_PRESERIAL - 1).Value = _
+                                        pt04Item.thisLine.finalPrice
+                                    repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_INIT_SERIAL_PRICE - 1).Value = _
+                                        pt04Item.baseLine.finalPrice
+                                        
+                                    repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1).Value = _
+                                        CDbl(pt04Item.thisLine.finalPrice / pt04Item.baseLine.finalPrice)
+                                    
+                                    
+                                    If CDbl(pt04Item.baseLine.finalPrice) = 0# And CDbl(pt04Item.thisLine.finalPrice) = 0# Then
+                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK"
+                                    Else
+                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = defineOKNOKon(repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1))
+                                    End If
+        
+                                    
+                                    If repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK" Then
+                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Interior.Color = RGB(245, 0, 0)
+                                    End If
+                                End If
+                                    
+                                Set repRng = repRng.Offset(1, 0)
+                                
+                            Else
+                            
+                                ' Debug.Print r.Offset(0, EVO.E_MASTER_Reference - 1).Value & " " & r.Offset(0, EVO.E_MASTER_Reference - 1).row
+                                
                             End If
-                                
-                            Set repRng = repRng.Offset(1, 0)
                             
                             
                         Else
@@ -378,6 +471,27 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet)
         MsgBox "No data to match!", vbCritical
     End If
 End Sub
+
+
+Private Function parsePriceAgain(x As Variant) As Double
+    
+    If IsNumeric(x) Then
+        'Debug.Print x
+        
+        parsePriceAgain = CDbl(x)
+    Else
+        'Debug.Print x & " " & Len(x)
+        
+        If x Like "*.???,??" Then
+            
+            'Debug.Print "yes it is!"
+            x = Replace(x, ".", "")
+            parsePriceAgain = CDbl(x)
+        End If
+        
+    End If
+End Function
+
 
 
 Private Function calcUn(param As String) As Double
@@ -451,6 +565,38 @@ Private Sub addLabelsToPT04Report(sh1tp04 As Worksheet, pusMasterSheet As Worksh
         .Cells(1, x).Font.Bold = True
         
         
+        ' x = E_MASTER_TMC + 4 ===     E_ADJUSTED_SQ01_OKNOK
+        ' E_ADJUSTED_SQ01_WITH_INDEX
+        ' E_ADJUSTED_SQ01_IS_INTERNAL
+        ' E_ADJUSTED_SQ01_IS_IN_TANGO
+        .Cells(1, E_ADJUSTED_SQ01_WITH_INDEX).Value = "WITH_INDEX"
+        .Cells(1, E_ADJUSTED_SQ01_WITH_INDEX).Font.Bold = True
+        .Cells(1, E_ADJUSTED_SQ01_IS_INTERNAL).Value = "IS_INTERNAL"
+        .Cells(1, x).Font.Bold = True
+        .Cells(1, E_ADJUSTED_SQ01_IS_IN_TANGO).Value = "IS_IN_TANGO"
+        .Cells(1, E_ADJUSTED_SQ01_IS_IN_TANGO).Font.Bold = True
+        .Cells(1, EVO.E_ADJUSTED_SQ01_TANGO_PCS_PRICE).Value = "TANGO_PCS_PRICE"
+        .Cells(1, EVO.E_ADJUSTED_SQ01_TANGO_PCS_PRICE).Font.Bold = True
+        .Cells(1, EVO.E_ADJUSTED_SQ01_TANGO_PCS_PRICE).EntireColumn.ColumnWidth = 10
+        
+        .Cells(1, EVO.E_ADJUSTED_SQ01_DIV).Value = "DIV"
+        .Cells(1, EVO.E_ADJUSTED_SQ01_DIV).Font.Bold = True
+        .Cells(1, EVO.E_ADJUSTED_SQ01_DIV).EntireColumn.ColumnWidth = 8
+        
+        .Cells(1, EVO.E_ADJUSTED_SQ01_DOMAIN).Value = "DOMAIN"
+        .Cells(1, EVO.E_ADJUSTED_SQ01_DOMAIN).Font.Bold = True
+        .Cells(1, EVO.E_ADJUSTED_SQ01_DOMAIN).EntireColumn.ColumnWidth = 9
+        
+        .Cells(1, EVO.E_ADJUSTED_SQ01_RU).Value = "RU"
+        .Cells(1, EVO.E_ADJUSTED_SQ01_RU).Font.Bold = True
+        .Cells(1, EVO.E_ADJUSTED_SQ01_RU).EntireColumn.ColumnWidth = 6
+        
+        
+        .Cells(1, EVO.E_ADJUSTED_SQ01_MANAGER_DA).Value = "Managers DA"
+        .Cells(1, EVO.E_ADJUSTED_SQ01_MANAGER_DA).Font.Bold = True
+        .Cells(1, EVO.E_ADJUSTED_SQ01_MANAGER_DA).EntireColumn.ColumnWidth = 12
+        
+        
         ' auto width
         Dim awtr As Range
         Set awtr = .Range(.Cells(E_MASTER_TMC + 1, 1), .Cells(1, E_MASTER_TMC + 4)) ' :P
@@ -471,7 +617,8 @@ Private Function defineRangeOfArticlesFromPT04() As Range
     
     If CStr(r.Offset(1, 0).Value) <> "" Then
     
-        Set defineRangeOfArticlesFromPT04 = tp04Sheet.Range(r, r.End(xlDown))
+        Set defineRangeOfArticlesFromPT04 = tp04Sheet.Range(r, r.Parent.Range("A1048576").End(xlUp).Offset(1, 0))
+        
         
         Debug.Print defineRangeOfArticlesFromPT04.Address
     End If

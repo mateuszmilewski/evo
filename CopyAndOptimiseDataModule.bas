@@ -48,8 +48,8 @@ Public Sub copyData(ictrl As IRibbonControl)
         
         
         For Each w In Application.Workbooks
-            .ComboBoxFeed.AddItem w.name
-            .ComboBoxMaster.AddItem w.name
+            .ComboBoxFeed.addItem w.name
+            .ComboBoxMaster.addItem w.name
         Next w
         
         
@@ -60,6 +60,29 @@ Public Sub copyData(ictrl As IRibbonControl)
 End Sub
 
 Public Sub innerCopyData(masterFileName, feedFileName, Optional sh As StatusHandler)
+
+
+
+
+    ' additional question about how to treat ECHANCIER ONL (semaine)
+    
+    ECHANCIER_ONL_CW_TREAT_FORM.show
+    
+    
+    Dim eAnswer As E_ECHANCIER_ONL_semaine_SCENARIO
+    
+    If ECHANCIER_ONL_CW_TREAT_FORM.whatYouChoose = E_ECHANCIER_ONL_semaine_SCENARIO_DEL Then
+        eAnswer = E_ECHANCIER_ONL_semaine_SCENARIO_DEL
+    ElseIf ECHANCIER_ONL_CW_TREAT_FORM.whatYouChoose = E_ECHANCIER_ONL_semaine_SCENARIO_PU Then
+        eAnswer = E_ECHANCIER_ONL_semaine_SCENARIO_PU
+    Else
+        MsgBox "not possible for ECHANCIER_ONL_CW_TREAT_FORM to have diff ENUM value!", vbCritical
+        End
+    End If
+    
+    
+    
+    
 
 
     Application.ScreenUpdating = False
@@ -81,7 +104,7 @@ Public Sub innerCopyData(masterFileName, feedFileName, Optional sh As StatusHand
 
     Dim copy_h As CopyHandler
     Set copy_h = New CopyHandler
-    copy_h.init m, f, E_COPY_HANDLER_COPY_ONE
+    copy_h.init m, f, E_COPY_HANDLER_COPY_ONE, eAnswer
     
     copy_h.copyData sh
     

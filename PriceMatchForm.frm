@@ -38,8 +38,8 @@ Private Sub BtnFromExternalFile_Click()
         
         
         For Each w In Application.Workbooks
-            .ComboBoxFeed.AddItem w.name
-            .ComboBoxMaster.AddItem w.name
+            .ComboBoxFeed.addItem w.name
+            .ComboBoxMaster.addItem w.name
         Next w
         
         

@@ -37,42 +37,78 @@ Option Explicit
 ' THE EVO TOOL
 
 
-
-Public Function recalculDatesIfSatOrSun(ByRef li As LineItem)
+Public Function simpleByCellValidation(sh1 As Worksheet) As E_PIVOT_STD
+    simpleByCellValidation = E_PIVOT_ANGEL_STD
     
-    
-    Dim d1 As Date
-    Dim d2 As Date
-    ' iteration date
-    Dim id As Date
-    
-    d1 = li.puDate
-    d2 = li.delDate
-    
-    id = d1
-    Dim howManyDaysOffOffset As Long, wd As Integer
-    howManyDaysOffOffset = 0
-    Do
-        wd = Int(Application.WorksheetFunction.Weekday(id, 2))
-        
-        If Int(wd) = 6 Or Int(wd) = 7 Then
-            howManyDaysOffOffset = howManyDaysOffOffset + 1
+    Dim tmpB As Boolean
+    tmpB = True
+    If sh1.Cells(1, 1).Value = "DELIVERY YEAR" Then
+        If sh1.Cells(2, 1).Value = "DELIVERY WEEK" Then
+            If sh1.Cells(3, 1).Value = "TYPE_DE_PIECE" Then
+            
+                If sh1.Cells(5, 1).Value = "OQ ( OQ 2 )" Then
+                
+                    simpleByCellValidation = E_PIVOT_CAROLINE_STD
+                    
+                ElseIf sh1.Cells(5, 1).Value = "Th(RN)(mL)" Then
+                
+                    simpleByCellValidation = E_PIVOT_ANGEL_STD
+                    
+                Else
+                    tmpB = True
+                End If
+            Else
+                tmpB = False
+            End If
+        Else
+            tmpB = False
         End If
-        id = id + 1
-    Loop While id < (d2 + 1)
-    
-    li.puDate = CDate(li.puDate - howManyDaysOffOffset)
-    
-    wd = Application.WorksheetFunction.Weekday(li.puDate, 2)
-    
-    If Int(wd) = 7 Then
-        li.puDate = CDate(li.puDate - 2)
+    Else
+        tmpB = False
     End If
     
-    If Int(wd) = 6 Then
-        li.puDate = CDate(li.puDate - 1)
+    If Not tmpB Then
+        MsgBox "This active sheet is not pivot in proper stanard!"
+        End
     End If
 End Function
+
+
+Public Sub recalculDatesIfSatOrSun(ByRef li As LineItem, Optional e As E_ECHANCIER_ONL_semaine_SCENARIO)
+
+
+    Dim wd As Variant
+    
+    
+    
+    If e = E_ECHANCIER_ONL_semaine_SCENARIO_DEL Then
+    
+        wd = Application.WorksheetFunction.Weekday(li.puDate, 2)
+        
+        If Int(wd) = 7 Then
+            li.puDate = CDate(li.puDate - 2)
+        End If
+        
+        If Int(wd) = 6 Then
+            li.puDate = CDate(li.puDate - 1)
+        End If
+        
+    ElseIf e = E_ECHANCIER_ONL_semaine_SCENARIO_PU Then
+    
+    
+        wd = Application.WorksheetFunction.Weekday(li.delDate, 2)
+        
+        If Int(wd) = 7 Then
+            li.delDate = CDate(li.delDate + 1)
+        End If
+        
+        If Int(wd) = 6 Then
+            li.delDate = CDate(li.delDate + 2)
+        End If
+        
+        
+    End If
+End Sub
 
 
 Public Function validateSearching(pleRng As Range, cloeRng As Range, mainRng As Range, condiRng As Range) As Boolean
@@ -84,29 +120,36 @@ Public Function validateSearching(pleRng As Range, cloeRng As Range, mainRng As 
                 If Not condiRng Is Nothing Then
                     validateSearching = True
                 Else
-                    On Error Resume Next
-                    MsgBox "condi data missing for cofor exp: " & mainRng.Value, vbCritical
-                    MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
-                    End
+                    'On Error Resume Next
+                    'MsgBox "condi data missing for cofor exp: " & mainRng.Value, vbCritical
+                    'MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+                    'End
+                    
+                    Debug.Print "condi data missing for cofor exp: " & mainRng.Value & mainRng.row
                 End If
             Else
-                On Error Resume Next
-                MsgBox "main data missing for cofor exp: " & mainRng.Value, vbCritical
-                MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
-                End
+                'On Error Resume Next
+                'MsgBox "main data missing for cofor exp: " & mainRng.Value, vbCritical
+                'MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+                'End
+                
+                Debug.Print "main data missing for cofor exp: " & mainRng.Value & mainRng.row
             End If
         Else
-            On Error Resume Next
-            MsgBox "cloe data missing for cofor exp: " & mainRng.Value, vbCritical
-            MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
-            End
+            'On Error Resume Next
+            'MsgBox "cloe data missing for cofor exp: " & mainRng.Value, vbCritical
+            'MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+            'End
             
+            Debug.Print "cloe data missing for cofor exp: " & mainRng.Value & mainRng.row
         End If
     Else
-        On Error Resume Next
-        MsgBox "PLE missing for cofor exp: " & mainRng.Value, vbCritical
-        MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
-        End
+        'On Error Resume Next
+        'MsgBox "PLE missing for cofor exp: " & mainRng.Value, vbCritical
+        'MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+        'End
+        
+        Debug.Print "ple data missing for cofor exp: " & mainRng.Value & mainRng.row
     End If
 End Function
 
@@ -194,6 +237,11 @@ Public Function calculateYYYYCW(s As String)
 
 
     Dim arr As Variant
+    Dim cw As String
+    Dim yy As String
+    
+    Dim yyyycw As Long
+    Dim yyyy As Long
     
     
     If VBA.Left(s, 1) = "S" Then
@@ -202,10 +250,7 @@ Public Function calculateYYYYCW(s As String)
     
         arr = Split(s, "/")
         
-        Dim cw As String
-        Dim yy As String
-        
-        Dim yyyycw As Long
+
         ' wazne na 1000 lat :)
         yyyycw = 200000
         
@@ -217,6 +262,49 @@ Public Function calculateYYYYCW(s As String)
         
         calculateYYYYCW = yyyycw
     
+    
+    ElseIf VBA.Left(s, 2) = "CW" Then
+    
+        
+        yyyy = Year(Date)
+        yyyy = yyyy * 100
+        
+        s = VBA.Mid(s, 3)
+        
+        If IsNumeric(s) Then
+            
+            cw = CStr(s)
+        Else
+            cw = CStr(Application.WorksheetFunction.IsoWeekNum(Date))
+        End If
+        
+        
+        yyyycw = CLng(yyyy) + CLng(cw)
+        
+        calculateYYYYCW = yyyycw
+        
+    ElseIf VBA.Mid(s, 3, 3) = "-CW" Then
+    
+        yyyy = 2000
+        
+        yyyy = yyyy + CLng(CStr(VBA.Left(s, 2)))
+        
+        arr = Split(s, "CW")
+        cw = CStr(arr(1))
+        If Len(cw) = 1 Then
+            cw = "0" & CStr(cw)
+        End If
+        
+        If IsNumeric(cw) Then
+            cw = CStr(cw)
+        Else
+            cw = CStr(Application.WorksheetFunction.IsoWeekNum(Date))
+        End If
+        
+        
+        yyyycw = CStr(yyyy) + CStr(cw)
+        calculateYYYYCW = yyyycw
+        
     Else
         MsgBox "Wrong format of the weeks in ECHANCIER ONL (semaine)!", vbCritical
         End
@@ -233,6 +321,9 @@ Public Sub makeMyFormulas(sh As Worksheet)
     
     Dim r As Range, lastRow As Long, wynikParsu As String
     lastRow = calcLastRowInThisPivotSource(sh)
+    
+    ThisWorkbook.Activate
+    sh.Activate
     
     makeSpecificSumIf sh, r, CLng(lastRow), E_PIVOT_SRC_QTY, E_PIVOT_SRC_SUMIF_QTY
     makeSpecificSumIf sh, r, CLng(lastRow), E_PIVOT_SRC_CQTY, E_PIVOT_SRC_SUMIF_CQTY
@@ -505,15 +596,35 @@ Public Function makeLeanCopyOfPivotSource(sh As Worksheet) As Worksheet
     ' Sheets("SrcPivot_20200408_II").Select
     ' sh.Activate
     Set newSh = ThisWorkbook.Sheets.Add
-    sh.UsedRange.Copy
-    newSh.Paste
-    Application.CutCopyMode = False
+    'sh.UsedRange.Copy newSh.Cells(1, 1)
+    ' newSh.PasteSpecial xlValues
+    'Application.CutCopyMode = False
     ' Set newSh = ActiveSheet
     'Debug.Print newSh.Name
     ' Range("A1").Select
-    Selection.RemoveDuplicates columns:=1, Header:=xlYes
     
-    newSh.Cells(1, 1).Select
+    ' Debug.Print Selection.Address
+    'Selection.RemoveDuplicates columns:=1, Header:=xlYes
+    
+    'newSh.Cells(1, 1).Select
+    'quick and dirty hack
+    Dim x As Variant, y As Variant
+    For x = 1 To 500000
+        For y = 1 To 100
+        
+            If sh.Cells(x, 1).Value = "" Then
+                Exit For
+            End If
+            
+            If sh.Cells(x, y).Value <> "" Then
+                newSh.Cells(x, y).Value = sh.Cells(x, y).Value
+            End If
+        Next y
+    Next x
+    
+    newSh.Range(newSh.Cells(1, 1), newSh.Cells(500000, 100)).Select
+    Selection.RemoveDuplicates columns:=1, Header:=xlYes
+    newSh.Range("A1").Select
     
     With newSh
 
@@ -544,9 +655,7 @@ Public Sub makePivot(ByRef ph As PivotHandler)
     
     lastRow = calcLastRowInThisPivotSource(sh)
 
-    ' Sheets("SrcPivot_20200408_II").Select
-    ' sh.Activate
-    ' Set newSh = ThisWorkbook.Sheets.Add
+
     Set r = sh.UsedRange
     ' Looks like it is OK!
     Debug.Print r.Address
@@ -573,9 +682,7 @@ Public Sub makeTPivot(ByRef ph As PivotHandler)
     
     lastRow = calcLastRowInThisPivotSource(sh)
 
-    ' Sheets("SrcPivot_20200408_II").Select
-    ' sh.Activate
-    ' Set newSh = ThisWorkbook.Sheets.Add
+
     Set r = sh.UsedRange
     ' Looks like it is OK!
     Debug.Print r.Address
@@ -590,7 +697,61 @@ Public Sub makeTPivot(ByRef ph As PivotHandler)
 End Sub
 
 
-Public Sub copyThisPivotToTcamReport(ByRef ph As PivotHandler)
+
+Public Sub makePivot2(ByRef ph As PivotHandler2)
+    
+    Dim r As Range, lastRow As Long, wynikParsu As String, localPivotSh As Worksheet
+    Dim sh As Worksheet
+    
+    
+    Set sh = ph.proxy2
+    Set localPivotSh = ph.getPivot()
+    
+    lastRow = calcLastRowInThisPivotSource(sh)
+
+
+    Set r = sh.UsedRange
+'    ' Looks like it is OK!
+    Debug.Print r.Address
+    Debug.Print localPivotSh.name
+
+    ph.setRangeDataFromProxy2ForPivot r
+    ' ==================================================
+    ph.runMainLogicForCreationPivotTable
+    ' ==================================================
+    
+    
+End Sub
+
+
+
+Public Sub makeTPivot2(ByRef ph As PivotHandler2)
+    
+    Dim r As Range, lastRow As Long, wynikParsu As String, localPivotSh As Worksheet
+    Dim sh As Worksheet
+    
+    
+    Set sh = ph.proxy2
+    Set localPivotSh = ph.getPivot()
+    
+    lastRow = calcLastRowInThisPivotSource(sh)
+    
+    Set r = sh.UsedRange
+    ' Looks like it is OK!
+    Debug.Print r.Address
+    Debug.Print localPivotSh.name
+    
+    ph.setRangeDataFromProxy2ForPivot r
+    ' ==================================================
+    ph.runMainLogicForCreationTheoreticPivotTable
+    ' ==================================================
+    
+    
+End Sub
+
+
+
+Public Sub copyThisPivotToTcamReport(ByRef ph As PivotHandler, Optional e As E_PIVOT_STD)
 
     
     ph.tcamSheet.Cells(1, 1).Value = "TCAM REPORT"
@@ -601,6 +762,7 @@ Public Sub copyThisPivotToTcamReport(ByRef ph As PivotHandler)
     
     ph.tcamSheet.Cells(2, 4).Value = "PIVOT"
     ph.tcamSheet.Cells(2, 5).Value = ph.getPivot.name
+    
     
     
     
@@ -714,7 +876,14 @@ Public Sub copyThisPivotToTcamReport(ByRef ph As PivotHandler)
                 'ostatniWiersz
                 deco_r.Value = "SUM: "
                 wsadzFormulySumy deco_r, deco_r.Offset(0, 1), startingPointData, ileMamyKolumn
-                wsadzFormulyDlaCloeData ph.tcamSheet, deco_r, deco_r.Offset(0, 1), startingPointData, ileMamyKolumn
+                
+                If e = E_PIVOT_ANGEL_STD Then
+                    wsadzFormulyDlaCloeData ph.tcamSheet, deco_r, deco_r.Offset(0, 1), startingPointData, ileMamyKolumn
+                ElseIf e = E_PIVOT_CAROLINE_STD Then
+                    wsadzFormulyDlaCloeData_CarolineApproach ph.tcamSheet, deco_r, deco_r.Offset(0, 1), startingPointData, ileMamyKolumn
+                Else
+                    MsgBox "No good std in this section! Call dev! :D", vbCritical
+                End If
             End If
             ' ------------------------------------------------------------------------
             Set deco_r = deco_r.Offset(1, 0)
@@ -867,6 +1036,48 @@ Private Sub wsadzFormulySumy(fstSumRange As Range, tmpDecoRange As Range, sp As 
     
 End Sub
 
+Private Sub wsadzFormulyDlaCloeData_CarolineApproach(tcamSh As Worksheet, fstSumRange As Range, tmpDecoRange As Range, sp As Range, imk As Long)
+    
+    ' sp stands for starting point
+    ' imk stands for copy from ileMamyKolumn
+    
+    Dim tmpValue As Double, tmpFromFormula As String, adr1 As String, adr2 As String
+    Dim columnMount As Long, columnDiff As Long
+    Dim formulaFromRegister As Range, rangeForCloeFormula As Range
+    Set formulaFromRegister = ThisWorkbook.Sheets("register").Range("Z20")
+    Set rangeForCloeFormula = Nothing
+    
+    columnMount = CLng(imk - 4)
+    
+    tmpFromFormula = CStr(formulaFromRegister.FormulaR1C1Local)
+    
+    Set tmpDecoRange = tmpDecoRange.Offset(0, columnMount - 1)
+    
+    adr1 = CStr(sp.Offset(1, columnMount).Address)
+    adr2 = CStr(tmpDecoRange.Offset(-1, 0).Address)
+    
+    Debug.Print "adrs: " & adr1 & ":" & adr2
+    
+    With tcamSh.Range("" & adr1 & ":" & adr2).Validation
+        .Delete
+        .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:=xlBetween, Formula1:="=register!$T$1:$T$" & _
+            CStr(ThisWorkbook.Sheets("register").Range("T1").End(xlDown).row)
+        .IgnoreBlank = True
+        .InCellDropdown = True
+        .InputTitle = ""
+        .ErrorTitle = ""
+        .InputMessage = ""
+        .ErrorMessage = ""
+        .ShowInput = True
+        .ShowError = True
+    End With
+    
+    
+    Set rangeForCloeFormula = tcamSh.Range("" & adr1 & ":" & adr2).Offset(0, 1)
+    tmpFromFormula = Replace(tmpFromFormula, "X", "1")
+    rangeForCloeFormula.FormulaR1C1Local = tmpFromFormula
+
+End Sub
 
 
 

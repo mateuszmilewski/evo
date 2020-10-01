@@ -75,6 +75,7 @@ Public Sub runMainLogicForCreationTheoreticPivotTable()
         ' test loop through fields
         Dim pfs As PivotFields, pf As PivotField, pi As PivotItem
         Set pfs = pT.PivotFields
+        
         For Each pf In pfs
             Debug.Print pf.name
             ' Debug.Print pf.Orientation

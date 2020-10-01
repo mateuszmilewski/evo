@@ -393,3 +393,304 @@ Option Explicit
 ' z perspektywy pckg
 
 ' ==============================================================
+
+
+
+' 0.38
+' ==============================================================
+'
+' welcome
+' fixes on register
+
+' ==============================================================
+
+
+
+
+
+' 0.39
+' ==============================================================
+'
+' changes on TCAM report
+' based on information of Caroline!
+' a little bit different approach on data
+' new values, new columns etc...
+' shipper cofor + supplier name
+' Change meters to condi and boxes
+' brak danych ple, cloe or main -> musi byc drugi raport ktory pokazuje braki!
+
+
+' CopyHandler line 745: starts from here extra worksheet - but only flag
+' for nok report - missing data - nto available for pivot!
+' for pivot proxy2 -> and finally from TCAM!
+' later doubleLoop... sub for treatment
+'
+'Private Sub doubleLoopForNOKrepForTCAMLogic(mmk1 As Variant, mmk2 As Variant,
+'    ByRef mmexpCofors As Dictionary,
+'    ByRef mmlinesIter As Dictionary,
+'    mmli As LineItem)
+
+
+' new NOK report:
+' TCAM_NOKs_YYYYMMDD_ checking availablity for CONDI, CLOE nad PLE
+' creating after clicking craete source for pivot
+' in parallel with source and proxy2
+
+
+' ==============================================================
+
+
+
+
+' 0.39
+' ==============================================================
+'
+' zmiana na ECHANCIER ONL (semaine) z S??/?? na CW??
+' dodatkowe sprawdzenie
+
+
+' ==============================================================
+
+' 0.40 + 0.41
+' ==============================================================
+' minor changes in formatting
+' new feature for internal fourniseures ...
+' new transaction from sigapp
+' Y_PI1_80000391
+' newSh.PasteSpecial Paste:=xlPasteValues - in copy to proxy2!
+' ==============================================================
+
+
+
+
+' 0.42
+' ==============================================================
+'
+' fix on tcam logic- proxy2 stopped in the middle!
+' now it should work!
+' ==============================================================
+
+
+' 0.43
+' ==============================================================
+' preliminary feature for forecase pp1x so called green light
+' ==============================================================
+
+
+' 0.44
+' ==============================================================
+' tcam update - fix about CLOE NOK and PLE NOK
+' ==============================================================
+
+
+
+' 0.45
+' ==============================================================
+' mb51 now inside
+' some changes in sq01 and internal parts - seperate please!
+' ==============================================================
+
+' 0.46
+' ==============================================================
+' adjusting layouts for final list
+' ==============================================================
+
+
+
+' 0.47
+' ==============================================================
+' final touch for reports green light and reception
+'
+' new final touch modules
+'
+' ==============================================================
+
+
+' 0.48
+' =============================================================
+' final touch for reception ready
+' + green light dev in this version
+' + starting point for final report leaf
+' input def synthese preparation
+'
+' ==============================================================
+
+
+' 0.49
+' ==============================================================
+' quick side fix for DHxx copy
+' 1324 CopyHandler - DHxx + DAP + DDP logic - smth wrong here
+' ==============================================================
+
+
+' 0.50
+' ==============================================================
+' quick side fix for DHxx copy - going back to org logic
+' extra check in BASE CPL - if there is a dates - chose them
+' first!
+' ==============================================================
+
+
+' 0.50
+' ==============================================================
+' combo time - one form rulez
+' somea automatic recognition on data
+' for example for RU - reception can have data only when
+' in EVO there is some data from source from green light
+' quite complicated for reception part
+' but i will just made simple loop and check trough whole evo
+
+' ==============================================================
+
+
+' 0.51
+' ==============================================================
+' combo time - one form rulez
+' extra logic for smart lookup custom made
+
+' ==============================================================
+
+
+
+
+' 0.52 + 0.53
+' ==============================================================
+' small fixes
+' +
+' managers list
+' Y_DI3_8000594 - not done inside ManagersDAModule - tbd
+
+' ==============================================================
+
+
+
+' 0.54
+' ==============================================================
+'
+' managers list
+' Y_DI3_8000594 = tbc
+
+'
+' change logic for calc DHxx - now need to have
+'
+' ECHANCIER ONL (semaine) - question before copy data
+
+
+' ==============================================================
+
+
+
+' 0.55 + 0.56
+' ==============================================================
+'
+' managers da logic initial + final touch  buttons
+' starting logic for combo forecast
+' ==============================================================
+
+
+' 0.57
+' ==============================================================
+'
+' lot of mistakes in version < 0.56 > 0.55
+' this version run successfully on PPx1 - lot of fixes
+' on reception issue with ENUMS !!
+
+' ==============================================================
+
+
+' 0.58
+' ==============================================================
+'
+' going back to TCAM volume 2
+
+' ==============================================================
+
+
+' 0.58 + 0.59
+' ==============================================================
+'
+' UN issue - wrong column taken into cosideration!
+' there is 2 columns UN: UQs and UNx - UQs is the right one!
+
+' ==============================================================
+
+
+' 0.60
+' ==============================================================
+'
+' prepa for auto managers da
+' new columns in green light! (domain, ru, div)
+' to auto recognize where i should look for
+' managers in Y_DI3_80000594
+
+' ==============================================================
+
+
+' 0.61 + 0.62
+' ==============================================================
+'
+' sq01 adjusted so tp04 prefix - new column at the end
+' manager da
+
+' partial solution! - some issues with OLE waiting too long
+' maybe i should ignore this issue with RU = 4 PM confirmed
+'
+' recheck pivot 2 logic making final tcam logic
+'
+
+' ==============================================================
+
+
+
+' 0.63
+' ==============================================================
+'
+' initiall feeback logic from mb51 for tp04
+'
+'
+' ==============================================================
+
+
+' 0.64
+' ==============================================================
+'
+' ModelessLeaf
+'
+'
+' ==============================================================
+
+
+' 0.64 + 0.65 + 0.66 + 0.67
+' ==============================================================
+'
+' change in pus - now version 2.6 - change on ECHANCIER ONL (semaine)
+' new layout from col E YY-CWXX
+' have issue with TMC - who will be now optimising?
+' '
+' new standard on
+' fortunanetly i have good q on code
+' implementation provided is in operations handler...
+' there is dry logic:
+' .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+' every echancier onl data will first of all calc into std yyyycw
+'
+' Public Function calculateYYYYCW(s As String) in 227 in OperationsHandler class
+'
+'
+' ==============================================================
+
+
+' 0.68
+' ==============================================================
+'
+' ModelessLeaf - activate the export button for making new
+' workbook which already provides one leaf of the report
+' ==============================================================
+
+
+' 0.69 + 0.70
+' ==============================================================
+'
+' 069 backup version
+' 070 finally first vresion of combo form for green light data
+' ==============================================================

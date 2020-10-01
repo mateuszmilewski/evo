@@ -49,8 +49,8 @@ Public Sub createSourceForPivot(ictrl As IRibbonControl)
         
         
         For Each w In Application.Workbooks
-            .ComboBoxFeed.AddItem w.name
-            .ComboBoxMaster.AddItem w.name
+            .ComboBoxFeed.addItem w.name
+            .ComboBoxMaster.addItem w.name
         Next w
         
         .ComboBoxFeed.Value = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("m2").Value
@@ -109,6 +109,16 @@ Public Sub makeTPivot(ictrl As IRibbonControl)
     MsgBox "READY!"
 End Sub
 
+Public Sub makePivot2(ictrl As IRibbonControl)
+    innerMakePivot2
+    MsgBox "READY!"
+End Sub
+
+Public Sub makeTPivot2(ictrl As IRibbonControl)
+    innerMakeTPivot2
+    MsgBox "READY!"
+End Sub
+
 Public Sub makeTCAM(ictrl As IRibbonControl)
     innerMakeTcamByCopingFromPivotOnActiveSheet
     MsgBox "READY!", vbInformation
@@ -161,6 +171,46 @@ Private Sub innerMakeTPivot()
     
 End Sub
 
+
+
+Private Sub innerMakePivot2()
+
+
+    If checkActiveSheetIfItIsProxy2() Then
+    
+        Dim ph As PivotHandler2, oh As OperationsHandler
+        Set ph = New PivotHandler2
+        Set oh = New OperationsHandler
+        
+        Set ph.proxy2 = ActiveSheet
+        ph.initPivotSheet
+        oh.makePivot2 ph
+        
+    Else
+        MsgBox "Proxy2 sheet need to be active to perform action!", vbInformation
+    End If
+    
+End Sub
+
+Private Sub innerMakeTPivot2()
+
+
+    If checkActiveSheetIfItIsProxy2() Then
+    
+        Dim ph As PivotHandler2, oh As OperationsHandler
+        Set ph = New PivotHandler2
+        Set oh = New OperationsHandler
+        
+        Set ph.proxy2 = ActiveSheet
+        ph.initPivotSheet
+        oh.makeTPivot2 ph
+        
+    Else
+        MsgBox "Proxy2 sheet need to be active to perform action!", vbInformation
+    End If
+    
+End Sub
+
 Private Function checkActiveSheetIfItIsProxy2() As Boolean
     checkActiveSheetIfItIsProxy2 = False
     
@@ -198,6 +248,16 @@ Public Sub innerMakeTcamByCopingFromPivotOnActiveSheet()
 
     Dim ph As New PivotHandler
     Dim oh As New OperationsHandler
+    
+    
+    
+    
+    Dim psh As Worksheet
+    Set psh = ThisWorkbook.ActiveSheet
+    
+    Dim e As E_PIVOT_STD
+    e = oh.simpleByCellValidation(psh)
+    
 
 
     Dim thisPivot As PivotTable, srcAdrString As String
@@ -226,7 +286,7 @@ Public Sub innerMakeTcamByCopingFromPivotOnActiveSheet()
             Set ph.proxy2 = Nothing
             On Error Resume Next
             Set ph.proxy2 = ThisWorkbook.Sheets(prxy2ShNm)
-            oh.copyThisPivotToTcamReport ph
+            oh.copyThisPivotToTcamReport ph, e
         End With
     End If
 End Sub

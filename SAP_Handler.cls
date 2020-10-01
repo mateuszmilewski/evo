@@ -39,7 +39,7 @@ Private sess As SAPFEWSELib.GuiSession
 Private window As SAPFEWSELib.GuiModalWindow
 Private c As SAPFEWSELib.GuiCollection
 Private item As SAPFEWSELib.GuiComponent
-Private btn As SAPFEWSELib.GuiButton
+Private Btn As SAPFEWSELib.GuiButton
 Private table As SAPFEWSELib.GuiTableControl ' ISapTableControlTarget
 Private grid As SAPFEWSELib.GuiGridView
 Private gv As SAPFEWSELib.GuiGridView
@@ -60,8 +60,21 @@ Private x As Variant
 Private x2 As Variant
 Private x3 As Variant
 
+
+
+
 Private Sub Class_Initialize()
-    Set sapGuiAuto = GetObject("SAPGUI")
+
+    If EVO.GlobalSapModule.sapGuiAuto Is Nothing Then
+        Set sapGuiAuto = GetObject("SAPGUI")
+        Set EVO.GlobalSapModule.sapGuiAuto = sapGuiAuto
+        Set sapGui = sapGuiAuto.GetScriptingEngine
+        Set EVO.GlobalSapModule.sapGui = sapGui
+    Else
+        Set sapGuiAuto = EVO.GlobalSapModule.sapGuiAuto
+        Set sapGui = EVO.GlobalSapModule.sapGui
+    End If
+    
     Set sapGui = sapGuiAuto.GetScriptingEngine
     Set cnn = sapGui.Connections(0)
     
@@ -93,8 +106,63 @@ Private Sub Class_Terminate()
     Set item = Nothing
 End Sub
 
+Public Sub runMainLogicFor__Y_PI1_80000391(sh1 As Worksheet, ByRef st_h As StatusHandler, ByRef xStHelper As Integer)
+    
+    ' we just taking all the data from this transaction - nothing special!"
+    ' im not proud of this "hack"
+    ' ----------------------------------------------------
+    Dim x17 As Variant
+    For x17 = 0 To 10
+        On Error Resume Next
+        sess.FindById("wnd[0]/tbar[0]/btn[12]").Press
+    Next x17
+    ' ----------------------------------------------------
+    
+    
+    sess.FindById("wnd[0]/tbar[0]/okcd").Text = "Y_PI1_80000391"
+    sess.FindById("wnd[0]").SendVKey 0
+    sess.FindById("wnd[0]/tbar[1]/btn[8]").Press
+    
+    'sess.FindById("wnd[0]/usr/cntlGRID1/shellcont/shell").SetCurrentCell 53, "LFA1-NAME1"
+    'sess.FindById("wnd[0]/usr/cntlGRID1/shellcont/shell").FirstVisibleRow = 31
+    'sess.FindById("wnd[0]/usr/cntlGRID1/shellcont/shell").SelectedRows = "53"
+    
+    Set grid = sess.FindById("wnd[0]/usr/cntlGRID1/shellcont/shell")
+    Set cols = grid.ColumnOrder
+    
+    
+    Dim refOutput2 As Range  ' , lm As Long
+    Set refOutput2 = sh1.Cells(2, 1)
+    
+    ' lm = CLng((ish.Range("A1").End(xlDown).row) / 50)
+    
+    For x = 0 To grid.RowCount - 1
+        For y = 0 To grid.ColumnCount - 1
+        
+        
+            refOutput2.Offset(0, y).Value = CStr(grid.GetCellValue(x, cols(y)))
+        Next y
+        
+        If x Mod 50 = 0 Then
+        
+            grid.FirstVisibleRow = x
+            grid.CurrentCellRow = x
+            
+            ' delegacjaDlaProgresu st_h, xStHelper, 20 ' obsolete
+            ' st_h.progress_increase
+            
+        End If
+        
+        
+        Set refOutput2 = refOutput2.Offset(1, 0)
+    Next x
+End Sub
 
-Public Sub runMainLogicForSQ01__with_preDef(mcfg1 As E_SQ01_CONFIG, ByRef ish As Worksheet, ByRef osh As Worksheet, ByRef st_h As StatusHandler, ByRef xStHelper As Integer)
+
+Public Sub runMainLogicForSQ01__with_preDef(mcfg1 As E_SQ01_CONFIG, ByRef ish As Worksheet, ByRef osh As Worksheet, ByRef st_h As StatusHandler, ByRef xStHelper As Integer, whichLineForInput As Integer)
+
+
+    ' from now on 2 possibilities
 
 
     If mcfg1 = E_SQ01_CONFIG_START_FROM_PASTING_ALREADY_PREPARED_INPUT_LIST Then
@@ -123,15 +191,15 @@ Public Sub runMainLogicForSQ01__with_preDef(mcfg1 As E_SQ01_CONFIG, ByRef ish As
         'sess.FindById("wnd[1]/usr/cntlGRID1/shellcont/shell").DoubleClickCurrentCell
         
         
-        runLoopsWithPreDef "wnd[1]/usr/cntlGRID1/shellcont/shell", E_SQ01_PREDEF_SYSTEM
+        runLoopsWithPreDef "wnd[1]/usr/cntlGRID1/shellcont/shell", E_SQ01_PREDEF_SYSTEM, whichLineForInput
         
-        runLoopsWithPreDef "wnd[0]/usr/cntlGRID_CONT0050/shellcont/shell", E_SQ01_PREDEF_LIST1
+        runLoopsWithPreDef "wnd[0]/usr/cntlGRID_CONT0050/shellcont/shell", E_SQ01_PREDEF_LIST1, whichLineForInput
         
         
         sess.FindById("wnd[0]/tbar[1]/btn[17]").Press
         sess.FindById("wnd[1]").SendVKey 4
         
-        runLoopsWithPreDef "wnd[2]/usr/cntlALV_CONTAINER_1/shellcont/shell", E_SQ01_PREDEF_STD1
+        runLoopsWithPreDef "wnd[2]/usr/cntlALV_CONTAINER_1/shellcont/shell", E_SQ01_PREDEF_STD1, whichLineForInput
         
         
         sess.FindById("wnd[1]/tbar[0]/btn[0]").Press
@@ -178,7 +246,7 @@ Public Sub runMainLogicForSQ01__with_preDef(mcfg1 As E_SQ01_CONFIG, ByRef ish As
             
             
 
-            If x Mod 100 = 0 Then
+            If x Mod 50 = 0 Then
             
                 grid.FirstVisibleRow = x
                 grid.CurrentCellRow = x
@@ -212,14 +280,18 @@ Public Sub runMainLogicForSQ01__with_preDef(mcfg1 As E_SQ01_CONFIG, ByRef ish As
         
         ' tym razem wybieramy konkretnie
         
-        runLoopsWithPreDef "wnd[0]/usr/cntlGRID_CONT0050/shellcont/shell", E_SQ01_PREDEF_LIST2
+        runLoopsWithPreDef "wnd[0]/usr/cntlGRID_CONT0050/shellcont/shell", E_SQ01_PREDEF_LIST2, whichLineForInput
         
         
         sess.FindById("wnd[0]/tbar[1]/btn[17]").Press
         ' otwieramy liste z dostepnymi standardami do etapu drugiego!
         sess.FindById("wnd[1]").SendVKey 4
         
-        runLoopsWithPreDef "wnd[2]/usr/cntlALV_CONTAINER_1/shellcont/shell", E_SQ01_PREDEF_STD2
+        sess.FindById("wnd[2]/usr/cntlALV_CONTAINER_1/shellcont/shell").SelectedRows = "0"
+        sess.FindById("wnd[2]/tbar[0]/btn[2]").Press
+        
+        ' runLoopsWithPreDef "wnd[2]/usr/cntlALV_CONTAINER_1/shellcont/shell", E_SQ01_PREDEF_STD2, whichLineForInput
+        session.FindById("wnd[1]/usr/ctxtRS38R-VARIANT").Text = getProperRefFromPreDef(E_SQ01_PREDEF_STD2, whichLineForInput)
         
         sess.FindById("wnd[1]/tbar[0]/btn[0]").Press
         
@@ -275,11 +347,13 @@ Public Sub runMainLogicForSQ01__with_preDef(mcfg1 As E_SQ01_CONFIG, ByRef ish As
         Set refOutput2 = refOutput2.Offset(1, 0)
     Next x
     
+    st_h.hide
+    
 End Sub
 
 
 
-Public Sub runMainLogicForSQ01(mcfg1 As E_SQ01_CONFIG, ByRef ish As Worksheet, ByRef osh As Worksheet, ByRef st_h As StatusHandler, ByRef xStHelper As Integer)
+Public Sub runMainLogicForSQ01(mcfg1 As E_SQ01_CONFIG, ByRef ish As Worksheet, ByRef osh As Worksheet, ByRef st_h As StatusHandler, ByRef xStHelper As Integer, whichLineForInput As Integer)
 
 
     If mcfg1 = E_SQ01_CONFIG_START_FROM_PASTING_ALREADY_PREPARED_INPUT_LIST Then
@@ -362,7 +436,7 @@ Public Sub runMainLogicForSQ01(mcfg1 As E_SQ01_CONFIG, ByRef ish As Worksheet, B
             
             
 
-            If x Mod 100 = 0 Then
+            If x Mod 50 = 0 Then
             
                 grid.FirstVisibleRow = x
                 grid.CurrentCellRow = x
@@ -418,9 +492,7 @@ Public Sub runMainLogicForSQ01(mcfg1 As E_SQ01_CONFIG, ByRef ish As Worksheet, B
     
     With sess
         .FindById("wnd[0]/usr/btn%_SP$00002_%_APP_%-VALU_PUSH").Press
-        
         .FindById("wnd[1]/tbar[0]/btn[16]").Press
-            
         Set rngToCopy = ish.Range(ish.Range("A2"), ish.Range("A2").End(xlDown))
         rngToCopy.Copy
         
@@ -472,13 +544,14 @@ Private Function fillFormAndWaitForDecision(cfg1 As Integer) As String
     fillFormAndWaitForDecision = ""
     
     SQ01ConfigForm.ListBox1.Clear
+    SQ01ConfigForm.ListBox1.MultiSelect = fmMultiSelectSingle
     
     If cfg1 = 1 Then
         ' pierwsze wybieranie!
         ' -----------------------------------------------------
         
         For x = 0 To grid.RowCount - 1
-            SQ01ConfigForm.ListBox1.AddItem CStr(grid.GetCellValue(x, cols(0)))
+            SQ01ConfigForm.ListBox1.addItem CStr(grid.GetCellValue(x, cols(0)))
         Next x
         
         ' -----------------------------------------------------
@@ -543,7 +616,7 @@ Private Sub runLoops(stringReference As String)
 End Sub
 
 
-Private Sub runLoopsWithPreDef(stringReference As String, preDefEnum As E_SQ01_PREDEF)
+Private Sub runLoopsWithPreDef(stringReference As String, preDefEnum As E_SQ01_PREDEF, preDefLine As Integer)
 
 
     Dim wynik As String
@@ -551,7 +624,7 @@ Private Sub runLoopsWithPreDef(stringReference As String, preDefEnum As E_SQ01_P
     Set grid = sess.FindById(CStr(stringReference))
     Set cols = grid.ColumnOrder
     
-    wynik = getPreDef(preDefEnum)
+    wynik = getPreDef(preDefEnum, preDefLine)
     
     For x = 0 To grid.RowCount - 1
         If CStr(wynik) = CStr(grid.GetCellValue(x, cols(0))) Then
@@ -569,20 +642,24 @@ Private Sub runLoopsWithPreDef(stringReference As String, preDefEnum As E_SQ01_P
 
 End Sub
 
+Private Function getProperRefFromPreDef(preDefEnum As E_SQ01_PREDEF, preDefLine As Integer) As String
+    getProperRefFromPreDef = getPreDef(preDefEnum, preDefLine)
+End Function
 
-Private Function getPreDef(preDefEnum As E_SQ01_PREDEF) As String
+
+Private Function getPreDef(preDefEnum As E_SQ01_PREDEF, m_getPreDef As Integer) As String
 
     If preDefEnum = E_SQ01_PREDEF_SYSTEM Then
         
-        getPreDef = "" & ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Value
+        getPreDef = "" & ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(m_getPreDef - 1, 0).Value
     ElseIf preDefEnum = E_SQ01_PREDEF_LIST1 Then
-        getPreDef = "" & ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(0, 1).Value
+        getPreDef = "" & ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(m_getPreDef - 1, 1).Value
     ElseIf preDefEnum = E_SQ01_PREDEF_STD1 Then
-        getPreDef = "" & ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(0, 2).Value
+        getPreDef = "" & ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(m_getPreDef - 1, 2).Value
     ElseIf preDefEnum = E_SQ01_PREDEF_LIST2 Then
-        getPreDef = "" & ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(0, 3).Value
+        getPreDef = "" & ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(m_getPreDef - 1, 3).Value
     ElseIf preDefEnum = E_SQ01_PREDEF_STD2 Then
-        getPreDef = "" & ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(0, 4).Value
+        getPreDef = "" & ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(getPreDef - 1, 4).Value
     Else
         MsgBox "Fatal error in pre-def logic inside foo getPreDef!", vbCritical
         End

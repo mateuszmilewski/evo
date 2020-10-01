@@ -1,6 +1,9 @@
 Attribute VB_Name = "TryToRenameModule"
 Option Explicit
 
+
+
+' not fully DRY - be careful - there are some duplicates!
 Public Function tryToRenameWorksheet(psh As Worksheet, prefix As String) As String
 
     tryToRenameWorksheet = psh.name

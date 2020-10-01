@@ -70,11 +70,11 @@ Public Sub innerSq01()
         
         For Each w In Application.Workbooks
             ' .ComboBoxFeed.AddItem w.name
-            .ComboBoxMaster.AddItem w.name
+            .ComboBoxMaster.addItem w.name
         Next w
         
         For Each sh1 In ThisWorkbook.Sheets
-            .ComboBoxFeed.AddItem sh1.name
+            .ComboBoxFeed.addItem sh1.name
         Next sh1
         
         .ComboBoxFeed.Value = ActiveSheet.name
