@@ -31,6 +31,10 @@ Option Explicit
 
 Public Sub finalTouchOnReceptionReport(ictrl As IRibbonControl)
     innerFinalTouchOnReceptionReport ActiveSheet
+    
+    addFormatConditionsForReceptionReport
+    
+    startModelessLeaf
 End Sub
 
 
@@ -61,6 +65,15 @@ Public Sub innerFinalTouchOnReceptionReport(Optional sh As Worksheet, Optional a
         fillLabelsForReceptions finalOut
         
         goThroughMb51Data sh1, finalOut, coll
+        
+        
+        
+        addFormatConditionsForReceptionReport
+        
+        ' some hiding and font changing with column width adjustment
+        beautifyReceptionList
+        
+        startModelessLeaf
     Else
         MsgBox "Active worksheet is in wrong standard!"
     End If
@@ -220,14 +233,18 @@ Private Function defineTiming(sh1 As Worksheet, Optional ycw As String) As Colle
     
     
     If Not FinalScope.c Is Nothing Then
-        If FinalScope.c.Count > 0 Then
-            Debug.Print "FinalScope.c.Count: " & FinalScope.c.Count
+        If FinalScope.c.count > 0 Then
+            Debug.Print "FinalScope.c.Count: " & FinalScope.c.count
             Set defineTiming = FinalScope.c
         End If
     End If
 End Function
 
 Private Sub goThroughMb51Data(sh1 As Worksheet, out As Worksheet, coll As Collection)
+
+
+
+    Application.Calculation = xlCalculationManual
 
 
     ' r1 as input
@@ -309,12 +326,16 @@ Private Sub goThroughMb51Data(sh1 As Worksheet, out As Worksheet, coll As Collec
                 r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_cible - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z12").FormulaR1C1Local
                 'E_FINAL_TOUCH_RECEPTION_Sigapp
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).Value = _
+                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z13").FormulaR1C1Local
                     
                 'E_FINAL_TOUCH_RECEPTION_GAP
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_GAP - 1).Value = _
+                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_GAP - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z21").FormulaR1C1Local
+                    
+                'E_FINAL_TOUCH_RECEPTION_OKNOK
+                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_OKNOK - 1).FormulaR1C1Local = _
+                    ThisWorkbook.Sheets("register").Range("Z22").FormulaR1C1Local
                     
                 'E_FINAL_TOUCH_RECEPTION_Interne
                 r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Interne - 1).Value = _
@@ -356,6 +377,10 @@ Private Sub goThroughMb51Data(sh1 As Worksheet, out As Worksheet, coll As Collec
                 'E_FINAL_TOUCH_RECEPTION_Date_cpt
                 r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Date_cpt - 1).Value = _
                     r1.Offset(0, EVO.E_MB51_0_DATE_PIECE - 1).Value
+                    
+                    
+                ' Application.Calculation = xlCalculationManual
+                    
                 'E_FINAL_TOUCH_RECEPTION_Fourn
                 r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Fourn - 1).Value = _
                     r1.Offset(0, EVO.E_MB51_0_FOUR - 1).Value
@@ -379,8 +404,19 @@ Private Sub goThroughMb51Data(sh1 As Worksheet, out As Worksheet, coll As Collec
                 r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_cible - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z12").FormulaR1C1Local
                 'E_FINAL_TOUCH_RECEPTION_Sigapp
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).Value = _
+                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z13").FormulaR1C1Local
+                    
+                    
+                'E_FINAL_TOUCH_RECEPTION_GAP
+                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_GAP - 1).FormulaR1C1Local = _
+                    ThisWorkbook.Sheets("register").Range("Z21").FormulaR1C1Local
+                    
+                'E_FINAL_TOUCH_RECEPTION_OKNOK
+                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_OKNOK - 1).FormulaR1C1Local = _
+                    ThisWorkbook.Sheets("register").Range("Z22").FormulaR1C1Local
+                    
+                    
                 'E_FINAL_TOUCH_RECEPTION_Interne
                 r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Interne - 1).Value = _
                     r1.Offset(0, EVO.E_MB51_0_IS_INTERNAL - 1).Value
@@ -405,6 +441,9 @@ Private Sub goThroughMb51Data(sh1 As Worksheet, out As Worksheet, coll As Collec
         
         Set r1 = r1.Offset(1, 0)
     Loop Until Trim(r1.Value) = ""
+    
+    
+    Application.Calculation = xlCalculationAutomatic
     
     
 End Sub
@@ -472,6 +511,8 @@ Private Sub fillLabelsForReceptions(sh2 As Worksheet)
     Do
     
         sh2.Cells(1, iter).Value = finalReceptionValidationRef.Value
+        sh2.Cells(1, iter).Interior.Color = finalReceptionValidationRef.Interior.Color
+        sh2.Cells(1, iter).Font.Color = finalReceptionValidationRef.Font.Color
 
         iter = iter + 1
         Set finalReceptionValidationRef = finalReceptionValidationRef.Offset(0, 1)

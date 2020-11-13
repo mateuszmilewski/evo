@@ -57,8 +57,11 @@ End Function
 
 
 Public Sub putCollectionIntoEvo(Optional auto1 As Boolean, Optional projectAlias As String)
+
+
+    Application.Calculation = xlCalculationManual
     
-    If interrocomCollection.Count > 0 Then
+    If interrocomCollection.count > 0 Then
         
         Dim outEvo As Worksheet
         Set outEvo = ThisWorkbook.Sheets.Add
@@ -110,6 +113,8 @@ Public Sub putCollectionIntoEvo(Optional auto1 As Boolean, Optional projectAlias
             Next i
         End With
     End If
+    
+    Application.Calculation = xlCalculationAutomatic
 End Sub
 
 
@@ -138,6 +143,8 @@ Public Sub makeLoop()
             .div = CStr(sh1.Cells(row, EVO.INTERROCOM_Div).Value)
             
             .orgCurrency = CStr(sh1.Cells(row, EVO.INTERROCOM_Devise).Value)
+            
+            ' Debug.Assert .orgCurrency = "EUR"
             
             On Error Resume Next
             .orgPrix = CDbl(prixToDouble(CStr(sh1.Cells(row, EVO.INTERROCOM_prix).Value)))
@@ -219,6 +226,10 @@ Private Function findCurrencyRate(currStr) As Double
     findCurrencyRate = 1
 
     Dim formulaString As String
+    Dim tmp As Range
+    Set tmp = ThisWorkbook.Sheets("register").Range("D98")
+    tmp.Value = ""
+    
     formulaString = ThisWorkbook.Sheets("register").Range("D99").Formula
     
     
@@ -226,9 +237,12 @@ Private Function findCurrencyRate(currStr) As Double
     formulaString = Replace(formulaString, "X", """X""")
     formulaString = Replace(formulaString, "X", currStr)
     
-    ' Debug.Print formulaString
+    tmp.Formula = formulaString
     
-    findCurrencyRate = Evaluate(formulaString)
+    findCurrencyRate = tmp.Value
+    tmp.Value = ""
+    
+    ' Debug.Print findCurrencyRate
 End Function
 
 

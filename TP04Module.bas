@@ -35,7 +35,7 @@ Public Sub tp04Match(ictrl As IRibbonControl)
 End Sub
 
 
-Public Sub innerAfterSQ01Logic(masterFileName As String, feedFileName As String, Optional sh As StatusHandler)
+Public Sub innerAfterSQ01Logic(masterFileName As String, feedFileName As String, Optional ByRef aSh As Worksheet, Optional sh As StatusHandler)
 
 
     Application.ScreenUpdating = False
@@ -82,6 +82,10 @@ Public Sub innerAfterSQ01Logic(masterFileName As String, feedFileName As String,
     With instance_of_tp04
         .setStatusHandler sh
         .init m, f, byUnit
+        
+        Set aSh = Nothing
+        On Error Resume Next
+        Set aSh = .getRepSh()
     End With
     ' ====================================================================
     

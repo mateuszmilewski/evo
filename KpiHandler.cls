@@ -53,9 +53,9 @@ End Sub
 
 Public Sub makeRepFromPns()
     
-    If pns.Count > 0 Then
+    If pns.count > 0 Then
     
-        stHndlr.init_statusbar (pns.Count + 1)
+        stHndlr.init_statusbar (pns.count + 1)
         stHndlr.show
         stHndlr.progress_increase
         

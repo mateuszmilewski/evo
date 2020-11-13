@@ -32,23 +32,42 @@ Option Explicit
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 'SOFTWARE.
 
+
+' OK - we need to change it into late binging becuase EVO users
+' might do not have any SAP app
+
 Private sapGuiAuto As Object
-Private sapGui As SAPFEWSELib.GuiApplication
-Private cnn As SAPFEWSELib.GuiConnection
-Private sess As SAPFEWSELib.GuiSession
-Private window As SAPFEWSELib.GuiModalWindow
-Private c As SAPFEWSELib.GuiCollection
-Private item As SAPFEWSELib.GuiComponent
-Private Btn As SAPFEWSELib.GuiButton
-Private table As SAPFEWSELib.GuiTableControl ' ISapTableControlTarget
-Private grid As SAPFEWSELib.GuiGridView
-Private gv As SAPFEWSELib.GuiGridView
-Private myTableRow As SAPFEWSELib.GuiTableRow
-Private coll As SAPFEWSELib.GuiCollection
+'Private sapGui As SAPFEWSELib.GuiApplication
+'Private cnn As SAPFEWSELib.GuiConnection
+'Private sess As SAPFEWSELib.GuiSession
+'Private window As SAPFEWSELib.GuiModalWindow
+'Private c As SAPFEWSELib.GuiCollection
+'Private item As SAPFEWSELib.GuiComponent
+'Private Btn As SAPFEWSELib.GuiButton
+'Private table As SAPFEWSELib.GuiTableControl ' ISapTableControlTarget
+'Private grid As SAPFEWSELib.GuiGridView
+'Private gv As SAPFEWSELib.GuiGridView
+'Private myTableRow As SAPFEWSELib.GuiTableRow
+'Private coll As SAPFEWSELib.GuiCollection
+
+'Private chbx As SAPFEWSELib.GuiCheckBox
+'Private txt As SAPFEWSELib.GuiTextedit
     
+Private sapGui As Object
+Private cnn As Object
+Private sess As Object
+Private window As Object
+Private c As Object
+Private item As Object
+Private Btn As Object
+Private table As Object
+Private grid As Object
+Private gv As Object
+Private myTableRow As Object
+Private coll As Object
     
-Private chbx As SAPFEWSELib.GuiCheckBox
-Private txt As SAPFEWSELib.GuiTextedit
+Private chbx As Object
+Private txt As Object
 
 
 ' !!
@@ -75,23 +94,22 @@ Private Sub Class_Initialize()
         Set sapGui = EVO.GlobalSapModule.sapGui
     End If
     
-    Set sapGui = sapGuiAuto.GetScriptingEngine
     Set cnn = sapGui.Connections(0)
     
     Debug.Print cnn.ConnectionString
-    Debug.Print cnn.Sessions.Count
+    Debug.Print cnn.Sessions.count
 
     
     Set sess = cnn.Children(0)
     Set item = sess.Children(0)
     Debug.Print item.name
     
-    Debug.Print sess.Children.Count
+    Debug.Print sess.Children.count
     
     
     ' Set item = sess.Children(0)
     Set item = sess.FindById("wnd[0]/usr")
-    Debug.Print item.Children.Count
+    Debug.Print item.Children.count
 
     
     
@@ -107,6 +125,9 @@ Private Sub Class_Terminate()
 End Sub
 
 Public Sub runMainLogicFor__Y_PI1_80000391(sh1 As Worksheet, ByRef st_h As StatusHandler, ByRef xStHelper As Integer)
+
+
+    Application.Calculation = xlCalculationManual
     
     ' we just taking all the data from this transaction - nothing special!"
     ' im not proud of this "hack"
@@ -140,7 +161,7 @@ Public Sub runMainLogicFor__Y_PI1_80000391(sh1 As Worksheet, ByRef st_h As Statu
         For y = 0 To grid.ColumnCount - 1
         
         
-            refOutput2.Offset(0, y).Value = CStr(grid.GetCellValue(x, cols(y)))
+            refOutput2.Offset(0, y).Value = CStr(grid.getCellValue(x, cols(y)))
         Next y
         
         If x Mod 50 = 0 Then
@@ -156,6 +177,8 @@ Public Sub runMainLogicFor__Y_PI1_80000391(sh1 As Worksheet, ByRef st_h As Statu
         
         Set refOutput2 = refOutput2.Offset(1, 0)
     Next x
+    
+    Application.Calculation = xlCalculationAutomatic
 End Sub
 
 
@@ -163,6 +186,8 @@ Public Sub runMainLogicForSQ01__with_preDef(mcfg1 As E_SQ01_CONFIG, ByRef ish As
 
 
     ' from now on 2 possibilities
+    
+    Application.Calculation = xlCalculationManual
 
 
     If mcfg1 = E_SQ01_CONFIG_START_FROM_PASTING_ALREADY_PREPARED_INPUT_LIST Then
@@ -235,9 +260,9 @@ Public Sub runMainLogicForSQ01__with_preDef(mcfg1 As E_SQ01_CONFIG, ByRef ish As
                 If CStr(cols(y)) Like "*_PRODUIT*" Then
                 
                     ' Debug.Print Cstr(grid.GetCellValue(x2, cols(y2))) ' OK
-                    refInput.Value = CStr(grid.GetCellValue(x, cols(y)))
-                    refInput.Offset(0, 1).Value = CStr(grid.GetCellValue(x, cols(y + 1)))
-                    refInput.Offset(0, 2).Value = CStr(grid.GetCellValue(x, cols(y + 2)))
+                    refInput.Value = CStr(grid.getCellValue(x, cols(y)))
+                    refInput.Offset(0, 1).Value = CStr(grid.getCellValue(x, cols(y + 1)))
+                    refInput.Offset(0, 2).Value = CStr(grid.getCellValue(x, cols(y + 2)))
                     Exit For
                 End If
                 
@@ -302,56 +327,196 @@ Public Sub runMainLogicForSQ01__with_preDef(mcfg1 As E_SQ01_CONFIG, ByRef ish As
     End If
     
     Dim rngToCopy As Range
-    
-    With sess
-        .FindById("wnd[0]/usr/btn%_SP$00002_%_APP_%-VALU_PUSH").Press
-        
-        .FindById("wnd[1]/tbar[0]/btn[16]").Press
-            
-        Set rngToCopy = ish.Range(ish.Range("A2"), ish.Range("A2").End(xlDown))
-        rngToCopy.Copy
-        
-        .FindById("wnd[1]/tbar[0]/btn[24]").Press
-        .FindById("wnd[1]/tbar[0]/btn[8]").Press
-        .FindById("wnd[0]/tbar[1]/btn[8]").Press
-    End With
-
-    
-    Set grid = sess.FindById("wnd[0]/usr/cntlGRID1/shellcont/shell")
-    Set cols = grid.ColumnOrder
-    
-    
     Dim refOutput2 As Range  ' , lm As Long
     Set refOutput2 = osh.Cells(2, 1)
     
-    ' lm = CLng((ish.Range("A1").End(xlDown).row) / 50)
+    ' A1048576 - always last one
+    Set rngToCopy = tryToAssignFirstBatchOfData(ish)
     
-    For x = 0 To grid.RowCount - 1
-        For y = 0 To grid.ColumnCount - 1
+    Do
+    
+    
+        With sess
         
         
-            refOutput2.Offset(0, y).Value = CStr(grid.GetCellValue(x, cols(y)))
-        Next y
-        
-        If x Mod 50 = 0 Then
-        
-            grid.FirstVisibleRow = x
-            grid.CurrentCellRow = x
+            ' Debug.Print TypeName(.FindById("wnd[0]/usr/btn%_SP$00001_%_APP_%-VALU_PUSH"))
             
-            ' delegacjaDlaProgresu st_h, xStHelper, 20 ' obsolete
-            st_h.progress_increase
+            
+            Dim btn3 As Variant ' SAPFEWSELib.GuiButton
+            Set btn3 = findMyButton() ' .FindById("wnd[0]/usr/btn%_SP$00001_%_APP_%-VALU_PUSH")
+            ' simple solution - you need to take 3rd button from top
+            'Debug.Print btn.Top
+            
+            'Set btn = .FindById("wnd[0]/usr/btn%_SP$00002_%_APP_%-VALU_PUSH")
+            'Debug.Print btn.Top
+            '
+            'Set btn = .FindById("wnd[0]/usr/btn%_SP$00003_%_APP_%-VALU_PUSH")
+            'Debug.Print btn.Top
+            '
+            'Set btn = .FindById("wnd[0]/usr/btn%_SP$00004_%_APP_%-VALU_PUSH")
+            'Debug.Print btn.Top
+            
+    
+            
+            ' Code de suppression dans le
+            '.FindById("wnd[0]/usr/btn%_SP$00001_%_APP_%-VALU_PUSH").Press
+            ' please do not delete data from this field!
+            ' .FindById("wnd[1]/tbar[0]/btn[16]").Press
+            '.FindById("wnd[1]/tbar[0]/btn[0]").Press
+            '.FindById("wnd[1]/tbar[0]/btn[8]").Press
+        
+            '.FindById("wnd[0]/usr/btn%_SP$00002_%_APP_%-VALU_PUSH").Press
+            '.FindById("wnd[1]/tbar[0]/btn[16]").Press
+            '.FindById("wnd[1]/tbar[0]/btn[0]").Press
+            '.FindById("wnd[1]/tbar[0]/btn[8]").Press
+            
+            ' Numéro d'article
+            '.FindById("wnd[0]/usr/btn%_SP$00003_%_APP_%-VALU_PUSH").Press
+            '.FindById("wnd[1]/tbar[0]/btn[16]").Press
+            
+            btn3.Press
+            .FindById("wnd[1]/tbar[0]/btn[16]").Press
+               
+            ' now we making it in the loop - to avoid OLE data missing issue
+            ' Set rngToCopy = ish.Range(ish.Range("A2"), ish.Range("A2").End(xlDown))
+            
+            ' Debug.Print rngToCopy.Address
+            rngToCopy.Copy
+            
+            .FindById("wnd[1]/tbar[0]/btn[24]").Press
+            .FindById("wnd[1]/tbar[0]/btn[8]").Press
+            .FindById("wnd[0]/tbar[1]/btn[8]").Press
+        End With
+    
+        
+        Set grid = sess.FindById("wnd[0]/usr/cntlGRID1/shellcont/shell")
+        Set cols = grid.ColumnOrder
+        
+        
+        
+        ' refOutput2
+        
+        If refOutput2.row > 2 Then
+            ' so at least next iteration
+            
+            ' Debug.Print refOutput2.row
+            
+            
+            ' very simple logic
+            ' be careful - almost without any additional checking
+            If Trim(refOutput2.Value) = "" Then
+                Set refOutput2 = refOutput2.Offset(-1, 0)
+            End If
+            
             
         End If
+
+        
+        ' lm = CLng((ish.Range("A1").End(xlDown).row) / 50)
+        
+        For x = 0 To grid.RowCount - 1
+            For y = 0 To grid.ColumnCount - 1
+            
+            
+                refOutput2.Offset(0, y).Value = CStr(grid.getCellValue(x, cols(y)))
+            Next y
+            
+            If x Mod 50 = 0 Then
+            
+                grid.FirstVisibleRow = x
+                grid.CurrentCellRow = x
+                
+                ' delegacjaDlaProgresu st_h, xStHelper, 20 ' obsolete
+                st_h.progress_increase
+                
+            End If
+            
+            
+            Set refOutput2 = refOutput2.Offset(1, 0)
+        Next x
         
         
-        Set refOutput2 = refOutput2.Offset(1, 0)
-    Next x
+        'step back in SIGAPP
+        sess.FindById("wnd[0]/tbar[0]/btn[3]").Press
+        ' new range to copy
+        Set rngToCopy = tryToAssignNewRange(ish, rngToCopy)
+        
+        
+        
+        
+        
+    Loop Until youDryOutRangeOfDataForSq01(rngToCopy)
     
     st_h.hide
     
+    Application.Calculation = xlCalculationAutomatic
+    
 End Sub
 
+Private Function tryToAssignFirstBatchOfData(sh As Worksheet) As Range
+    Set tryToAssignFirstBatchOfData = sh.Range("A2:A500")
+End Function
 
+
+
+Private Function tryToAssignNewRange(sh As Worksheet, data As Range) As Range
+    Set tryToAssignNewRange = Nothing
+    
+    
+    Dim tmp As Range
+    
+    Set tmp = data.Offset(499, 0)
+    
+    ' Debug.Print tmp.Address
+    
+    Set tryToAssignNewRange = tmp
+End Function
+
+Private Function youDryOutRangeOfDataForSq01(data As Range) As Boolean
+
+    youDryOutRangeOfDataForSq01 = False
+    
+    Dim ir As Range, i As Integer, tmp As Range
+    
+    i = 0
+    For Each ir In data
+        
+        If Trim(ir.Value) <> "" Then
+            i = i + 1
+        End If
+    Next ir
+    
+    If i > 0 Then
+        youDryOutRangeOfDataForSq01 = False
+    Else
+        youDryOutRangeOfDataForSq01 = True
+    End If
+End Function
+
+Private Function findMyButton() As Variant ' SAPFEWSELib.GuiButton
+    
+    Set findMyButton = Nothing
+    
+    ' top
+    '51
+    '73
+    '95
+    '29
+    
+    Dim tmpButton As Variant ' SAPFEWSELib.GuiButton
+    
+    Dim x As Variant
+    For x = 1 To 4
+        ' Set btn = .FindById("wnd[0]/usr/btn%_SP$00002_%_APP_%-VALU_PUSH")
+        Set tmpButton = sess.FindById("wnd[0]/usr/btn%_SP$0000" & CStr(x) & "_%_APP_%-VALU_PUSH")
+        
+        If (tmpButton.Top > 70 And tmpButton.Top < 80) Or (tmpButton.Top = 73) Then
+            ' this is it
+            Set findMyButton = tmpButton
+            Exit For
+        End If
+    Next x
+End Function
 
 Public Sub runMainLogicForSQ01(mcfg1 As E_SQ01_CONFIG, ByRef ish As Worksheet, ByRef osh As Worksheet, ByRef st_h As StatusHandler, ByRef xStHelper As Integer, whichLineForInput As Integer)
 
@@ -425,9 +590,9 @@ Public Sub runMainLogicForSQ01(mcfg1 As E_SQ01_CONFIG, ByRef ish As Worksheet, B
                 If CStr(cols(y)) Like "*_PRODUIT*" Then
                 
                     ' Debug.Print Cstr(grid.GetCellValue(x2, cols(y2))) ' OK
-                    refInput.Value = CStr(grid.GetCellValue(x, cols(y)))
-                    refInput.Offset(0, 1).Value = CStr(grid.GetCellValue(x, cols(y + 1)))
-                    refInput.Offset(0, 2).Value = CStr(grid.GetCellValue(x, cols(y + 2)))
+                    refInput.Value = CStr(grid.getCellValue(x, cols(y)))
+                    refInput.Offset(0, 1).Value = CStr(grid.getCellValue(x, cols(y + 1)))
+                    refInput.Offset(0, 2).Value = CStr(grid.getCellValue(x, cols(y + 2)))
                     Exit For
                 End If
                 
@@ -518,7 +683,7 @@ Public Sub runMainLogicForSQ01(mcfg1 As E_SQ01_CONFIG, ByRef ish As Worksheet, B
         For y = 0 To grid.ColumnCount - 1
         
         
-            refOutput2.Offset(0, y).Value = CStr(grid.GetCellValue(x, cols(y)))
+            refOutput2.Offset(0, y).Value = CStr(grid.getCellValue(x, cols(y)))
         Next y
         
         If x Mod 50 = 0 Then
@@ -551,7 +716,7 @@ Private Function fillFormAndWaitForDecision(cfg1 As Integer) As String
         ' -----------------------------------------------------
         
         For x = 0 To grid.RowCount - 1
-            SQ01ConfigForm.ListBox1.addItem CStr(grid.GetCellValue(x, cols(0)))
+            SQ01ConfigForm.ListBox1.addItem CStr(grid.getCellValue(x, cols(0)))
         Next x
         
         ' -----------------------------------------------------
@@ -600,7 +765,7 @@ Private Sub runLoops(stringReference As String)
     wynik = fillFormAndWaitForDecision(1)
     
     For x = 0 To grid.RowCount - 1
-        If CStr(wynik) = CStr(grid.GetCellValue(x, cols(0))) Then
+        If CStr(wynik) = CStr(grid.getCellValue(x, cols(0))) Then
         
             With grid
                 .CurrentCellRow = x
@@ -627,7 +792,7 @@ Private Sub runLoopsWithPreDef(stringReference As String, preDefEnum As E_SQ01_P
     wynik = getPreDef(preDefEnum, preDefLine)
     
     For x = 0 To grid.RowCount - 1
-        If CStr(wynik) = CStr(grid.GetCellValue(x, cols(0))) Then
+        If CStr(wynik) = CStr(grid.getCellValue(x, cols(0))) Then
         
             With grid
                 .CurrentCellRow = x

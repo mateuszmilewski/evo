@@ -116,7 +116,7 @@ Public Sub progress_increase()
         avr_on_one_pn = avr_on_one_pn * 60
         avr_on_one_pn = avr_on_one_pn * 60
         
-        If collection_of_avr_on_pn.Count > 1 Then
+        If collection_of_avr_on_pn.count > 1 Then
             collection_of_avr_on_pn.Remove 1
             collection_of_avr_on_pn.Remove 1
         End If
@@ -128,9 +128,9 @@ Public Sub progress_increase()
         
         ' to bedzie taki warunek brzegowy czy w ogole zajmowac sie
         'dokladnym przeliczaniem makra
-        If collection_of_avr_on_pn.Count > 10 Then
+        If collection_of_avr_on_pn.count > 10 Then
             Dim x As Integer
-            For x = act To collection_of_avr_on_pn.Count
+            For x = act To collection_of_avr_on_pn.count
                 '' Debug.Print collection_of_avr_on_pn.COUNT
                 collection_of_avr_on_pn.Remove x
                 '' Debug.Print collection_of_avr_on_pn.COUNT

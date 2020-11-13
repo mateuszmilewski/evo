@@ -135,6 +135,10 @@ End Sub
 
 
 Public Sub runMatchingLogicOnInternalSuppliers(sh As Worksheet, nData As Worksheet)
+
+
+
+    Application.Calculation = xlCalculationManual
     
     
     Dim rng As Range, bottomRng As Range, area As Range
@@ -183,6 +187,8 @@ Public Sub runMatchingLogicOnInternalSuppliers(sh As Worksheet, nData As Workshe
             rng.Offset(0, EVO.E_ADJUSTED_SQ01_IS_INTERNAL - EVO.E_ADJUSTED_SQ01_COFOR).Value = ""
         
             For Each nrng In n_area
+            
+                ' Application.Calculation = xlCalculationManual
             
                 If Trim(nrng.Value) = Trim(rng.Value) Then
                     rng.Offset(0, EVO.E_ADJUSTED_SQ01_IS_INTERNAL - EVO.E_ADJUSTED_SQ01_COFOR).Value = "internal"
@@ -241,6 +247,8 @@ Public Sub runMatchingLogicOnInternalSuppliers(sh As Worksheet, nData As Workshe
         Next rng
         
     End If
+    
+    Application.Calculation = xlCalculationAutomatic
     
 End Sub
 

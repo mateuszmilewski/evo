@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} ComboFormReceptionReport 
    Caption         =   "ComboFormReceptionReport"
-   ClientHeight    =   3135
+   ClientHeight    =   2160
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   14160
+   ClientWidth     =   13995
    OleObjectBlob   =   "ComboFormReceptionReport.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -48,7 +48,9 @@ Private tango_output As Worksheet
 Private lean_tango As Worksheet
 Private managersDaSh As Worksheet
 
-
+' poniewaz mam nielichy problem z logika dzialania
+' gdu textbox Mag jest pusty, to ogranicze silowo
+' aby wlasciwie ograniczyc
 
 
 Public Sub innerAddLine()
@@ -80,45 +82,53 @@ Public Sub innerAddLine()
         End If
     Next c
         
-
+    
+    ' artificial limitation - only two possible!
+    If howManyLinesAlready < 3 Then
         
             
-    Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxMag0" & CStr(howManyLinesAlready + 1), True)
-    tbxMag.Top = 54 + 18 * (howManyLinesAlready)
-    tbxMag.Left = 6
-    tbxMag.Value = ""
-    
-    Set tbxDu = cs.Add("Forms.TextBox.1", "TextBoxDu0" & CStr(howManyLinesAlready + 1), True)
-    tbxDu.Top = 54 + 18 * (howManyLinesAlready)
-    tbxDu.Left = 84
-    tbxDu.Value = Me.TextBoxDu01.Value
-    
-    Set tbxAu = cs.Add("Forms.TextBox.1", "TextBoxAu0" & CStr(howManyLinesAlready + 1), True)
-    tbxAu.Top = 54 + 18 * howManyLinesAlready
-    tbxAu.Left = 162
-    tbxAu.Value = Me.TextBoxAu01.Value
-    
-    
-    
-    Set tbxMvt1 = cs.Add("Forms.TextBox.1", "TextBoxMvt1_0" & CStr(howManyLinesAlready + 1), True)
-    tbxMvt1.Top = 54 + 18 * howManyLinesAlready
-    tbxMvt1.Left = 240
-    
-    tbxMvt1.Value = "101"
-    
-    Set tbxMvt2 = cs.Add("Forms.TextBox.1", "TextBoxMvt2_0" & CStr(howManyLinesAlready + 1), True)
-    tbxMvt2.Top = 54 + 18 * howManyLinesAlready
-    tbxMvt2.Left = 318
-    tbxMvt2.Value = "102"
-    
-    Me.Height = Me.Height + 18
+        Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxMag0" & CStr(howManyLinesAlready + 1), True)
+        tbxMag.Top = 54 + 18 * (howManyLinesAlready)
+        tbxMag.Left = 6
+        tbxMag.Value = ""
+        
+        Set tbxDu = cs.Add("Forms.TextBox.1", "TextBoxDu0" & CStr(howManyLinesAlready + 1), True)
+        tbxDu.Top = 54 + 18 * (howManyLinesAlready)
+        tbxDu.Left = 84
+        tbxDu.Value = Me.TextBoxDu01.Value
+        
+        Set tbxAu = cs.Add("Forms.TextBox.1", "TextBoxAu0" & CStr(howManyLinesAlready + 1), True)
+        tbxAu.Top = 54 + 18 * howManyLinesAlready
+        tbxAu.Left = 162
+        tbxAu.Value = Me.TextBoxAu01.Value
+        
+        
+        
+        Set tbxMvt1 = cs.Add("Forms.TextBox.1", "TextBoxMvt1_0" & CStr(howManyLinesAlready + 1), True)
+        tbxMvt1.Top = 54 + 18 * howManyLinesAlready
+        tbxMvt1.Left = 240
+        
+        tbxMvt1.Value = "101"
+        
+        Set tbxMvt2 = cs.Add("Forms.TextBox.1", "TextBoxMvt2_0" & CStr(howManyLinesAlready + 1), True)
+        tbxMvt2.Top = 54 + 18 * howManyLinesAlready
+        tbxMvt2.Left = 318
+        tbxMvt2.Value = "102"
+        
+        Me.Height = Me.Height + 18
+    End If
 
 End Sub
 
 
 Private Sub AddLineBtn_Click()
 
-    innerAddLine
+    Dim c As Control
+    Set c = Nothing
+    On Error Resume Next
+    Set c = Me.Controls("TextBoxMag02")
+        
+    If c Is Nothing Then innerAddLine
 
 End Sub
 
@@ -187,135 +197,140 @@ Private Sub SubmitBtn_Click()
     divForInterrocom = Me.TxtBoxPricePattern.Value
     
     
+    Dim v As New Validator
+    If v.checkIfComboFormIsFilledProperly(Me) Then
     
     
-    If Me.ComboBoxTangoSource.Value = "" Then
-    
-    
-        ' open file dialog and take proper iterrocom file!
-        Dim ans2 As Variant
-        
-        ans2 = MsgBox("You do not choose any for interrocom files for EVO, do you want to find a fresh external file for report?", vbInformation + vbYesNo)
+        If Me.ComboBoxTangoSource.Value = "" Then
         
         
-        If ans2 = vbYes Then
+            ' open file dialog and take proper iterrocom file!
+            Dim ans2 As Variant
             
-            Set tango_output = Nothing
+            ans2 = MsgBox("You do not choose any for interrocom files for EVO, do you want to find a fresh external file for report?", vbInformation + vbYesNo)
+            
+            
+            If ans2 = vbYes Then
+                
+                Set tango_output = Nothing
+            
+                Set tango_output = tryToFindProperInterrocomFileThen()
+                
+                If tango_output Is Nothing Then
+                
+                    MsgBox "NO! You can't run report without Tango data in proper standard!", vbCritical
+                    End
+                Else
+                
+                    ok_runInterrocomAdjustment tango_output, lean_tango, alias
+                    
+                    closeExternalFile tango_output
+                    
+                    ThisWorkbook.Activate
+                End If
+            End If
+        Else
+            ' just assign nicely to variable
+            Set lean_tango = ThisWorkbook.Sheets(CStr(Me.ComboBoxTangoSource.Value))
+        End If
         
-            Set tango_output = tryToFindProperInterrocomFileThen()
+    
+        Dim c As Control
+        Dim cs As Controls
+        Set cs = Me.Controls
+        
+        
+        Dim i_mb51 As MB51_InputItem
+        
+        
+        Dim d As New Dictionary
+        ' key will be number from textbox
+        
+        Dim enumItem As Long
+        enumItem = 1
+        
+        Dim key As String
+        For Each c In cs
+        
+            If c.name Like "TextBox*" Then
+        
+                key = Right(c.name, 2)
+                
+                If Not d.Exists(key) Then
+                    
+                    Set i_mb51 = New MB51_InputItem
+                    tryToAddValueInto i_mb51, c
+                    
+                    d.Add key, i_mb51
+                Else
+                    Set i_mb51 = d(key)
+                    tryToAddValueInto i_mb51, c
+                End If
+            End If
             
-            If tango_output Is Nothing Then
-            
-                MsgBox "NO! You can't run report without Tango data in proper standard!", vbCritical
+        Next c
+        
+        Dim ans As Variant
+        
+        If Me.ComboBoxInternalSupplier.Value = "" Then
+            'MsgBox "You do not choose any worksheet with internal supplier data... tool need extra time for downloading it from sigapp now", vbInformation
+            'ans = MsgBox("You are sure you want to make it? Maybe check again if there is any N_ worksheet with internal suppliers list already...", vbInformation + vbYesNo)
+            ans = vbYes
+            If ans = vbYes Then
+                isolatedLogicForInternalSuppliers internalSuppliersSheet
+            Else
                 End
-            Else
-            
-                ok_runInterrocomAdjustment tango_output, lean_tango, alias
-                
-                closeExternalFile tango_output
-                
-                ThisWorkbook.Activate
             End If
-        End If
-    Else
-        ' just assign nicely to variable
-        Set lean_tango = ThisWorkbook.Sheets(CStr(Me.ComboBoxTangoSource.Value))
-    End If
-    
-
-    Dim c As Control
-    Dim cs As Controls
-    Set cs = Me.Controls
-    
-    
-    Dim i_mb51 As MB51_InputItem
-    
-    
-    Dim d As New Dictionary
-    ' key will be number from textbox
-    
-    Dim enumItem As Long
-    enumItem = 1
-    
-    Dim key As String
-    For Each c In cs
-    
-        If c.name Like "TextBox*" Then
-    
-            key = Right(c.name, 2)
-            
-            If Not d.Exists(key) Then
-                
-                Set i_mb51 = New MB51_InputItem
-                tryToAddValueInto i_mb51, c
-                
-                d.Add key, i_mb51
-            Else
-                Set i_mb51 = d(key)
-                tryToAddValueInto i_mb51, c
-            End If
+        Else
+            Debug.Print "You choose internal suppliers source - no need to donwload it again!"
+            Set internalSuppliersSheet = ThisWorkbook.Sheets(CStr(Me.ComboBoxInternalSupplier.Value))
         End If
         
-    Next c
+        
     
-    Dim ans As Variant
-    
-    If Me.ComboBoxInternalSupplier.Value = "" Then
-        'MsgBox "You do not choose any worksheet with internal supplier data... tool need extra time for downloading it from sigapp now", vbInformation
-        'ans = MsgBox("You are sure you want to make it? Maybe check again if there is any N_ worksheet with internal suppliers list already...", vbInformation + vbYesNo)
-        ans = vbYes
-        If ans = vbYes Then
-            isolatedLogicForInternalSuppliers internalSuppliersSheet
+        
+        ThisWorkbook.Activate
+        
+        currentStep = E_RECEPTION_REPORT_STEP_GET_DATA_FROM_MB51
+        runMainMB51Logic d, True, mb51_output
+        
+        
+        'sepcial place after main logic because main logic for mb51 provide feed for managers da
+        ' managers da new one!
+        If Me.ComboBoxManagersDA.Value = "" Then
+            'MsgBox "There is no source for managers da fields... tool need extra time for downloading", vbInformation
+            'ans = MsgBox("You are sure you want to make it? Maybe check again if there is any MANAGERS_DA_ worksheet with internal suppliers list already...", vbInformation + vbYesNo)
+            ans = vbYes
+            If ans = vbYes Then
+                
+                ' mb51_output
+                innerGetManagersDa mb51_output, managersDaSh
+            Else
+                End
+            End If
         Else
-            End
+            Debug.Print "You choose internal suppliers source - no need to donwload it again!"
+            Set managersDaSh = ThisWorkbook.Sheets(CStr(Me.ComboBoxManagersDA.Value))
         End If
+        
+        fillReceptionManagersDaColumn mb51_output, managersDaSh
+        
+        mb51_output.Activate
+        
+        currentStep = E_RECEPTION_REPORT_STEP_GET_INTERNAL_SUPPLIERS
+        runMatchingLogicOnInternalSuppliers mb51_output, internalSuppliersSheet
+        
+        currentStep = E_RECEPTION_REPORT_STEP_MATCH_WITH_INTERROCOM
+        runMatchingLogicOnTango mb51_output, lean_tango, True, divForInterrocom
+        
+        currentStep = E_RECEPTION_REPORT_STEP_FINAL_TOUCH
+        innerFinalTouchOnReceptionReport mb51_output, True, Me.TextBoxYYYYCW.Value
+        
+        
+        MsgBox "Ready!"
     Else
-        Debug.Print "You choose internal suppliers source - no need to donwload it again!"
-        Set internalSuppliersSheet = ThisWorkbook.Sheets(CStr(Me.ComboBoxInternalSupplier.Value))
+        MsgBox "Hey! What are you doing!? PLeAse fill inpput data correctly!", vbQuestion
     End If
-    
-    
-
-    
-    ThisWorkbook.Activate
-    
-    currentStep = E_RECEPTION_REPORT_STEP_GET_DATA_FROM_MB51
-    runMainMB51Logic d, True, mb51_output
-    
-    
-    'sepcial place after main logic because main logic for mb51 provide feed for managers da
-    ' managers da new one!
-    If Me.ComboBoxManagersDA.Value = "" Then
-        'MsgBox "There is no source for managers da fields... tool need extra time for downloading", vbInformation
-        'ans = MsgBox("You are sure you want to make it? Maybe check again if there is any MANAGERS_DA_ worksheet with internal suppliers list already...", vbInformation + vbYesNo)
-        ans = vbYes
-        If ans = vbYes Then
-            
-            ' mb51_output
-            innerGetManagersDa mb51_output, managersDaSh
-        Else
-            End
-        End If
-    Else
-        Debug.Print "You choose internal suppliers source - no need to donwload it again!"
-        Set managersDaSh = ThisWorkbook.Sheets(CStr(Me.ComboBoxManagersDA.Value))
-    End If
-    
-    fillReceptionManagersDaColumn mb51_output, managersDaSh
-    
-    mb51_output.Activate
-    
-    currentStep = E_RECEPTION_REPORT_STEP_GET_INTERNAL_SUPPLIERS
-    runMatchingLogicOnInternalSuppliers mb51_output, internalSuppliersSheet
-    
-    currentStep = E_RECEPTION_REPORT_STEP_MATCH_WITH_INTERROCOM
-    runMatchingLogicOnTango mb51_output, lean_tango, True, divForInterrocom
-    
-    currentStep = E_RECEPTION_REPORT_STEP_FINAL_TOUCH
-    innerFinalTouchOnReceptionReport mb51_output, True, Me.TextBoxYYYYCW.Value
-    
-    
-    MsgBox "Ready!"
     
 End Sub
 

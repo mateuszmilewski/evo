@@ -30,7 +30,7 @@ Private Sub AddLineBtn_Click()
     Dim tbxMvt2 As Control
     
     
-    If cs.Count = 12 Then
+    If cs.count = 12 Then
         ' just a begining
         
         Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxMag02", True)
@@ -66,7 +66,7 @@ Private Sub AddLineBtn_Click()
     Else
     
         Dim howManyLinesAlready As Integer
-        howManyLinesAlready = ((cs.Count - 12) / 5) + 1
+        howManyLinesAlready = ((cs.count - 12) / 5) + 1
         
         If howManyLinesAlready < 10 Then
         

@@ -31,7 +31,7 @@ Option Explicit
 
 ' binding helpers subs - for coordination of steps
 
-Public Sub receptionOneClickCombo(ictrl As IRibbonControl)
+Public Sub greenLightOneClickCombo(ictrl As IRibbonControl)
     showComboFormForReceptionReport
 End Sub
 
@@ -39,7 +39,7 @@ Public Sub showComboFormForReceptionReport()
 
     Dim sh As Worksheet
     
-    Dim preDef As Range
+    Dim preDef As Range, preDefCurrFill As Range
     Set preDef = ThisWorkbook.Sheets("register").Range("AD2")
     
     With ComboFormGreenLightReport
@@ -56,6 +56,21 @@ Public Sub showComboFormForReceptionReport()
         
     End With
     
+    
+    ' fill already with pre-def
+    ' PRE_DEF_RUN_FOR_SQ01
+    Set preDefCurrFill = ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01")
+    Dim refReg As Range, x As Variant
+    Set refReg = preDefCurrFill
+    With ComboFormGreenLightReport
+        For x = 1 To 5
+            On Error Resume Next
+            .Controls("TextBox1" & CStr(x)).Value = CStr(refReg.Offset(0, x - 1).Value)
+            
+            On Error Resume Next
+            .Controls("TextBox2" & CStr(x)).Value = CStr(refReg.Offset(1, x - 1).Value)
+        Next x
+    End With
     
     ' filling data from combo boxes
     With ComboFormGreenLightReport
@@ -83,8 +98,18 @@ Public Sub showComboFormForReceptionReport()
         
     End With
     
+    ' fill with opened workbook
+    With ComboFormGreenLightReport
+        Dim w As Workbook
+        .ComboBoxPUS.Clear
+        For Each w In Workbooks
+            .ComboBoxPUS.addItem w.name
+        Next w
+    End With
+    
     
     With ComboFormGreenLightReport
+        .SubmitBtn.Enabled = False
         .show
     End With
     

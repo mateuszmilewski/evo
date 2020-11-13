@@ -1,4 +1,12 @@
-Attribute VB_Name = "MB51Module"
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "SQ01_InputItem"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 Option Explicit
 
 'The MIT License (MIT)
@@ -27,48 +35,14 @@ Option Explicit
 '
 ' THE EVO TOOL
 
-Public Sub getDataFromMB51(ictrl As IRibbonControl)
-    
-    MB51Form.TextBoxDu01.Value = Format((Date - 30), "dd.mm.yyyy")
-    MB51Form.TextBoxAu01.Value = Format(Date, "dd.mm.yyyy")
-    MB51Form.TextBoxMvt1_01.Value = "101"
-    MB51Form.TextBoxMvt2_01.Value = "102"
-    MB51Form.show
-End Sub
 
-
-
-
-Public Function validMb51data(sh1 As Worksheet, validationRefRef As Range) As Boolean
-    validMb51data = False
-    
-    Dim validationRef As Range, labelsRef As Range
-    
-    ' Set validationRef = ThisWorkbook.Sheets("forValidation").Range("D35")
-    Set validationRef = validationRefRef
-    
-    Set labelsRef = ActiveSheet.Cells(1, 1)
-    
-    Do
-    
-        If validationRef.Value = labelsRef.Value Then
-            validMb51data = True
-        Else
-            validMb51data = False
-            Exit Do
-        End If
-    
-        Set validationRef = validationRef.Offset(0, 1)
-        Set labelsRef = labelsRef.Offset(0, 1)
-    Loop Until Trim(labelsRef.Value) = ""
-    
-    
-    
-    
-    
-    If validMb51data Then
-        Debug.Print "activesheet is in std!"
-    End If
-    
-    
-End Function
+' TANGO_TP04
+Public group As String
+' REQ_ZSI1_T064
+Public query1 As String
+' T064_XXX
+Public standard1 As String
+' TP04_XXX
+Public query2 As String
+' REF_XXX_PP
+Public standard2 As String

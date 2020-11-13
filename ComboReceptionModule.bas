@@ -37,7 +37,7 @@ End Sub
 
 Public Sub showComboFormForReceptionReport()
 
-    Dim sh As Worksheet
+    Dim sh As Worksheet, c As Control
 
     ' check interrocom availability inside evo already
     ' +
@@ -87,7 +87,11 @@ Public Sub showComboFormForReceptionReport()
         .TextBoxMvt1_01.Value = "101"
         .TextBoxMvt2_01.Value = "102"
         
-        .innerAddLine
+        Set c = Nothing
+        On Error Resume Next
+        Set c = .Controls("TextBoxMag02")
+        
+        If c Is Nothing Then .innerAddLine
         
         
     End With

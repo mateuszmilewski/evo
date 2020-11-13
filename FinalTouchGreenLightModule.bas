@@ -30,26 +30,28 @@ Option Explicit
 
 
 Public Sub finalTouchOnGreenLightReport(ictrl As IRibbonControl)
-    innerFinalTouchOnGreenLightReport
+    innerFinalTouchOnGreenLightReport ActiveSheet, False
+    
+
 End Sub
 
 
-Public Sub innerFinalTouchOnGreenLightReport()
+Public Sub innerFinalTouchOnGreenLightReport(sh1 As Worksheet, auto1 As Boolean)
 
 
     ' before you do anything check if active sheet is in proper standard
-    If valid_TP04_data(ActiveSheet) Then
+    If valid_TP04_data(sh1) Then
         
         Dim coll As Collection
         Set coll = Nothing
-        Set coll = defineTimingInGreenLight(ActiveSheet)
+        Set coll = defineTimingInGreenLight(sh1, auto1)
         
-        Dim sh1 As Worksheet
-        Set sh1 = ActiveSheet
+        'Dim sh1 As Worksheet
+        'Set sh1 = ActiveSheet
         
         
         If Not coll Is Nothing Then
-            If coll.Count > 0 Then
+            If coll.count > 0 Then
             
             
                 Dim finalOut As Worksheet
@@ -59,6 +61,18 @@ Public Sub innerFinalTouchOnGreenLightReport()
                 fillLabelsForGreenLight finalOut
                 
                 goThroughTP04Data sh1, finalOut, coll
+                
+                
+                
+                
+                
+                addFormatConditionsForGreenLightReport
+                
+                ' some hiding and font changing with column width adjustment
+                beautifyGreenLightList
+                
+                startModelessLeaf
+                
             Else
                 MsgBox "Scope is wrongly defined!", vbCritical
             End If
@@ -71,7 +85,7 @@ Public Sub innerFinalTouchOnGreenLightReport()
     
 End Sub
 
-Private Function defineTimingInGreenLight(sh1 As Worksheet) As Collection
+Private Function defineTimingInGreenLight(sh1 As Worksheet, auto1 As Boolean) As Collection
     Set defineTimingInGreenLight = Nothing
     
     
@@ -103,19 +117,40 @@ Private Function defineTimingInGreenLight(sh1 As Worksheet) As Collection
         Next
     End With
     
-    FinalScope.show
     
+    If auto1 = False Then
     
-    If Not FinalScope.c Is Nothing Then
-        If FinalScope.c.Count > 0 Then
-            Debug.Print "FinalScope.c.Count: " & FinalScope.c.Count
-            Set defineTimingInGreenLight = FinalScope.c
+        FinalScope.show
+        
+        
+        If Not FinalScope.c Is Nothing Then
+            If FinalScope.c.count > 0 Then
+                Debug.Print "FinalScope.c.Count: " & FinalScope.c.count
+                Set defineTimingInGreenLight = FinalScope.c
+            End If
         End If
+    Else
+    
+    
+        Dim ctmp As New Collection
+
+        With FinalScope.ListBox1
+        
+            Dim x As Variant
+            For x = 0 To .ListCount - 1
+                ctmp.Add .list(x)
+            Next x
+        End With
+        
+        Set defineTimingInGreenLight = ctmp
     End If
 End Function
 
 Private Sub goThroughTP04Data(sh1 As Worksheet, out As Worksheet, coll As Collection)
 
+
+
+    Application.Calculation = xlCalculationManual
 
     ' r1 as input
     ' r2 for ouput
@@ -156,7 +191,8 @@ Private Sub goThroughTP04Data(sh1 As Worksheet, out As Worksheet, coll As Collec
                 ThisWorkbook.Sheets("register").Range("Z15").FormulaR1C1Local
                 
             'E_GREEN_LIGHT_MANAGER
-            r2.Offset(0, E_GREEN_LIGHT_MANAGER - 1).Value = ""
+            r2.Offset(0, E_GREEN_LIGHT_MANAGER - 1).Value = _
+                r1.Offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_DA - 1).Value
             
             'E_GREEN_LIGHT_Spending_Sigapp
             r2.Offset(0, E_GREEN_LIGHT_Spending_sigapp - 1).FormulaR1C1Local = _
@@ -210,6 +246,10 @@ Private Sub goThroughTP04Data(sh1 As Worksheet, out As Worksheet, coll As Collec
         
         Set r1 = r1.Offset(1, 0)
     Loop Until Trim(r1.Value) = ""
+    
+    
+    Application.Calculation = xlCalculationAutomatic
+    Application.Calculate
     
     
 End Sub

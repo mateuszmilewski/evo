@@ -30,7 +30,7 @@ Public Function parseToText() As String
     Dim getPriceFromGreenLight As Range
     Set getPriceFromGreenLight = rangeRefernceInGreen.Offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1)
     
-    parseSummary = parseSummary & " receptions: " & dictionaryOfMatchesFromReception.Count
+    parseSummary = parseSummary & " receptions: " & dictionaryOfMatchesFromReception.count
     
     
     Dim key As Variant, r As Range, count1 As Integer
@@ -97,7 +97,7 @@ Public Function parseToText() As String
     
     
     
-    If dictionaryOfMatchesFromReception.Count > 0 Then
+    If dictionaryOfMatchesFromReception.count > 0 Then
         parseSummary = parseSummary & " with NOK PPx1: " & CStr(count1) & Chr(10)
         parseSummary = parseSummary & "last price from reception: " & CStr(lastPriceFromReception)
         
@@ -136,7 +136,7 @@ Public Function parseSummary() As String
     Dim getPriceFromGreenLight As Range
     Set getPriceFromGreenLight = rangeRefernceInGreen.Offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1)
     
-    parseSummary = parseSummary & " receptions: " & dictionaryOfMatchesFromReception.Count
+    parseSummary = parseSummary & " receptions: " & dictionaryOfMatchesFromReception.count
     
     Dim key As Variant, r As Range, count1 As Integer
     count1 = 0

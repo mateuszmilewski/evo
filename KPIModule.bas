@@ -238,7 +238,7 @@ Private Sub makeSomeLeanTablesAndChartsForActiveSheet()
         Set srcSh = ActiveSheet
         Set tb = ActiveSheet.UsedRange
         Dim countRows As Long
-        countRows = tb.rows.Count - 1
+        countRows = tb.rows.count - 1
         
         With ActiveSheet
             Set dapRng = .Range(.Cells(2, E_KPI_SRC_DAP), .Cells(countRows, E_KPI_SRC_DAP))

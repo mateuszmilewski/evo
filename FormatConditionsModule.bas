@@ -34,11 +34,15 @@ Public Sub addFormatConditionsForReceptionReport()
     'addCondFrmt1 "W:W", "NO TANGO PRICE", RGB(255, 128, 0)
     
     addCondFrmt3939 "K:K", "3939"
+    addCondFrmt1 "S:S", "NOK", RGB(255, 0, 0)
+    addCondFrmt1 "S:S", "NO TANGO PRICE", RGB(255, 128, 0)
 End Sub
 
 Public Sub addFormatConditionsForGreenLightReport()
 Attribute addFormatConditionsForGreenLightReport.VB_Description = "add a few dynamic colors"
 Attribute addFormatConditionsForGreenLightReport.VB_ProcData.VB_Invoke_Func = "F\n14"
+
+    addCondFrmt3939 "H:H", "3939"
     addCondFrmt1 "T:T", "NOK", RGB(255, 0, 0)
     addCondFrmt1 "W:W", "NOK", RGB(255, 0, 0)
     addCondFrmt1 "W:W", "NO TANGO PRICE", RGB(255, 128, 0)
@@ -46,16 +50,13 @@ End Sub
 
 Private Sub addCondFrmt1(columnsStr As String, str As String, myColor As Long)
 Attribute addCondFrmt1.VB_ProcData.VB_Invoke_Func = " \n14"
-'
-' addCondFrmt1 Macro
-'
 
 '
     columns(columnsStr).Select
     ' Application.CutCopyMode = False
     Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
         Formula1:="=""" & str & """"
-    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    Selection.FormatConditions(Selection.FormatConditions.count).SetFirstPriority
     With Selection.FormatConditions(1).Interior
         .PatternColorIndex = xlAutomatic
         .Color = myColor
@@ -71,7 +72,7 @@ Private Sub addCondFrmt3939(columnStr As String, begStr As String)
     columns(columnStr).Select
     Selection.FormatConditions.Add Type:=xlTextString, String:=begStr, _
         TextOperator:=xlBeginsWith
-    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    Selection.FormatConditions(Selection.FormatConditions.count).SetFirstPriority
     With Selection.FormatConditions(1).Interior
         .PatternColorIndex = xlAutomatic
         .ThemeColor = xlThemeColorAccent1
