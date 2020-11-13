@@ -30,16 +30,32 @@ Option Explicit
 
 ' sap globals
 
+
+' late binging necessary becuase there is some users without SIGAPP SAP...
+
 Global sapGuiAuto As Object
-Global sapGui As SAPFEWSELib.GuiApplication
-Global cnn As SAPFEWSELib.GuiConnection
-Global sess As SAPFEWSELib.GuiSession
-Global window As SAPFEWSELib.GuiModalWindow
-Global c As SAPFEWSELib.GuiCollection
-Global item As SAPFEWSELib.GuiComponent
-Global Btn As SAPFEWSELib.GuiButton
-Global table As SAPFEWSELib.GuiTableControl ' ISapTableControlTarget
-Global gv As SAPFEWSELib.GuiGridView
-Global myTableRow As SAPFEWSELib.GuiTableRow
-Global coll As SAPFEWSELib.GuiCollection
+'Global sapGui As SAPFEWSELib.GuiApplication
+'Global cnn As SAPFEWSELib.GuiConnection
+'Global sess As SAPFEWSELib.GuiSession
+'Global window As SAPFEWSELib.GuiModalWindow
+'Global c As SAPFEWSELib.GuiCollection
+'Global item As SAPFEWSELib.GuiComponent
+'Global Btn As SAPFEWSELib.GuiButton
+'Global table As SAPFEWSELib.GuiTableControl ' ISapTableControlTarget
+'Global gv As SAPFEWSELib.GuiGridView
+'Global myTableRow As SAPFEWSELib.GuiTableRow
+'Global coll As SAPFEWSELib.GuiCollection
+
+
+Global sapGui As Object
+Global cnn As Object
+Global sess As Object
+Global window As Object
+Global c As Object
+Global item As Object
+Global Btn As Object
+Global table As Object
+Global gv As Object
+Global myTableRow As Object
+Global coll As Object
 

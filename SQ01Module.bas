@@ -35,37 +35,55 @@ Option Explicit
 
 
 Public Sub concatDataFromSq01(ictrl As IRibbonControl)
-    concatAndStd
+    concatAndStd Nothing, Nothing, Nothing
 End Sub
 
-Public Sub concatAndStd()
+Public Sub concatAndStd(Optional sq01sh1 As Worksheet, Optional sq01sh2 As Worksheet, Optional resultSh As Worksheet)
+
+
+
+    Application.Calculation = xlCalculationManual
 
 
     Dim whatToConcat As Collection
     Set whatToConcat = Nothing
     
-    SQ01ConfigForm.ListBox1.Clear
-    SQ01ConfigForm.ListBox1.MultiSelect = fmMultiSelectMulti
     
-    Dim sh1 As Worksheet
-    For Each sh1 In ThisWorkbook.Sheets
-        If isInSq01OutputStd(sh1) Then
-            SQ01ConfigForm.ListBox1.addItem sh1.name
-        End If
-    Next sh1
     
-    SQ01ConfigForm.show
+    If sq01sh1 Is Nothing And sq01sh2 Is Nothing Then
     
-    If SQ01ConfigForm.coll Is Nothing Then
-        MsgBox "You do not choose anything!", vbCritical
-        End
-    Else
+        SQ01ConfigForm.ListBox1.Clear
+        SQ01ConfigForm.ListBox1.MultiSelect = fmMultiSelectMulti
         
-        If SQ01ConfigForm.coll.Count = 1 Then
-            MsgBox "You choose only one worksheet - so nothing to do - nothing to concatenate", vbInformation
+        Dim sh1 As Worksheet
+        For Each sh1 In ThisWorkbook.Sheets
+            If isInSq01OutputStd(sh1) Then
+                SQ01ConfigForm.ListBox1.addItem sh1.name
+            End If
+        Next sh1
+        
+        SQ01ConfigForm.show
+        
+        If SQ01ConfigForm.coll Is Nothing Then
+            MsgBox "You do not choose anything!", vbCritical
+            End
         Else
-            Set whatToConcat = SQ01ConfigForm.coll
+            
+            If SQ01ConfigForm.coll.count = 1 Then
+                MsgBox "You choose only one worksheet - so nothing to do - nothing to concatenate", vbInformation
+            Else
+                Set whatToConcat = SQ01ConfigForm.coll
+            End If
         End If
+    ElseIf (Not sq01sh1 Is Nothing) And (Not sq01sh2 Is Nothing) Then
+    
+    
+        Set whatToConcat = New Collection
+        whatToConcat.Add sq01sh1.name
+        whatToConcat.Add sq01sh2.name
+        
+    Else
+        MsgBox "This logic is not allowed!", vbCritical
     End If
     
     
@@ -83,6 +101,7 @@ Public Sub concatAndStd()
         
         Dim concatSh As Worksheet
         Set concatSh = ThisWorkbook.Sheets.Add
+        Set resultSh = concatSh
         concatSh.name = EVO.TryToRenameModule.tryToRenameWorksheet(concatSh, "CONCAT_")
         fillLabels concatSh.Range("A1")
         
@@ -116,6 +135,8 @@ Public Sub concatAndStd()
                 
                     
                 Set cr = cr.Offset(1, 0)
+                
+                ' Application.Calculation = xlCalculationManual
 
             Next x1
             
@@ -123,11 +144,14 @@ Public Sub concatAndStd()
             
         Next el
         
-        MsgBox "READY!", vbInformation
+        ' MsgBox "READY!", vbInformation
     Else
         MsgBox "list of concat is empty!", vbCritical
         End
     End If
+    
+    
+    Application.Calculation = xlCalculationAutomatic
     
     
 End Sub
@@ -197,7 +221,10 @@ Public Sub getDataFromSq01(ictrl As IRibbonControl)
 End Sub
 
 
-Private Sub innerMainForSq01(Optional preDef As Boolean, Optional tbx13_Str As String, Optional tbx23_Str As String)
+Public Sub innerMainForSq01(Optional preDef As Boolean, _
+    Optional tbx13_Str As String, Optional tbx23_Str As String, _
+    Optional ByRef osh As Worksheet, Optional ByRef osh2 As Worksheet, _
+    Optional autoForCombo As Boolean)
 
 
     '---------------------------------------------------------------------------------
@@ -218,7 +245,8 @@ Private Sub innerMainForSq01(Optional preDef As Boolean, Optional tbx13_Str As S
     
     ' inter4sh stands for internal suppliers list worksheet
     Dim ish As Worksheet, ish2 As Worksheet
-    Dim osh As Worksheet, osh2 As Worksheet
+    ' already as params to have possibility for combo logic
+    ' Dim osh As Worksheet, osh2 As Worksheet
     ' dim inter4Sh As Worksheet,
     Dim irng As Range, orng As Range
     Set ish = ThisWorkbook.Sheets.Add
@@ -302,7 +330,10 @@ Private Sub innerMainForSq01(Optional preDef As Boolean, Optional tbx13_Str As S
 '    End If
     
     
-    MsgBox "GOTOWE!", vbInformation
+    If autoForCombo Then
+    Else
+        MsgBox "GOTOWE!", vbInformation
+    End If
     
     '---------------------------------------------------------------------------------
     '---------------------------------------------------------------------------------
@@ -313,6 +344,9 @@ End Sub
 
 
 Private Sub changePricesIntoDouble(sh1 As Worksheet)
+
+
+    Application.Calculation = xlCalculationManual
     
     Dim r As Range, tmpstrv As String, doubleValue As String
     Set r = sh1.Range("A1048576").End(xlUp) ' to jest ostatni
@@ -322,6 +356,8 @@ Private Sub changePricesIntoDouble(sh1 As Worksheet)
     Dim ir As Range, priceRng As Range
     For Each ir In r
         Set priceRng = ir.Offset(0, EVO.E_FROM_SQ01_QUASI_TP04_SUM - 1)
+        
+        ' Application.Calculation = xlCalculationManual
         
         If priceRng.Value Like "*.*,??" Or priceRng.Value Like "*,??" Then
             tmpstrv = Replace(Replace(priceRng.Value, ".", ""), ",", "")
@@ -333,6 +369,8 @@ Private Sub changePricesIntoDouble(sh1 As Worksheet)
             End If
         End If
     Next ir
+    
+    Application.Calculation = xlCalculationAutomatic
 End Sub
 
 Private Sub copyAndPasteAsValues(refRng As Range)

@@ -110,6 +110,75 @@ Public Sub recalculDatesIfSatOrSun(ByRef li As LineItem, Optional e As E_ECHANCI
     End If
 End Sub
 
+Public Sub reculculIfBetweenDatesWeekend(ByRef li As LineItem, Optional e As E_ECHANCIER_ONL_semaine_SCENARIO)
+
+
+    Dim wd As Variant
+    Dim i As Date
+    Dim helper As Integer
+    helper = 0
+    
+    If e = E_ECHANCIER_ONL_semaine_SCENARIO_DEL Then
+    
+
+
+        For i = li.delDate To li.puDate Step -1
+            
+            wd = Application.WorksheetFunction.Weekday(i, 2)
+            
+            If Int(wd) = 6 Then
+                helper = helper + 1
+            ElseIf Int(wd) = 7 Then
+                helper = helper + 1
+            End If
+        Next i
+        
+        li.puDate = CDate(li.puDate - helper)
+        
+        
+        wd = Application.WorksheetFunction.Weekday(li.puDate, 2)
+
+        If Int(wd) = 7 Then
+            li.puDate = CDate(li.puDate - 2)
+        End If
+
+        If Int(wd) = 6 Then
+            li.puDate = CDate(li.puDate - 1)
+        End If
+        
+    ElseIf e = E_ECHANCIER_ONL_semaine_SCENARIO_PU Then
+    
+    
+
+        
+        For i = li.delDate To li.puDate Step -1
+            
+            wd = Application.WorksheetFunction.Weekday(i, 2)
+            
+            If Int(wd) = 6 Then
+                helper = helper + 1
+            ElseIf Int(wd) = 7 Then
+                helper = helper + 1
+            End If
+        Next i
+        
+        li.delDate = CDate(li.delDate + helper)
+        
+        
+        wd = Application.WorksheetFunction.Weekday(li.delDate, 2)
+
+        If Int(wd) = 7 Then
+            li.delDate = CDate(li.delDate + 1)
+        End If
+
+        If Int(wd) = 6 Then
+            li.delDate = CDate(li.delDate + 2)
+        End If
+        
+        
+    End If
+End Sub
+
 
 Public Function validateSearching(pleRng As Range, cloeRng As Range, mainRng As Range, condiRng As Range) As Boolean
     validateSearching = False
@@ -187,15 +256,52 @@ Public Function getMondayFromYYYYCW(yyyycw As Long) As Date
     curr_yyyycw = currYear * 100 + CLng(currCW)
     
     Dim diff As Long
-    diff = yyyycw - curr_yyyycw
     
-    ' to jest current monday: tmpDate
-    tmpdate = tmpdate + 7 * diff
+    If Left(yyyycw, 4) = Left(curr_yyyycw, 4) Then
+        diff = yyyycw - curr_yyyycw
+        
+        ' to jest current monday: tmpDate
+        tmpdate = tmpdate + (7 * diff)
+        
+        getMondayFromYYYYCW = tmpdate
+    Else
+        ' to diff years - needs more attention!
+        Dim tmpdate2 As Date
+        tmpdate2 = tmpdate
+        
+        Dim potBlock As Integer
+        potBlock = 0
+        Do
+            tmpdate2 = tmpdate2 + 7
+            potBlock = potBlock + 1
+            
+            If potBlock > 100 Then
+                getMondayFromYYYYCW = CDate(Format("1900-01-01", "yyyy-mm-dd"))
+                Exit Function
+            End If
+        Loop Until doYouReachYYYYCW(tmpdate2, yyyycw)
+        
+        getMondayFromYYYYCW = tmpdate2
+        
+    End If
+
     
-    getMondayFromYYYYCW = tmpdate
+End Function
+
+Private Function doYouReachYYYYCW(td As Date, yyyycw As Long) As Boolean
+    doYouReachYYYYCW = False
     
+    Dim td_currYear As Long
+    Dim td_currCW As Long
+    td_currYear = CLng(Year(td))
+    td_currCW = CLng(Application.WorksheetFunction.IsoWeekNum(td))
     
+    Dim td_yyyycw As Long
+    td_yyyycw = td_currYear * 100 + CLng(td_currCW)
     
+    If yyyycw = td_yyyycw Then
+        doYouReachYYYYCW = True
+    End If
 End Function
 
 

@@ -694,3 +694,212 @@ Option Explicit
 ' 069 backup version
 ' 070 finally first vresion of combo form for green light data
 ' ==============================================================
+
+
+' 0.71
+' ==============================================================
+'
+' 071 backup version
+' ' continue with green light combo implementation
+' MODULE: ComboGreenLightModule initially ready
+'  'FORM: ComboFormGreenLightReport - version 1.0 ready
+''' '(compatible with the current setup of reception and green light
+' ==============================================================
+
+
+' 0.72
+' ==============================================================
+'
+' 072 backup version
+' + reception new column!
+' ==============================================================
+
+
+
+' 0.73
+' ==============================================================
+'
+' 073 backup version
+' final touch on green light re-check auto
+' ==============================================================
+
+
+' 0.74
+' ==============================================================
+'
+' 073 backup version
+' final touch on green light re-check auto - extra fine tunning
+' ==============================================================
+
+
+
+' 0.75
+' ==============================================================
+' ==============================================================
+' big change on runMainLogicForSQ01__with_preDef ' clearing and putting again
+' ==============================================================
+' ==============================================================
+
+
+' 0.76
+' ==============================================================
+'
+' heavy cating on types in ManagersDaModule
+' for green light adjusted worksheet
+' to be sure that data will match
+' ==============================================================
+
+
+
+' 0.77 + 0.78
+' ==============================================================
+'
+' split list for sq01 to not block OLE logic
+' ==============================================================
+
+' 0.79
+' ==============================================================
+' make modeless leaf a little but smarter - some logic
+' not only step by step - create leaf
+' but make all with one click - create leafs
+' should have some basic cfg and loop for create leaf x times
+' and at the end there will be as well some total scaffold logic
+' ==============================================================
+
+
+
+' 0.80
+' ==============================================================
+' backup with ready make new for modeless leaf
+' ==============================================================
+
+
+' 0.81
+' ==============================================================
+' late binding to the SAP lib to avoid errors for users
+' which are without SAP
+'
+' +++++
+' new columns in source PIVOT - LUCIE feature
+' ==============================================================
+
+
+
+' 0.82
+' ==============================================================
+' final touch extension for colour frmtting + auto synthesis
+' 0.83
+' ==============================================================
+' hot-fix for modeless leaf not starting from first Cw
+' hot-fix interrocom currency issue still
+' ==============================================================
+
+
+' 0.84 + 0.85
+' ==============================================================
+' initial version of new PUS version with extra columns  from PM
+' also minor changes for COPY DATA LOGIC
+' ==============================================================
+
+
+
+' 0.852
+' ==============================================================
+' huge fix for internal part of screen mb51 - still layout problem
+' and order of the columns inside sap - now fixed hard with
+' internal name of the each field - the order is random
+' each week so be careful:
+'
+'0 MATNR -100550588
+'1 MAKTX - Agrafes ARaymond
+'2 WERKS -5820
+'3 LGORT -3770
+'4 KOSTL -
+'5 BWART -101
+'6 MBLNR -5000096857#
+'7 CHARG -2506007
+'8 MENGE -1
+'9 DMBTR -7.74, 0
+'10 BUDAT - 22.10.2020
+'11 CPUDT - 22.10.2020
+'12 BLDAT - 22.10.2020
+'13 CPUTM - 11:26:02
+'14 ERFME -UN
+'15 BPRME -UN
+'16 WAERS -EUR
+'17 BUKRS -260
+'18 BWTAR -2506007
+'19 EBELP -30
+'20 EXBWR -0, 0
+'21 GRUND -
+'22 KDAUF -
+'23 KDPOS -
+'24 KUNNR -
+'25 MJAHR -2020
+'26 VORNR -
+'27 PSPID -
+'28 SHKZG -s
+'29 XABLN -
+'30 NAME1 - ONL MADRID
+'31 BTEXT - EM Entrée marchand.
+'32 SOBKZ -
+'33 ZEILE -1
+'34 ERFMG -1
+'35 ANLN1 -
+'36 APLZL -
+'37 AUFPL -
+'38 BPMNG -1
+'39 BSTME -UN
+'40 BSTMG -1
+'41 LONGNUM -
+'42 EXVKW -0, 0
+'43 KDEIN -
+'44 KZBEW -b
+'45 KZVBR -
+'46 KZZUG -
+'47 MEINS -UN
+'48 NPLNR -
+'49 RSNUM -
+'50 RSPOS -
+'51 USNAM -U313961
+'52 VGART -WE
+'53 VKWRT -0, 0
+'54 XAUTO -
+'55 AUFNR -
+'56 XBLNR -ADLC5081
+'57 EBELN -3939539113#
+'58 LIFNR - 98780U  01
+'59 ANLN2 -
+' ==============================================================
+
+
+' 0.86
+' ==============================================================
+' fix on mb51 : decimal separator vs grouping separator
+' ==============================================================
+
+
+' 0.87
+' -
+' version with readme -ReadMeButtonsModule
+' -
+' modeless leaf add for existing one
+
+
+
+'0.88
+' ==============================================================
+' li.addRawInfoToLog "this PN is missing in CPL BASE: Control Tower DB!"
+' ==============================================================
+
+'0.89
+' ==============================================================
+' fine tunning the reception ppx1 add to existing one!
+' ==============================================================
+
+
+' 0.90
+' ==============================================================
+' hot fix for calcul in DHxx between dates
+' ' fine tunning the reception ppx1 add to existing one! 2nd
+' ==============================================================

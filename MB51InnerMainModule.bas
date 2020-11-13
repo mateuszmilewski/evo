@@ -27,11 +27,110 @@ Option Explicit
 
 
 
+' Private Sub changeColumnOrder(ByRef mgv As SAPFEWSELib.GuiGridView)
+Private Sub changeColumnOrder(ByRef mgv As Variant)
 
+    Dim newColumnOrder As Object ' SAPFEWSELib.GuiCollection
+    Set newColumnOrder = EVO.sapGui.CreateGuiCollection
+    
+    
+    ' or maybe offset ' should start from zero to one huge mistake
+    ' MAKTX - article
+    ' WERKS - part name
+    ' LGORT - DIV
+    ' KOSTL - MAG
+    ' BWART - crte cout
+    ' MBLNR - MVT
+    ' CHARG - doc article
+    ' MENGE - lot
+    ' DMBTR - qty
+    ' BUDAT - montant di
+    ' CPUDT - date cpt
+    ' BLDAT - saise le
+    ' CPUTM - date piece
+    ' ERFME - saise a
+    ' BPRME - UQS - my UN
+    ' WAERS - UN2 - dont touch
+    ' BUKRS - EUR
+    ' BWTAR - ste ?
+    ' EBELP - grp valor ?
+    ' EXBWR - poste ?
+    ' GRUND - montant 2 0.00?
+    ' KDAUF - motif
+    ' KDPOS - cde clint
+    ' KUNNR - p cde ?
+    ' MJAHR - client
+    ' VORNR - exer
+    ' PSPID - ope
+    ' SHKZG - element otp
+    ' XABLN - D
+    ' NAME1 - bon acc
+    ' BTEXT - nom 1
+    ' SOBKZ - some text
+    ' ZEILE - S
+    ' ERFMG - pos
+    ' ANLN1 - qty???
+    ' APLZL - immobi?
+    ' AUFPL - comp
+    ' BPMNG - no g
+    
+    With newColumnOrder
+        .Add "MAKTX" ' MAKTX - article
+        .Add "WERKS" ' WERKS - part name
+        .Add "LGORT" ' LGORT - DIV
+        .Add "KOSTL" ' KOSTL - MAG
+        .Add "BWART" ' BWART - crte cout
+        .Add "MBLNR" ' MBLNR - MVT
+        .Add "CHARG" ' CHARG - doc article
+        .Add "MENGE" ' MENGE - lot
+        .Add "CPUDT" ' date cpt
+        .Add "BLDAT" ' - saise le
+        .Add "CPUTM" ' CPUTM - date piece
+        .Add "ERFME" ' ERFME - saise a
+        .Add "DMBTR" ' QTY
+        .Add "BPRME" ' BPRME - UQS - my UN
+        .Add "WAERS" ' WAERS - UN2 - dont touch
+        .Add "BUDAT" ' ' BUDAT - montant di
+        .Add "BUKRS" ' CURRENCY ' ' BUKRS - EUR
+        .Add "XABLN" ' ' XABLN - D
+        .Add "ZEILE" ' ZEILE - S
+    End With
+    
+    
+    ' OLD AND WRONG
+    'With newColumnOrder
+    '    .Add "MAKTX"
+    '    .Add "WERKS"
+    '    .Add "LGORT"
+    '    .Add "KOSTL"
+    '    .Add "BWART"
+    '    .Add "MBLNR"
+    '    .Add "CHARG"
+    '    .Add "BUDAT"
+    '    .Add "CPUDT"
+    '    .Add "BLDAT"
+    '    .Add "CPUTM"
+    '    .Add "MENGE"
+    '    .Add "ERFME"
+    '    .Add "BPRME"
+    '    .Add "DMBTR"
+    '    .Add "WAERS"
+    '    .Add "AUFNR"
+    '    .Add "XBLNR"
+    '    .Add "EBELN"
+    '    .Add "LIFNR"
+    'End With
+
+    mgv.ColumnOrder = newColumnOrder
+End Sub
 
 
 
 Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolean, Optional osh As Worksheet)
+
+
+
+    Application.Calculation = xlCalculationManual
 
 
 
@@ -45,8 +144,8 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
 
 
     
-    Dim chbx As SAPFEWSELib.GuiCheckBox
-    Dim txt As SAPFEWSELib.GuiTextedit
+    Dim chbx As Variant ' SAPFEWSELib.GuiCheckBox
+    Dim txt As Variant ' SAPFEWSELib.GuiTextedit
     
     
     If EVO.GlobalSapModule.sapGuiAuto Is Nothing Then
@@ -65,19 +164,19 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
     Set cnn = sapGui.Connections(0)
     
     Debug.Print cnn.ConnectionString
-    Debug.Print cnn.Sessions.Count
+    Debug.Print cnn.Sessions.count
 
     
     Set sess = cnn.Children(0)
     Set item = sess.Children(0)
     Debug.Print item.name
     
-    Debug.Print sess.Children.Count
+    Debug.Print sess.Children.count
     
     
     ' Set item = sess.Children(0)
     Set item = sess.FindById("wnd[0]/usr")
-    Debug.Print item.Children.Count
+    Debug.Print item.Children.count
 
     
     
@@ -117,7 +216,7 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
     
     
     Dim i_mb51 As MB51_InputItem, key As Variant
-    Debug.Print "d.Count: " & d.Count
+    Debug.Print "d.Count: " & d.count
     
     
     ' auto enum variables
@@ -149,6 +248,9 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
     For Each key In d.Keys
     
     
+        Application.Calculation = xlCalculationManual
+    
+    
         Set i_mb51 = d(key)
         
 
@@ -175,11 +277,16 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
             
         If Not gv Is Nothing Then
             Dim cols As Variant
+            ' changeColumnOrder gv
             Set cols = gv.ColumnOrder
             Debug.Print "gv.RowCount: " & gv.RowCount
-            
 
+            ' changeColumnOrder gv
             
+            Dim yyy As Variant
+            For yyy = 0 To 100
+                Debug.Print yyy & " " & cols(yyy) & " - " & gv.getCellValue(1, cols(yyy))
+            Next yyy
             
             
             
@@ -285,51 +392,136 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
             Dim x As Variant
             Dim y As Variant
             Dim tmp As Variant
-        
-        
-        
-        
+            
+            
+            
+            
             For x = 0 To gv.RowCount
-                For y = y_start - 1 To y_end
-                    
-                    
-                    If y = 0 Then
-                    
-                        If Trim(gv.GetCellValue(x, cols(y))) = "" Then
-                            orng.Value = "X"
-                        Else
-                            orng.Value = gv.GetCellValue(x, cols(y))
-                        End If
-                    
-                    ElseIf y = pcsPriceEnum - 1 Then
+                '0 MATNR -100550588
+                '1 MAKTX - Agrafes ARaymond
+                '2 WERKS -5820
+                '3 LGORT -3770
+                '4 KOSTL -
+                '5 BWART -101
+                '6 MBLNR -5000096857#
+                '7 CHARG -2506007
+                '8 MENGE -1
+                '9 DMBTR -7.74, 0
+                '10 BUDAT - 22.10.2020
+                '11 CPUDT - 22.10.2020
+                '12 BLDAT - 22.10.2020
+                '13 CPUTM - 11:26:02
+                '14 ERFME -UN
+                '15 BPRME -UN
+                '16 WAERS -EUR
+                '17 BUKRS -260
+                '18 BWTAR -2506007
+                '19 EBELP -30
+                '20 EXBWR -0, 0
+                '21 GRUND -
+                '22 KDAUF -
+                '23 KDPOS -
+                '24 KUNNR -
+                '25 MJAHR -2020
+                '26 VORNR -
+                '27 PSPID -
+                '28 SHKZG -s
+                '29 XABLN -
+                '30 NAME1 - ONL MADRID
+                '31 BTEXT - EM Entrée marchand.
+                '32 SOBKZ -
+                '33 ZEILE -1
+                '34 ERFMG -1
+                '35 ANLN1 -
+                '36 APLZL -
+                '37 AUFPL -
+                '38 BPMNG -1
+                '39 BSTME -UN
+                '40 BSTMG -1
+                '41 LONGNUM -
+                '42 EXVKW -0, 0
+                '43 KDEIN -
+                '44 KZBEW -b
+                '45 KZVBR -
+                '46 KZZUG -
+                '47 MEINS -UN
+                '48 NPLNR -
+                '49 RSNUM -
+                '50 RSPOS -
+                '51 USNAM -U313961
+                '52 VGART -WE
+                '53 VKWRT -0, 0
+                '54 XAUTO -
+                '55 AUFNR -
+                '56 XBLNR -ADLC5081
+                '57 EBELN -3939539113#
+                '58 LIFNR - 98780U  01
+                '59 ANLN2 -
+                
+                y = 0
+                If Trim(gv.getCellValue(x, "MATNR")) = "" Then
+                    orng.Offset(0, 0).Value = "X"
+                Else
+                    orng.Offset(0, 0).Value = gv.getCellValue(x, "MATNR")
+                End If
+                orng.Offset(0, 1).Value = gv.getCellValue(x, "MAKTX")
+                orng.Offset(0, 2).Value = gv.getCellValue(x, "WERKS")
+                orng.Offset(0, 3).Value = gv.getCellValue(x, "LGORT")
+                orng.Offset(0, 4).Value = gv.getCellValue(x, "KOSTL")
+                orng.Offset(0, 5).Value = gv.getCellValue(x, "BWART")
+                orng.Offset(0, 6).Value = gv.getCellValue(x, "MBLNR")
+                orng.Offset(0, 7).Value = "'" & CStr(gv.getCellValue(x, "MENGE"))
+                numHandler.parseStringProperlyToNum orng.Offset(0, 7)
+                
+                
+                ' CPUDT - date cpt
+                ' BLDAT - saise le
+                ' CPUTM - date piece
+                ' ERFME - saise a
+                orng.Offset(0, 8).Value = gv.getCellValue(x, "BUDAT")
+                orng.Offset(0, 9).Value = gv.getCellValue(x, "CPUDT")
+                orng.Offset(0, 10).Value = gv.getCellValue(x, "BLDAT")
+                orng.Offset(0, 11).Value = gv.getCellValue(x, "CPUTM")
+                
+                orng.Offset(0, 12).Value = "'" & CStr(gv.getCellValue(x, "MENGE"))
+                numHandler.parseStringProperlyToNum orng.Offset(0, 12)
+                
+                ' BPRME - UQS - my UN
+                ' WAERS - UN2 - dont touch
+                orng.Offset(0, 13).Value = "'" & gv.getCellValue(x, "ERFME")
+                orng.Offset(0, 14).Value = gv.getCellValue(x, "BPRME")
+                
+                ' $
+                orng.Offset(0, 15).Value = "'" & gv.getCellValue(x, "DMBTR")
+                numHandler.parseStringProperlyToNum orng.Offset(0, 15)
+                
+                ' EUR
+                orng.Offset(0, 16).Value = "'" & gv.getCellValue(x, "WAERS")
+                
+                
+                orng.Offset(0, 17).Value = "" ' gv.getCellValue(x, "BUKRS")
+                orng.Offset(0, 18).Value = gv.getCellValue(x, "USNAM")
+                orng.Offset(0, 19).Value = "" ' gv.getCellValue(x, "ZEILE")
+                
+                
+                
+                ' cofor supplier
+                orng.Offset(0, 20).Value = gv.getCellValue(x, "LIFNR")
+
+                
+                y = pcsPriceEnum - 1
                         
-                        orng.Offset(0, y).FormulaR1C1 = "=RC[-" & CStr(offsetForPrice) & "]" & _
-                            "/RC[-" & CStr(offsetForQty) & "]"
+                orng.Offset(0, y).FormulaR1C1 = "=RC[-" & CStr(offsetForPrice) & "]" & _
+                    "/RC[-" & CStr(offsetForQty) & "]"
                             
                             
-                        If IsError(orng.Offset(0, y).Value) Then
-                            orng.Offset(0, y).Value = 0
-                        End If
-                            
-                    ElseIf y = qtyEnum - 1 Then
-                        
-                        On Error Resume Next
-                        orng.Offset(0, y).Value = "'" & gv.GetCellValue(x, cols(y))
-                        numHandler.parseStringProperlyToNum orng.Offset(0, y)
+                If IsError(orng.Offset(0, y).Value) Then
+                    orng.Offset(0, y).Value = 0
+                End If
+
                         
                         
-                    ElseIf y = montantDiEnum - 1 Then
-                        
-                        On Error Resume Next
-                        orng.Offset(0, y).Value = "'" & gv.GetCellValue(x, cols(y))
-                        numHandler.parseStringProperlyToNum orng.Offset(0, y)
-                        
-                        
-                    Else
-                        On Error Resume Next
-                        orng.Offset(0, y).Value = gv.GetCellValue(x, cols(y))
-                    End If
-                Next y
+
             
             
                 'E_MB51_EXT_PCS_PRICE
@@ -420,6 +612,9 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
         
     
         ' Set rng = rng.Offset(1, 0)
+        
+        
+        Application.Calculation = xlCalculationAutomatic
             
 
     
@@ -427,9 +622,14 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
     
     
     
-    
+    Set st_h = Nothing
+    Set st_h = New StatusHandler
+    st_h.init_statusbar 10
+    st_h.show
     'orng.Offset(0, EVO.E_MB51_IS_CANCELLED - 1).Value = _
     '    isCancelled(orng.Offset(0, EVO.E_MB51_MVT - 1), osh.Range(osh.Range("A2"), osh.Range("A2").End(xlDown)))
+    
+    Application.Calculation = xlCalculationManual
     
     ' need to be outside of major loop
     For Each orng In osh.Range(osh.Range("A2"), osh.Range("A1").End(xlDown))
@@ -445,13 +645,27 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
         '    Application.WorksheetFunction.IsoWeekNum(CDbl(orng.Offset(0, EVO.E_MB51_DATE_CPT - 1).Value))
         
         orng.Offset(0, cwEnum - 1).Value = tryToAssignYearAndCW(orng, dateEnum)
+        
+        
+        '  Application.Calculation = xlCalculationManual
+        
+        If orng.row Mod 50 = 0 Then
+            On Error Resume Next
+            st_h.progress_increase
+        End If
     Next orng
+    
+    st_h.hide
+    Set st_h = Nothing
     
     
     If avoidFinalMsgBox Then
     Else
         MsgBox "GOTOWE!", vbInformation
     End If
+    
+    
+    Application.Calculation = xlCalculationAutomatic
     
 End Sub
 

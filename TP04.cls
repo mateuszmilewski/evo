@@ -40,6 +40,7 @@ Private stHndlr As StatusHandler
 
 Private pusMasterSheet As Worksheet
 Private tp04Sheet As Worksheet
+Private repsh As Worksheet
 
 Private pt04Item As TP04ItemHandler
 Private pt04ItemDictionary As Dictionary
@@ -51,6 +52,11 @@ Private rngOfArticlesInsideTp04 As Range
 Public Sub setStatusHandler(sh1 As StatusHandler)
     Set stHndlr = sh1
 End Sub
+
+
+Public Function getRepSh() As Worksheet
+    Set getRepSh = repsh
+End Function
 
 
 
@@ -333,10 +339,10 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
 
             DoEvents
             
-            If pt04ItemDictionary.Count > 0 Then
+            If pt04ItemDictionary.count > 0 Then
             
-                Dim repsh As Worksheet, repRng As Range, outputIter As Variant
-            
+                Dim repRng As Range, outputIter As Variant
+                
                 Set repsh = ThisWorkbook.Sheets.Add
                 ' tryToRename repSh
                 repsh.name = EVO.TryToRenameModule.tryToRenameWorksheet(repsh, "TP04_")

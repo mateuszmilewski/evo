@@ -670,6 +670,17 @@ Public Sub fillPivotSourceWithLabels()
         .Cells(1, EVO.E_PIVOT_SRC____TYPE_DE_PIECE).Value = "TYPE_DE_PIECE"
         .Cells(1, EVO.E_PIVOT_SRC____CLOE_COL_E_PRICE).Value = "PRICE_FROM_CLOE_COL_E"
         
+        
+        .Cells(1, EVO.E_PIVOT_SRC__lb_COFOR_HYBRID).Value = "COFOR HYBRID"
+        .Cells(1, EVO.E_PIVOT_SRC__lb_DHAS).Value = "DHAS"
+        .Cells(1, EVO.E_PIVOT_SRC__lb_DHEO).Value = "DHEO"
+        .Cells(1, EVO.E_PIVOT_SRC__lb_DHEF).Value = "DHEF"
+        
+        .Cells(1, EVO.E_PIVOT_SRC__lb_INCOTERM).Value = "INCOTERM"
+        .Cells(1, EVO.E_PIVOT_SRC__lb_PILOT).Value = "PILOT"
+        .Cells(1, EVO.E_PIVOT_SRC__lb_ROUTE).Value = "ROUTE"
+        
+        
     End With
 
 End Sub

@@ -89,6 +89,11 @@ Public Enum E_MASTER_2_ORDER
     E_MASTER_2_No_Ordenes
     E_MASTER_2_ROUTE
     E_MASTER_2_ML
+    E_MASTER_3_COM_SECHEL
+    E_MASTER_3_Commentaires_RPO
+    E_MASTER_3_VOR
+    E_MASTER_3_Acteur
+    E_MASTER_3_Echeanciers_regroupés_par_TMC
 End Enum
 
 
@@ -163,6 +168,14 @@ Public Enum E_PIVOT_SRC
     E_PIVOT_SRC___SHORT_DEL_DATE
     E_PIVOT_SRC____TYPE_DE_PIECE
     E_PIVOT_SRC____CLOE_COL_E_PRICE
+    ' new
+    E_PIVOT_SRC__lb_COFOR_HYBRID
+    E_PIVOT_SRC__lb_DHEO
+    E_PIVOT_SRC__lb_DHEF
+    E_PIVOT_SRC__lb_DHAS
+    E_PIVOT_SRC__lb_ROUTE
+    E_PIVOT_SRC__lb_PILOT
+    E_PIVOT_SRC__lb_INCOTERM
 End Enum
 
 
@@ -212,6 +225,14 @@ Public Enum E_PIVOT_PROXY2
     E_PIVOT_PROXY2___SHORT_DEL_DATE
     E_PIVOT_PROXY2____TYPE_DE_PIECE
     E_PIVOT_PROXY2____CLOE_COL_E_PRICE
+    ' new
+    E_PIVOT_PROXY2__lb_COFOR_HYBRID
+    E_PIVOT_PROXY2__lb_DHEO
+    E_PIVOT_PROXY2__lb_DHEF
+    E_PIVOT_PROXY2__lb_DHAS
+    E_PIVOT_PROXY2__lb_ROUTE
+    E_PIVOT_PROXY2__lb_PILOT
+    E_PIVOT_PROXY2__lb_INCOTERM
 End Enum
 
 
@@ -526,6 +547,7 @@ Public Enum E_FINAL_TOUCH_RECEPTION
     E_FINAL_TOUCH_RECEPTION_prix_cible
     E_FINAL_TOUCH_RECEPTION_Sigapp
     E_FINAL_TOUCH_RECEPTION_GAP
+    E_FINAL_TOUCH_RECEPTION_OKNOK
     E_FINAL_TOUCH_RECEPTION_Interne
     E_FINAL_TOUCH_RECEPTION_Sem
     E_FINAL_TOUCH_RECEPTION_Manager_DA
@@ -579,6 +601,15 @@ Public Enum E_RECEPTION_REPORT_STEP
     E_RECEPTION_REPORT_STEP_FINAL_TOUCH
 End Enum
 
+Public Enum E_GREEN_LIGHT_REPORT_STEP
+    E_GREEN_LIGHT_REPORT_STEP_GET_SQ01
+    E_GREEN_LIGHT_REPORT_STEP_CONCAT
+    E_GREEN_LIGHT_REPORT_STEP_ADJUST
+    E_GREEN_LIGHT_REPORT_STEP_GET_INTERNAL_SUPPLIERS
+    E_GREEN_LIGHT_REPORT_MATCH_WITH_INTERROCOM
+    E_GREEN_LIGHT_REPORT_FINAL_TOUCH
+End Enum
+
 
 
 Public Enum E_MANAGERS_DA
@@ -597,4 +628,39 @@ End Enum
 Public Enum E_PIVOT_STD
     E_PIVOT_ANGEL_STD
     E_PIVOT_CAROLINE_STD
+End Enum
+
+
+
+' modeless leaf section
+'.Cells(3, 2).Value = "Mass € Internal part (out of perimeter price * 1)"
+'.Cells(4, 2).Value = "Number of Internal parts"
+'.Cells(5, 2).Value = "Mass € Reception without Tango price"
+'.Cells(6, 2).Value = "% mass €  without Tango price"
+'.Cells(7, 2).Value = "number ref without Tango price"
+'.Cells(8, 2).Value = "rate  : Mass Sigapp pre-serial price / initial price (without Tango price)"
+'
+'.Cells(10, 2).Value = "Mass € Sigapp reception (With Tango price)"
+'.Cells(11, 2).Value = "number ref with Tango price"
+'.Cells(12, 2).Value = "Including number no price * 1"
+'
+'.Cells(14, 2).Value = "Mass € target Price * 1"
+'.Cells(15, 2).Value = "rate  : Mass reception Sigapp price /target price * 1 (with Tango price)"
+'.Cells(16, 2).Value = "Mass € gap Sigapp price / price *1"
+Public Enum E_MODELESS_LEAF_ORDER
+    E_MODELESS_LEAF_ORDER_DATE = 2
+    E_MODELESS_LEAF_ORDER_MASS_EUR_INTERNAL = 3
+    E_MODELESS_LEAF_ORDER_NUM_OF_INTERNAL = 4
+    E_MODELESS_LEAF_ORDER_MASS_EUR_WO_TANGO
+    E_MODELESS_LEAF_ORDER_PERC_MASS_EUR_WO_TANGO
+    E_MODELESS_LEAF_ORDER_NUM_OF_WO_TANGO
+    E_MODELESS_LEAF_ORDER_RATE_WO_TANGO
+    E_MODELESS_LEAF_ORDER_EMPTY_1
+    E_MODELESS_LEAF_ORDER_MASS_EUR_W_TANGO
+    E_MODELESS_LEAF_ORDER_NUM_OF_W_TANGO
+    E_MODELESS_LEAF_ORDER_NUM_OF_W_TANGO_NOK
+    E_MODELESS_LEAF_ORDER_EMPTY_2
+    E_MODELESS_LEAF_ORDER_MASS_EUR_TARGET_PRICE
+    E_MODELESS_LEAF_ORDER_RATE
+    E_MODELESS_LEAF_ORDER_MASS_EUR_GAP
 End Enum

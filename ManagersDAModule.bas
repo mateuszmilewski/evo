@@ -80,9 +80,9 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
                 justReferenceToAvoidDuplicates.Add el, 1
         
             
-                If iter Mod 200 = 0 Or iter = (c.Count - 1) Then
+                If iter Mod 200 = 0 Or iter = (c.count - 1) Then
                 
-                    Debug.Print "iter and counter: " & iter & " " & c.Count
+                    Debug.Print "iter and counter: " & iter & " " & c.count
                     
                     counterForInnerDic = counterForInnerDic + 1
                     Set innerDic = New Dictionary
@@ -128,7 +128,7 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
             '   Debug.Print key & " " & ikey
             'Next
             
-            Debug.Print "TEST: innerDic.Count: " & innerDic.Count
+            Debug.Print "TEST: innerDic.Count: " & innerDic.count
         Next
     
     
@@ -192,8 +192,8 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
         orng.Select
         
         
-        Dim chbx As SAPFEWSELib.GuiCheckBox
-        Dim txt As SAPFEWSELib.GuiTextedit
+        Dim chbx As Variant '  SAPFEWSELib.GuiCheckBox
+        Dim txt As Variant ' SAPFEWSELib.GuiTextedit
         
         
         If EVO.GlobalSapModule.sapGuiAuto Is Nothing Then
@@ -423,14 +423,14 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
                         
                     
                         ' Debug.Print "PN: " & gv.GetCellValue(x1, cols(EVO.E_MANAGERS_DA_ARTICLE - 1))
-                        If Trim(gv.GetCellValue(x1, cols(EVO.E_MANAGERS_DA_ARTICLE - 1))) <> "" Then
-                            lastNotEmptyPartNumber = Trim(gv.GetCellValue(x1, cols(EVO.E_MANAGERS_DA_ARTICLE - 1)))
+                        If Trim(gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_ARTICLE - 1))) <> "" Then
+                            lastNotEmptyPartNumber = Trim(gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_ARTICLE - 1)))
                         End If
                         .Offset(0, EVO.E_MANAGERS_DA_ARTICLE - 1).Value = lastNotEmptyPartNumber
                         
                         
-                        .Offset(0, EVO.E_MANAGERS_DA_ACHETEUR - 1).Value = gv.GetCellValue(x1, cols(EVO.E_MANAGERS_DA_ACHETEUR - 1))
-                        .Offset(0, EVO.E_MANAGERS_DA_RU - 1).Value = gv.GetCellValue(x1, cols(EVO.E_MANAGERS_DA_RU - 1))
+                        .Offset(0, EVO.E_MANAGERS_DA_ACHETEUR - 1).Value = gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_ACHETEUR - 1))
+                        .Offset(0, EVO.E_MANAGERS_DA_RU - 1).Value = gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_RU - 1))
                     End With
                     
                     Set orng = orng.Offset(1, 0)
@@ -453,7 +453,7 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
                 Next x1
                     
                 
-                Debug.Print gv.id & Chr(10) & gv.Children.Count & " " & gv.ColumnOrder(0)
+                Debug.Print gv.id & Chr(10) & gv.Children.count & " " & gv.ColumnOrder(0)
                 
                 If Not gv Is Nothing Then
                     sess.FindById("wnd[0]/tbar[0]/btn[15]").Press
@@ -560,7 +560,7 @@ Private Function prepareInputFOrManagersDa(ish As Worksheet, ByRef semicolonedDo
         Set prepareInputFOrManagersDa = tmpColl
         
         
-        Debug.Print "prepareInputFOrManagersDa: " & prepareInputFOrManagersDa.Count
+        Debug.Print "prepareInputFOrManagersDa: " & prepareInputFOrManagersDa.count
         
         
     Else
@@ -625,6 +625,11 @@ End Sub
 ' ----------
 Public Sub fillReceptionManagersDaColumn(mb51Out As Worksheet, managersDaSh As Worksheet)
 
+
+
+    Application.Calculation = xlCalculationManual
+    
+
     Dim rfa As Range, rm As Range
     Set rfa = mb51Out.Cells(2, EVO.E_MB51_0_ARTICLE)
     
@@ -641,10 +646,69 @@ Public Sub fillReceptionManagersDaColumn(mb51Out As Worksheet, managersDaSh As W
                     
                 rfa.Offset(0, EVO.E_MB51_0_MANAGER_DA - EVO.E_MB51_0_ARTICLE).Value = _
                     rm.Offset(0, EVO.E_MANAGERS_DA_ACHETEUR - EVO.E_MANAGERS_DA_ARTICLE).Value
+                    
+                ' Application.Calculation = xlCalculationManual
             End If
             Set rm = rm.Offset(1, 0)
         Loop Until Trim(rm.Value) = ""
         
         Set rfa = rfa.Offset(1, 0)
     Loop Until Trim(rfa.Value) = ""
+    
+    Application.Calculation = xlCalculationAutomatic
 End Sub
+
+
+
+' ----------
+Public Sub fillGreenLightManagersDaColumn(aSh As Worksheet, managersDaSh As Worksheet)
+
+
+    Application.Calculation = xlCalculationManual
+
+    Dim rfa As Range, rm As Range
+    Set rfa = aSh.Cells(2, EVO.E_ADJUSTED_SQ01_Reference)
+    
+    Dim strPn As String
+    
+    Do
+        ' starting from beg every time!
+        Set rm = managersDaSh.Cells(2, EVO.E_MANAGERS_DA_ARTICLE)
+        
+        Do
+        
+        
+            ' Debug.Assert rfa.Value <> "9832114080-02"
+            
+            ' Debug.Assert rm.row < 71
+            
+            
+            strPn = Split(rfa.Value, "-")(0)
+            If CStr(rm.Value) = strPn Then
+                rfa.Offset(0, EVO.E_ADJUSTED_SQ01_RU - 1).Value = _
+                    rm.Offset(0, EVO.E_MANAGERS_DA_RU - EVO.E_MANAGERS_DA_ARTICLE).Value
+                    
+                rfa.Offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_DA - 1).Value = _
+                    rm.Offset(0, EVO.E_MANAGERS_DA_ACHETEUR - EVO.E_MANAGERS_DA_ARTICLE).Value
+            End If
+            Set rm = rm.Offset(1, 0)
+            
+            ' Application.Calculation = xlCalculationManual
+            
+        Loop Until Trim(rm.Value) = ""
+        
+        Set rfa = rfa.Offset(1, 0)
+    Loop Until Trim(rfa.Value) = ""
+    
+    
+    Application.Calculation = xlCalculationAutomatic
+End Sub
+
+
+Public Sub testForFillingManagersDaForGreenLightAdjustedWorkhsheet()
+    
+    fillGreenLightManagersDaColumn ThisWorkbook.Sheets("TP04_20201007_I"), ThisWorkbook.Sheets("MANAGERS_DA_20201007_I")
+End Sub
+    
+    
+

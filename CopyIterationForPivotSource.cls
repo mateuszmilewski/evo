@@ -40,9 +40,17 @@ Option Explicit
 
 ' TYPE_DE_PIECE handler for offset
 Private diffE As Integer
-
+Private diff_for_cofor_hybrid As Integer
+Private diff_for_incoterm As Integer
 
 Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, ByRef li As LineItem, ByRef ph As PivotHandler, linia As Long)
+
+
+
+
+    ' uwaga!
+    ' ta iteracja ma pomieszane kolejnosci kolumn totalnie
+    ' wiec ostatnie zmiany niekoniecznie znajduja sie na koncu tego suba!
 
     
 
@@ -70,14 +78,26 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
 
     
     ' Debug.Print li.sourceRng.Offset(0, diffE).Value ' OK!
+    ' -------------------------------------------------------------------------------
+    ' -------------------------------------------------------------------------------
+    
+    ' this is some extra data based on sourceRng
     
     sh.Cells(linia, EVO.E_PIVOT_SRC____TYPE_DE_PIECE).Value = _
         li.sourceRng.Offset(0, diffE).Value
         
+    ' based on sourceRng starting from 0.8x
+    sh.Cells(linia, EVO.E_PIVOT_SRC__lb_COFOR_HYBRID).Value = _
+        li.sourceRng.Offset(0, diff_for_cofor_hybrid).Value
+        
+    sh.Cells(linia, EVO.E_PIVOT_SRC__lb_INCOTERM).Value = _
+        li.sourceRng.Offset(0, diff_for_incoterm).Value
+        
+    ' -------------------------------------------------------------------------------
+    ' -------------------------------------------------------------------------------
+        
     ' DEL DATE
     If IsDate(li.delDate) Then
-    
-    
         If CLng(li.delDate) <> 0 Then
     
             sh.Cells(linia, EVO.E_PIVOT_SRC_DELIVERY_DATE).Value = li.delDate
@@ -92,13 +112,17 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
                 
             ' here quickly short date
             sh.Cells(linia, EVO.E_PIVOT_SRC___SHORT_DEL_DATE).Value = Format(li.delDate, "dd/mm/yy")
+            ' new in 0.8x
+            sh.Cells(linia, EVO.E_PIVOT_SRC__lb_DHAS).Value = li.delDate
                 
         End If
-        
-        
-        
-        
-        
+    End If
+    
+    ' PU DATE
+    If IsDate(li.puDate) Then
+        If CLng(li.puDate) <> 0 Then
+            sh.Cells(linia, EVO.E_PIVOT_SRC__lb_DHEF).Value = li.puDate
+        End If
     End If
     
     ' for order date calc
@@ -141,6 +165,11 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
             sh.Cells(linia, EVO.E_PIVOT_SRC___SHORT_ORDER_DATE).Value = _
                 Format(li.supplementForPivotSource.orderDate, "dd/mm/yy")
                 
+            
+            ' new in 0.8x
+            sh.Cells(linia, EVO.E_PIVOT_SRC__lb_DHEO).Value = _
+                li.supplementForPivotSource.orderDate
+                
         End If
             
             
@@ -178,6 +207,15 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
         li.supplementForPivotSource.refRangeForCloe.Offset(0, 2).Value & _
         " - " & _
         li.supplementForPivotSource.refRangeForCloe.Offset(0, 3).Value
+        
+    ' again splitted data - need to see it
+    ' new in 0.8x
+    ' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    sh.Cells(linia, EVO.E_PIVOT_SRC__lb_PILOT).Value = _
+        li.supplementForPivotSource.refRangeForCloe.Offset(0, 3).Value
+    sh.Cells(linia, EVO.E_PIVOT_SRC__lb_ROUTE).Value = _
+        li.supplementForPivotSource.refRangeForCloe.Offset(0, 2).Value
+    ' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         
     ' QTY
     ' -------------------------------------------------------------------
@@ -248,4 +286,6 @@ End Sub
 Private Sub Class_Initialize()
     ' TYPE_DE_PIECE
     diffE = EVO.E_MASTER_2_TYPE_DE_PIECE - EVO.E_MASTER_2_COFOR_EXPEDITEUR
+    diff_for_cofor_hybrid = EVO.E_MASTER_2_COFOR_HIBRIDE - EVO.E_MASTER_2_COFOR_EXPEDITEUR
+    diff_for_incoterm = EVO.E_MASTER_2_Incoterm - EVO.E_MASTER_2_COFOR_EXPEDITEUR
 End Sub

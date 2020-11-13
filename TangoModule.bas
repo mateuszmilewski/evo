@@ -105,7 +105,7 @@ Public Sub runMatchingLogicOnTango(sh As Worksheet, interrocomData As Worksheet,
     Set area = sh.Range(rng, bottomRng)
     
     Dim status_h As New StatusHandler
-    status_h.init_statusbar (area.Count / 10)
+    status_h.init_statusbar (area.count / 10)
     
     status_h.show
     

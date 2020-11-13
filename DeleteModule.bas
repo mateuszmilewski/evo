@@ -65,7 +65,7 @@ Public Sub deleteAllDataSheets(ictrl As IRibbonControl)
             Else
                 Sheets(x).Delete
             End If
-        Loop Until x > Sheets.Count
+        Loop Until x > Sheets.count
         Application.DisplayAlerts = True
     End If
 End Sub

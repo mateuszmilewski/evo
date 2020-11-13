@@ -61,8 +61,14 @@ Private operacja As OperationsHandler
 Private ci As CopyIterationForPivotSource
 
 
+Private v As Validator
+
+
 
 Private e As E_ECHANCIER_ONL_semaine_SCENARIO
+
+
+Private xtraRep As XtraCopyDataReport
 
 
 
@@ -84,6 +90,11 @@ Private Sub Class_Initialize()
     
     Set operacja = New OperationsHandler
     Set ci = New CopyIterationForPivotSource
+    
+    
+    Set v = New Validator
+    
+    Set xtraRep = New XtraCopyDataReport
 End Sub
 
 Private Sub Class_Terminate()
@@ -101,6 +112,10 @@ Private Sub Class_Terminate()
     
     Set operacja = Nothing
     Set ci = Nothing
+    
+    Set v = Nothing
+    
+    Set xtraRep = Nothing
 End Sub
 
 
@@ -115,9 +130,9 @@ Public Sub optimise(sh As StatusHandler)
 
     
     If Not pns2 Is Nothing Then
-        If pns2.Count > 0 Then
+        If pns2.count > 0 Then
         
-            sh.init_statusbar (pns2.Count + 1)
+            sh.init_statusbar (pns2.count + 1)
             sh.show
             sh.progress_increase
             
@@ -195,13 +210,13 @@ Public Sub optimise(sh As StatusHandler)
                             minWiersz = 0
                             backupWiersz = 0
                             
-                            If innerDicForByTMC.Count = 1 Then
+                            If innerDicForByTMC.count = 1 Then
                             
                                 For Each k4 In innerDicForByTMC.Keys
                                     minWiersz = k4
                                 Next
                                 
-                            ElseIf innerDicForByTMC.Count > 1 Then
+                            ElseIf innerDicForByTMC.count > 1 Then
                             
                                 
                                 
@@ -502,9 +517,9 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
     Dim xadr1 As String, xadr2 As String
     
     If Not expCofors Is Nothing Then
-        If expCofors.Count > 0 Then
+        If expCofors.count > 0 Then
         
-            sh.init_statusbar (expCofors.Count + 1)
+            sh.init_statusbar (expCofors.count + 1)
             sh.show
             sh.progress_increase
             
@@ -840,9 +855,9 @@ Public Sub copyData(sh As StatusHandler)
     
     
     If Not cofors Is Nothing Then
-        If cofors.Count > 0 Then
+        If cofors.count > 0 Then
         
-            sh.init_statusbar (cofors.Count + 1)
+            sh.init_statusbar (cofors.count + 1)
             sh.show
             sh.progress_increase
             
@@ -868,7 +883,7 @@ Public Sub copyData(sh As StatusHandler)
                     Set srcRng = feed.Range(srcRng, srcRng.End(xlDown))
                 End If
                 
-                Debug.Print "control tower range: " & srcRng.Address & " " & srcRng.Count
+                Debug.Print "control tower range: " & srcRng.Address & " " & srcRng.count
             
                 For Each k1 In cofors.Keys
                 
@@ -918,6 +933,7 @@ Public Sub copyData(sh As StatusHandler)
                                     
 
                                 Next irSrc
+                                
                             End If
                             
                             pns.Add pn, f
@@ -926,6 +942,7 @@ Public Sub copyData(sh As StatusHandler)
                         
                         If f Is Nothing Then
                             li.found = False
+                            li.addRawInfoToLog "this PN is missing in CPL BASE: Control Tower DB!"
                             
                             ' no data in input!
                             ' put red mark on part number!
@@ -967,11 +984,21 @@ Public Sub copyData(sh As StatusHandler)
                             
                         End If
                         
+                        
+                        
+                        ' xtra NOK report!
+                        ' =============================================================
+                        If Len(li.getFullLog()) > 0 Then xtraRep.addLiToCollection li
+                        ' =============================================================
+                        
                     Next
-                    
+                                        
                     sh.progress_increase
                     
                 Next
+                
+                
+                xtraRep.createXtraReport
             
             End If
             
@@ -1249,6 +1276,7 @@ Private Sub mainCopyBasedOnRegisterData(li As LineItem, ByRef linesIter As Dicti
                     ' msh.Cells(optWiersz, kolumna1).Value = "error n/a in source file"
                     msh.Cells(optWiersz, kolumna1).Interior.Color = RGB(255, 200, 200)
                    ' msh.Cells(optWiersz, 1).Interior.Color = RGB(255, 200, 200)
+                   li.addRawInfoToLog "error in source file! source: " & CStr(lsh.Cells(optSrcWiersz, kolumna2).Address)
                 Else
                 
                 
@@ -1275,6 +1303,9 @@ Private Sub mainCopyBasedOnRegisterData(li As LineItem, ByRef linesIter As Dicti
                         
                     ' diff data - yellow color
                     ElseIf msh.Cells(optWiersz, kolumna1).Value <> lsh.Cells(optSrcWiersz, kolumna2).Value Then
+                    
+                    
+                        ' li.addRawInfoToLog "yellow data! PLEASE EXAMINE: " & CStr(lsh.Cells(optSrcWiersz, kolumna2).Address)
                     
                         ' tmpTxt = CStr(msh.Cells(optWiersz, kolumna1).Value)
                         tmpTxt = CStr(lsh.Cells(optSrcWiersz, kolumna2).Value)
@@ -1342,7 +1373,17 @@ Private Sub calculationForDH(li As LineItem, ByRef linesIter As Dictionary, dhTy
         ' ------------------------------------------------------------------
         
         ' li.CodEntrega = li.sourceRng.Parent.Cells(li.sourceRow, kolumnaCodu).Value
-        li.CodEntrega = lsh.Cells(li.sourceRow, EVO.G_COD_TRANSPORT_COLUMN).Value
+        li.CodEntrega = Trim(lsh.Cells(li.sourceRow, EVO.G_COD_TRANSPORT_COLUMN).Value)
+        
+        
+        ' could be one line of code but i want to show boldly that is important!
+        If v.checkIsCodeOK(li.CodEntrega) Then
+            li.isCodEntregaAvailable = True
+            
+        Else
+            li.isCodEntregaAvailable = False
+            li.addRawInfoToLog "cod entrega not available"
+        End If
         
         
         ' Debug.Assert li.wiersz <> 3628
@@ -1414,6 +1455,10 @@ Private Sub calculationForDH(li As LineItem, ByRef linesIter As Dictionary, dhTy
                     Else
                         msh.Cells(optWiersz, G_DHAS_COL + 1).Value = Int(msh.Cells(optWiersz, G_DHAS_COL + 1).Value) + 1
                     End If
+                    
+                Else
+                    
+                    li.addRawInfoToLog "qty and packing data is not numeric! col: N0 Ordenes"
                 
                 End If
             Else
@@ -1422,6 +1467,9 @@ Private Sub calculationForDH(li As LineItem, ByRef linesIter As Dictionary, dhTy
             End If
             ' ---------------------------------------------------------------------
             ' ---------------------------------------------------------------------
+            
+        Else
+            li.addRawInfoToLog "Incoterm: DAP or DDP"
         End If
         
         ' -----------------------------------------------------------------------
@@ -1444,10 +1492,12 @@ Private Sub assignStaticDatesIfThereIsAnyData(lsh As Worksheet, ByRef li As Line
 
     If Trim(lsh.Cells(li.sourceRow, EVO.G_SRC_DHAS_COL).Value) <> "" Then
         li.delDate = CDate(lsh.Cells(li.sourceRow, EVO.G_SRC_DHAS_COL).Value)
+        li.addRawInfoToLog "DHAS is manual!"
     End If
     
     If Trim(lsh.Cells(li.sourceRow, EVO.G_SRC_DHEF_COL).Value) <> "" Then
         li.puDate = CDate(lsh.Cells(li.sourceRow, EVO.G_SRC_DHEF_COL).Value)
+        li.addRawInfoToLog "DHEF is manual!"
     End If
 End Sub
 
@@ -1463,153 +1513,184 @@ Private Sub tryToAssignProperlyDHxxDatesWithDefaultCalculation(e As E_ECHANCIER_
     
         ' e As E_ECHANCIER_ONL_semaine_SCENARIO
         ' is copied again just to be clear what is the params for this sub!
+        
+        msh.Cells(optWiersz, EVO.G_DHEF_COL).Interior.Color = RGB(255, 255, 255)
+        msh.Cells(optWiersz, EVO.G_DHAS_COL).Interior.Color = RGB(255, 255, 255)
+        
+        If li.isCodEntregaAvailable = True Then
+        
+        
+            If IsNumeric(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value) Then
     
     
-        ' ============================================================================
-        ' tryToAssignProperlyDHxxDatesWithDefaultCalculation
-        ' !! full copy of params from upper sub
-        ' ============================================================================
-        If e = E_ECHANCIER_ONL_semaine_SCENARIO_DEL Then
-        
-        
-            ' this is the old logic when the echancier cw was treated as delivery date
-            
-            If CLng(li.delDate) = 0 Then
-            
-                li.dateAfterOffset = offsetDate(li.CodEntrega, li.monday)
-                li.delTime = CDate(lsh.Cells(li.sourceRow, EVO.G_DEL_TIME_COLUMN).Value)
-                li.delDate = li.dateAfterOffset + CDate(li.delTime)
-                
-            End If
-        
-        
-            If CLng(li.puDate) = 0 Then
-                
-                li.puDate = li.delDate - li.delTime - CDate(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value)
-                li.puTime = CDate(lsh.Cells(li.sourceRow, EVO.G_PU_TIME_COLUMN).Value)
-                li.puDate = li.puDate + li.puTime
-                
-            End If
-        
-        
-            operacja.recalculDatesIfSatOrSun li, E_ECHANCIER_ONL_semaine_SCENARIO_DEL
-            
-            
-        
-            If CStr(msh.Cells(optWiersz, G_DHEF_COL).Value) = "" Then
-                msh.Cells(optWiersz, G_DHEF_COL).Value = li.puDate
-                msh.Cells(optWiersz, G_DHEF_COL).Interior.Color = RGB(200, 255, 200)
-            Else
-                ' msh.Cells(optWiersz, G_DHEF_COL).Value = li.puDate
-                msh.Cells(optWiersz, G_DHEF_COL).Interior.Color = RGB(255, 255, 150)
-            End If
-            
-            If CStr(msh.Cells(optWiersz, G_DHAS_COL).Value) = "" Then
-                msh.Cells(optWiersz, G_DHAS_COL).Value = li.delDate
-                msh.Cells(optWiersz, G_DHAS_COL).Interior.Color = RGB(200, 255, 200)
-            Else
-                ' msh.Cells(optWiersz, G_DHAS_COL).Value = li.delDate
-                msh.Cells(optWiersz, G_DHAS_COL).Interior.Color = RGB(255, 255, 150)
-            End If
-            
-            
-            
-        ElseIf e = E_ECHANCIER_ONL_semaine_SCENARIO_PU Then
-        
-        
-            ' #newapporachonDH
-            ' #ENCHACIER #CW #ECHANCIER ONL (semaine) #semaine
-
-        
-            ' here we have totally new apporach, where enchancier cw is treated as
-            ' pikcup date - which means, that the parts in to be prepared a little
-            ' bit later - also there were a lot of confusion of the usage of this
-            ' tool - so maybe this new approach will help to provide better business
-            ' --------------------------------------------------------------------------------
-            ' --------------------------------------------------------------------------------
-            
-            If CLng(li.puDate) = 0 Then
+                ' ============================================================================
+                ' tryToAssignProperlyDHxxDatesWithDefaultCalculation
+                ' !! full copy of params from upper sub
+                ' ============================================================================
+                If e = E_ECHANCIER_ONL_semaine_SCENARIO_DEL Then
                 
                 
-                ' ' logic for echancier as delivery:
-                'li.puDate = li.delDate - li.delTime - CDate(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value)
-                'li.puTime = CDate(lsh.Cells(li.sourceRow, EVO.G_PU_TIME_COLUMN).Value)
-                'li.puDate = li.puDate + li.puTime
+                    ' this is the old logic when the echancier cw was treated as delivery date
+                    
+                    If CLng(li.delDate) = 0 Then
+                    
+                        li.dateAfterOffset = offsetDate(li.CodEntrega, li.monday)
+                        li.delTime = CDate(lsh.Cells(li.sourceRow, EVO.G_DEL_TIME_COLUMN).Value)
+                        li.delDate = li.dateAfterOffset + CDate(li.delTime)
+                        
+                    End If
                 
-                ' logic for echancier as pu:
-                li.dateAfterOffset = offsetDate(li.CodEntrega, li.monday)
-                li.puTime = CDate(lsh.Cells(li.sourceRow, EVO.G_PU_TIME_COLUMN).Value)
-                li.puDate = li.dateAfterOffset + CDate(li.puTime)
                 
-            End If
-            
-            If CLng(li.delDate) = 0 Then
-            
-                ' ' logic for echancier as delivery:
-                'li.dateAfterOffset = offsetDate(li.CodEntrega, li.monday)
-                'li.delTime = CDate(lsh.Cells(li.sourceRow, EVO.G_DEL_TIME_COLUMN).Value)
-                'li.delDate = li.dateAfterOffset + CDate(li.delTime)
+                    If CLng(li.puDate) = 0 Then
+                        
+                        li.puDate = li.delDate - li.delTime - CDate(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value)
+                        li.puTime = CDate(lsh.Cells(li.sourceRow, EVO.G_PU_TIME_COLUMN).Value)
+                        li.puDate = li.puDate + li.puTime
+                        
+                    End If
                 
-                ' logic for echancier as pu:
-                li.delDate = li.puDate - li.puTime + CDate(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value)
-                li.delTime = CDate(lsh.Cells(li.sourceRow, EVO.G_DEL_TIME_COLUMN).Value)
-                li.delDate = li.delDate + li.delTime
-            End If
+                
+                    ' operacja.recalculDatesIfSatOrSun li, E_ECHANCIER_ONL_semaine_SCENARIO_DEL
+                    operacja.reculculIfBetweenDatesWeekend li, E_ECHANCIER_ONL_semaine_SCENARIO_DEL
+                    
+                    
+                
+                    If CStr(msh.Cells(optWiersz, G_DHEF_COL).Value) = "" Then
+                        msh.Cells(optWiersz, G_DHEF_COL).Value = li.puDate
+                        msh.Cells(optWiersz, G_DHEF_COL).Interior.Color = RGB(200, 255, 200)
+                    Else
+                        ' msh.Cells(optWiersz, G_DHEF_COL).Value = li.puDate
+                        msh.Cells(optWiersz, G_DHEF_COL).Interior.Color = RGB(255, 255, 150)
+                    End If
+                    
+                    If CStr(msh.Cells(optWiersz, G_DHAS_COL).Value) = "" Then
+                        msh.Cells(optWiersz, G_DHAS_COL).Value = li.delDate
+                        msh.Cells(optWiersz, G_DHAS_COL).Interior.Color = RGB(200, 255, 200)
+                    Else
+                        ' msh.Cells(optWiersz, G_DHAS_COL).Value = li.delDate
+                        msh.Cells(optWiersz, G_DHAS_COL).Interior.Color = RGB(255, 255, 150)
+                    End If
+                    
+                    
+                    
+                ElseIf e = E_ECHANCIER_ONL_semaine_SCENARIO_PU Then
+                
+                
+                    ' #newapporachonDH
+                    ' #ENCHACIER #CW #ECHANCIER ONL (semaine) #semaine
         
-        
-        
-            operacja.recalculDatesIfSatOrSun li, E_ECHANCIER_ONL_semaine_SCENARIO_PU
-            
-            
-            Dim prvCmnt As String
-            
-            If CStr(msh.Cells(optWiersz, G_DHEF_COL).Value) = "" Then
-                msh.Cells(optWiersz, G_DHEF_COL).Value = li.puDate
-                msh.Cells(optWiersz, G_DHEF_COL).Interior.Color = RGB(200, 255, 200)
-            Else
-                ' msh.Cells(optWiersz, G_DHEF_COL).Value = li.puDate
-                'On Error Resume Next
-                'msh.Cells(optWiersz, G_DHEF_COL).Comment.Delete
-                prvCmnt = ""
-                If Not msh.Cells(optWiersz, G_DHEF_COL).Comment Is Nothing Then
                 
-                    prvCmnt = msh.Cells(optWiersz, G_DHEF_COL).Comment.Text
-                    msh.Cells(optWiersz, G_DHEF_COL).Comment.Delete
+                    ' here we have totally new apporach, where enchancier cw is treated as
+                    ' pikcup date - which means, that the parts in to be prepared a little
+                    ' bit later - also there were a lot of confusion of the usage of this
+                    ' tool - so maybe this new approach will help to provide better business
+                    ' --------------------------------------------------------------------------------
+                    ' --------------------------------------------------------------------------------
+                    
+                    If CLng(li.puDate) = 0 Then
+                        
+                        
+                        ' ' logic for echancier as delivery:
+                        'li.puDate = li.delDate - li.delTime - CDate(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value)
+                        'li.puTime = CDate(lsh.Cells(li.sourceRow, EVO.G_PU_TIME_COLUMN).Value)
+                        'li.puDate = li.puDate + li.puTime
+                        
+                        ' logic for echancier as pu:
+                        li.dateAfterOffset = offsetDate(li.CodEntrega, li.monday)
+                        li.puTime = CDate(lsh.Cells(li.sourceRow, EVO.G_PU_TIME_COLUMN).Value)
+                        li.puDate = li.dateAfterOffset + CDate(li.puTime)
+                        
+                    End If
+                    
+                    If CLng(li.delDate) = 0 Then
+                    
+                        ' ' logic for echancier as delivery:
+                        'li.dateAfterOffset = offsetDate(li.CodEntrega, li.monday)
+                        'li.delTime = CDate(lsh.Cells(li.sourceRow, EVO.G_DEL_TIME_COLUMN).Value)
+                        'li.delDate = li.dateAfterOffset + CDate(li.delTime)
+                        
+                        ' logic for echancier as pu:
+                        li.delDate = li.puDate - li.puTime + CDate(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value)
+                        li.delTime = CDate(lsh.Cells(li.sourceRow, EVO.G_DEL_TIME_COLUMN).Value)
+                        li.delDate = li.delDate + li.delTime
+                    End If
+                
+                
+                
+                    'operacja.recalculDatesIfSatOrSun li, E_ECHANCIER_ONL_semaine_SCENARIO_PU
+                    operacja.reculculIfBetweenDatesWeekend li, E_ECHANCIER_ONL_semaine_SCENARIO_PU
+                    
+                    
+                    Dim prvCmnt As String
+                    
+                    If CStr(msh.Cells(optWiersz, G_DHEF_COL).Value) = "" Then
+                        msh.Cells(optWiersz, G_DHEF_COL).Value = li.puDate
+                        msh.Cells(optWiersz, G_DHEF_COL).Interior.Color = RGB(200, 255, 200)
+                    Else
+                        ' msh.Cells(optWiersz, G_DHEF_COL).Value = li.puDate
+                        'On Error Resume Next
+                        'msh.Cells(optWiersz, G_DHEF_COL).Comment.Delete
+                        prvCmnt = ""
+                        If Not msh.Cells(optWiersz, G_DHEF_COL).Comment Is Nothing Then
+                        
+                            prvCmnt = msh.Cells(optWiersz, G_DHEF_COL).Comment.Text
+                            msh.Cells(optWiersz, G_DHEF_COL).Comment.Delete
+                        End If
+                        msh.Cells(optWiersz, G_DHEF_COL).AddComment prvCmnt & Chr(10) & _
+                            "not added: " & CStr(li.puDate)
+                        msh.Cells(optWiersz, G_DHEF_COL).Comment.Shape.TextFrame.AutoSize = True
+                        msh.Cells(optWiersz, G_DHEF_COL).Interior.Color = RGB(255, 255, 150)
+                    End If
+                    
+                    If CStr(msh.Cells(optWiersz, G_DHAS_COL).Value) = "" Then
+                        msh.Cells(optWiersz, G_DHAS_COL).Value = li.delDate
+                        msh.Cells(optWiersz, G_DHAS_COL).Interior.Color = RGB(200, 255, 200)
+                    Else
+                        ' msh.Cells(optWiersz, G_DHAS_COL).Value = li.delDate
+                        'On Error Resume Next
+                        'msh.Cells(optWiersz, G_DHAS_COL).Comment.Delete
+                        prvCmnt = ""
+                        If Not msh.Cells(optWiersz, G_DHAS_COL).Comment Is Nothing Then
+                        
+                            prvCmnt = msh.Cells(optWiersz, G_DHAS_COL).Comment.Text
+                            msh.Cells(optWiersz, G_DHAS_COL).Comment.Delete
+                        End If
+                        msh.Cells(optWiersz, G_DHAS_COL).AddComment prvCmnt & Chr(10) & _
+                            "not added: " & CStr(li.delDate)
+                        msh.Cells(optWiersz, G_DHAS_COL).Comment.Shape.TextFrame.AutoSize = True
+                        
+                        msh.Cells(optWiersz, G_DHAS_COL).Interior.Color = RGB(255, 255, 150)
+                    End If
+        
+                    
+                    ' --------------------------------------------------------------------------------
+                    ' --------------------------------------------------------------------------------
                 End If
-                msh.Cells(optWiersz, G_DHEF_COL).AddComment prvCmnt & Chr(10) & _
-                    "not added: " & CStr(li.puDate)
-                msh.Cells(optWiersz, G_DHEF_COL).Comment.Shape.TextFrame.AutoSize = True
-                msh.Cells(optWiersz, G_DHEF_COL).Interior.Color = RGB(255, 255, 150)
-            End If
             
-            If CStr(msh.Cells(optWiersz, G_DHAS_COL).Value) = "" Then
-                msh.Cells(optWiersz, G_DHAS_COL).Value = li.delDate
-                msh.Cells(optWiersz, G_DHAS_COL).Interior.Color = RGB(200, 255, 200)
-            Else
-                ' msh.Cells(optWiersz, G_DHAS_COL).Value = li.delDate
-                'On Error Resume Next
-                'msh.Cells(optWiersz, G_DHAS_COL).Comment.Delete
-                prvCmnt = ""
-                If Not msh.Cells(optWiersz, G_DHAS_COL).Comment Is Nothing Then
+            
+                ' ============================================================================
+                ' ============================================================================
                 
-                    prvCmnt = msh.Cells(optWiersz, G_DHAS_COL).Comment.Text
-                    msh.Cells(optWiersz, G_DHAS_COL).Comment.Delete
+                Else
+                
+                    ' transit time is not numeric
+                    li.addRawInfoToLog "missing transit time!"
+                    msh.Cells(optWiersz, EVO.G_DHEF_COL).Interior.Color = RGB(250, 200, 200)
+                    msh.Cells(optWiersz, EVO.G_DHAS_COL).Interior.Color = RGB(250, 200, 200)
                 End If
-                msh.Cells(optWiersz, G_DHAS_COL).AddComment prvCmnt & Chr(10) & _
-                    "not added: " & CStr(li.delDate)
-                msh.Cells(optWiersz, G_DHAS_COL).Comment.Shape.TextFrame.AutoSize = True
-                
-                msh.Cells(optWiersz, G_DHAS_COL).Interior.Color = RGB(255, 255, 150)
-            End If
-
             
-            ' --------------------------------------------------------------------------------
-            ' --------------------------------------------------------------------------------
+        Else
+            ' li.isCodEntregaAvailable = false
+            msh.Cells(optWiersz, EVO.G_DHEF_COL).Interior.Color = RGB(250, 200, 200)
+            msh.Cells(optWiersz, EVO.G_DHAS_COL).Interior.Color = RGB(250, 200, 200)
+            
+            
+            
+            
+            'msh.Cells(optWiersz, EVO.G_DHEF_COL).Value = ""
+            'msh.Cells(optWiersz, EVO.G_DHAS_COL).Value = ""
+            
         End If
-        
-        
-        ' ============================================================================
-        ' ============================================================================
 
 End Sub
 
@@ -1910,6 +1991,8 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         .isPast = CBool(operacja.isThisLineIsPast(CLng(.yyyycw)))
                         
+                        ' new one starting from 0.85
+                        .tmc2 = CStr(CStr(r.Offset(0, EVO.E_MASTER_3_Echeanciers_regroupés_par_TMC - 1).Value))
                     End With
                     
                     linesIter.Add r.row, thisLine
@@ -1935,6 +2018,10 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         .isPast = CBool(operacja.isThisLineIsPast(CLng(.yyyycw)))
                         
+                        
+                        ' new one starting from 0.85
+                        .tmc2 = CStr(CStr(r.Offset(0, EVO.E_MASTER_3_Echeanciers_regroupés_par_TMC - 1).Value))
+                        
                     End With
                     
                     
@@ -1951,7 +2038,7 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
         
         
         ' afer all check math
-        Debug.Print "count cofors: " & cofors.Count
+        Debug.Print "count cofors: " & cofors.count
         
         ' check all lines
         Dim xl As Integer, k As Variant
@@ -1960,8 +2047,8 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
             
             Set linesIter = cofors(k)
             
-            Debug.Print "for cofor: " & k & " we have: " & linesIter.Count & " lines"
-            xl = xl + linesIter.Count
+            Debug.Print "for cofor: " & k & " we have: " & linesIter.count & " lines"
+            xl = xl + linesIter.count
             
         Next
         

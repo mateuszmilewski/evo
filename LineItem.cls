@@ -41,6 +41,7 @@ Public qty As Long
 
 Public yyyycw As Long
 Public monday As Date
+Public isCodEntregaAvailable As Boolean
 Public CodEntrega As String
 Public dateAfterOffset As Date
 
@@ -51,6 +52,7 @@ Public puDate As Date
 Public puTime As Date
 
 Public tmc As String
+Public tmc2 As String ' the last column -> Echéanciers regroupés par TMC - new implementation
 
 Public pn As String
 Public cofor As String
@@ -78,4 +80,29 @@ Public validationForPivotSource As Boolean
 Public supplementForPivotSource As LineItemPivotSrouceSupplement
 
 
+Private log As String
 
+
+
+' ========================================================
+Public Function getFullLog() As String
+    
+    getFullLog = CStr(log)
+End Function
+
+
+Public Sub addRawInfoToLog(info As String)
+    
+    log = log & CStr(info) & Chr(10)
+End Sub
+' ========================================================
+
+
+Private Sub Class_Initialize()
+    isCodEntregaAvailable = False
+    log = ""
+End Sub
+
+Private Sub Class_Terminate()
+    isCodEntregaAvailable = False
+End Sub

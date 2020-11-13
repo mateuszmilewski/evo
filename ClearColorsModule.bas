@@ -105,14 +105,18 @@ Sub innerRemoveAllComments()
         Set rng = rng.End(xlDown).End(xlDown).End(xlUp)
         lastRow = CLng(rng.row)
         
+        Set rng = wrk.Sheets("BASE").Range("A3:AV" & CStr(lastRow))
         
-        Dim b As Worksheet
-        Set b = wrk.Sheets("BASE")
         
-        Dim c As Comment
-        For Each c In b.Comments
-            c.Delete
-        Next c
+        'Dim b As Worksheet
+        'Set b = wrk.Sheets("BASE")
+        '
+        'Dim c As Comment
+        'For Each c In b.Comments
+        '    c.Delete
+        'Next c
+        
+        rng.ClearComments
     Else
         MsgBox "No bind with PUS master workshhet!", vbCritical
         
