@@ -390,7 +390,7 @@ Public Function getRefRangeInSrcSheet() As Range
 End Function
 
 Public Sub moveRefRangeInSrcSheet()
-    Set refRangeInSrcSheet = refRangeInSrcSheet.Offset(1, 0)
+    Set refRangeInSrcSheet = refRangeInSrcSheet.offset(1, 0)
 End Sub
 
 

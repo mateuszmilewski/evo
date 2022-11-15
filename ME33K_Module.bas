@@ -1,12 +1,4 @@
-VERSION 1.0 CLASS
-BEGIN
-  MultiUse = -1  'True
-END
-Attribute VB_Name = "NumberHandler"
-Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Name = "ME33K_Module"
 Option Explicit
 
 'The MIT License (MIT)
@@ -31,28 +23,36 @@ Option Explicit
 'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 'SOFTWARE.
-
-Private separator As String
-Private sigappSeparator As String
-Private s As String
-Private ss As String
+'
+'
+' THE EVO TOOL
 
 
-
-Private Sub Class_Initialize()
-    separator = Application.DecimalSeparator
-    s = separator
-    sigappSeparator = ","
-    ss = sigappSeparator
+Public Sub getDataFromME33K(ictrl As IRibbonControl)
+    innerGetDataFromME33K
 End Sub
 
-Public Sub parseStringProperlyToNum(ByRef r As Range)
-    
-    Dim tmpString As String
-    tmpString = CStr(r.Value)
 
-    tmpString = Replace(tmpString, ".", "")
+Public Sub innerGetDataFromME33K()
+Attribute innerGetDataFromME33K.VB_ProcData.VB_Invoke_Func = "M\n14"
     
-    If tmpString <> "" Then r.Value = CDbl(tmpString)
+    Dim sapHandler As New SAP_Handler
+    
+    sapHandler.runMainLogicFor__ME33K Nothing, Nothing, 0
+    
+End Sub
+
+
+
+
+Public Sub innerGetDataFromME33K_2()
+    
+    Dim sapHandler As New SAP_Handler
+    
+    
+    Dim outputFromInputBox As String
+    outputFromInputBox = Trim(InputBox("DIV:"))
+    
+    sapHandler.runMainLogicFor__ME33K_mass Selection, outputFromInputBox
     
 End Sub

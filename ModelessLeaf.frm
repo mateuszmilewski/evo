@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} ModelessLeaf 
    Caption         =   "Modeless Leaf"
-   ClientHeight    =   7530
+   ClientHeight    =   7980
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   6255
@@ -39,12 +39,12 @@ Public Sub Setup(sh1 As Worksheet)
         Set rRef = repsh.Cells(2, 1)
         Do
             
-            key = rRef.Offset(0, EVO.E_GREEN_LIGHT_ECHANCIER_ONL_semaine - 1).Value
+            key = rRef.offset(0, EVO.E_GREEN_LIGHT_ECHANCIER_ONL_semaine - 1).Value
             If Not scopeDictionary.Exists(key) Then
                 scopeDictionary.Add key, 1
             End If
             
-            Set rRef = rRef.Offset(1, 0)
+            Set rRef = rRef.offset(1, 0)
         Loop Until Trim(rRef.Value) = ""
         
         
@@ -53,11 +53,11 @@ Public Sub Setup(sh1 As Worksheet)
         ' reception approach
         Set rRef = repsh.Cells(2, 1)
         Do
-            key = rRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - 1).Value
+            key = rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - 1).Value
             If Not scopeDictionary.Exists(key) Then
                 scopeDictionary.Add key, 1
             End If
-            Set rRef = rRef.Offset(1, 0)
+            Set rRef = rRef.offset(1, 0)
         Loop Until Trim(rRef.Value) = ""
     End If
     
@@ -126,7 +126,7 @@ Private Function funcSortDic(d1 As Dictionary) As Dictionary
         Set d1 = Nothing
         Set d1 = New Dictionary
         
-        For iter = 0 To UBound(str) - 1
+        For iter = 0 To UBound(str)
             
             d1.Add str(iter), 1
         Next iter
@@ -175,7 +175,7 @@ Private Function SortArrayAtoZ(myArray As Variant)
     Dim Temp
     
     'Sort the Array A-Z
-    For i = LBound(myArray) To UBound(myArray) - 1
+    For i = LBound(myArray) To UBound(myArray)
         For j = i + 1 To UBound(myArray)
             If UCase(myArray(i)) > UCase(myArray(j)) Then
                 Temp = myArray(j)
@@ -237,19 +237,24 @@ Private Sub ExportBtn_Click()
     mlh.createLeafs
 End Sub
 
+
+
 Private Sub ListBoxScope_Click()
     
 
         Dim pnCount As New Dictionary
         
         Dim internalCount As New Dictionary, costInternal As Double
-        Dim countNoTango As New Dictionary, costNoTango As Double
+        Dim countNoTango As New Dictionary
         
         Dim countTango As New Dictionary
         Dim countTangoOK As New Dictionary
         Dim countTangoNOK As New Dictionary
         Dim calcOKNOK As Double
         Dim costTango As Double, costTarget As Double, costGap As Double
+        
+        Dim costNoTango As Double, targetNoTango As Double
+        
         
         
         ' for rate without tango
@@ -264,111 +269,130 @@ Private Sub ListBoxScope_Click()
         Set rRef = repsh.Cells(2, 1)
         
         Do
+        
+        
+            If rRef.EntireRow.Hidden And Me.CheckBoxVisiblity Then
+            
+            Else
+            
 
-            If repsh.name Like "GREEN_LIGHT_*" Then
-            
+                If repsh.name Like "GREEN_LIGHT_*" Then
                 
-                If rRef.Offset(0, EVO.E_GREEN_LIGHT_ECHANCIER_ONL_semaine - 1).Value = Me.ListBoxScope.Value Then
                 
-                    key = rRef.Offset(0, EVO.E_GREEN_LIGHT_Reference - 1).Value
-                    If Not pnCount.Exists(key) Then pnCount.Add key, 1
                     
-                    ' internal
-                    If rRef.Offset(0, EVO.E_GREEN_LIGHT_IS_INTERNAL - 1).Value = "internal" Then
-                        If Not internalCount.Exists(key) Then internalCount.Add key, 1
+                    If rRef.offset(0, EVO.E_GREEN_LIGHT_ECHANCIER_ONL_semaine - 1).Value = Me.ListBoxScope.Value Then
+                    
+                        key = rRef.offset(0, EVO.E_GREEN_LIGHT_Reference - 1).Value
+                        If Not pnCount.Exists(key) Then pnCount.Add key, 1
                         
-                        costInternal = costInternal + CDbl(rRef.Offset(0, EVO.E_GREEN_LIGHT_Spending_sigapp - 1).Value)
-                    Else
-                        
-                        ' most important scope
-                        ' --------------------------------------------------------------
-                        If rRef.Offset(0, EVO.E_GREEN_LIGHT_TANGO_OKNOK - 1).Value = "NO TANGO PRICE" Then
-                        
-                            ' scope only for no tango price PNs
-                            If Not countNoTango.Exists(key) Then countNoTango.Add key, 1
-                            costNoTango = costNoTango + CDbl(rRef.Offset(0, EVO.E_GREEN_LIGHT_Spending_sigapp - 1).Value)
+                        ' internal
+                        If rRef.offset(0, EVO.E_GREEN_LIGHT_IS_INTERNAL - 1).Value = "internal" Then
+                            If Not internalCount.Exists(key) Then internalCount.Add key, 1
                             
-                            If CStr(rRef.Offset(EVO.E_GREEN_LIGHT_RATE_PRE_SERIAL_div_INIT_PRICE - 1).Value) <> "" Then
-                                rateSumWithoutTango = rateSumWithoutTango + CDbl(rRef.Offset(0, EVO.E_GREEN_LIGHT_RATE_PRE_SERIAL_div_INIT_PRICE - 1).Value)
-                                rateCountWithoutTango = rateCountWithoutTango + 1
-                            End If
+                            costInternal = costInternal + CDbl(rRef.offset(0, EVO.E_GREEN_LIGHT_Spending_sigapp - 1).Value)
                         Else
-                        
                             
+                            ' most important scope
+                            ' --------------------------------------------------------------
+                            If rRef.offset(0, EVO.E_GREEN_LIGHT_TANGO_OKNOK - 1).Value = "NO TANGO PRICE" Then
                             
-                            If Not countTango.Exists(key) Then countTango.Add key, 1
-                            
-                            costTango = costTango + CDbl(rRef.Offset(0, EVO.E_GREEN_LIGHT_Spending_sigapp - 1).Value)
-                            costTarget = costTarget + CDbl(rRef.Offset(0, EVO.E_GREEN_LIGHT_Spending_Target - 1).Value)
-                            
-                        
-                            If rRef.Offset(0, EVO.E_GREEN_LIGHT_TANGO_OKNOK - 1).Value = "OK" Then
-                                If Not countTangoOK.Exists(key) Then countTangoOK.Add key, 1
-                            ElseIf rRef.Offset(0, EVO.E_GREEN_LIGHT_TANGO_OKNOK - 1).Value = "NOK" Then
-                                If Not countTangoNOK.Exists(key) Then countTangoNOK.Add key, 1
-                            End If
-                        End If
-                        
-                        ' --------------------------------------------------------------
-                    End If
-                    
-                End If
-                
-            
-            ElseIf repsh.name Like "RECEPTION_*" Then
-            
-                     
-                If rRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - 1).Value = Me.ListBoxScope.Value Then
-                
-                
-                    key = rRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1).Value
-                    If Not pnCount.Exists(key) Then pnCount.Add key, 1
-                    
-                    ' internal
-                    If rRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Interne - 1).Value = "internal" Then
-                        If Not internalCount.Exists(key) Then internalCount.Add key, 1
-                        
-                        costInternal = costInternal + CDbl(rRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).Value)
-                    Else
-                        
-                        ' all section which is not internal
-                        ' most important scope
-                        ' --------------------------------------------------------------
-                        
-                        
-                        If Trim(rRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Tango - 1).Value) = "" Then
-                        
-                            ' scope only for no tango price PNs
-                            If Not countNoTango.Exists(key) Then countNoTango.Add key, 1
-                            costNoTango = costNoTango + CDbl(rRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).Value)
-                        Else
-                        
-                            calcOKNOK = CDbl(rRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Ecart - 1).Value)
-                        
-                            
-                            If Not countTango.Exists(key) Then countTango.Add key, 1
-                            
-                            costTango = costTango + CDbl(rRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).Value)
-                            costTarget = costTarget + CDbl(rRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_cible - 1).Value)
-                            
-                        
-                            If calcOKNOK < 1.1 Then
-                                If Not countTangoOK.Exists(key) Then countTangoOK.Add key, 1
+                                ' scope only for no tango price PNs
+                                If Not countNoTango.Exists(key) Then countNoTango.Add key, 1
+                                costNoTango = costNoTango + CDbl(rRef.offset(0, EVO.E_GREEN_LIGHT_Spending_sigapp - 1).Value)
+                                ' targetNoTango = targetNoTango + CDbl(rRef.Offset(0, EVO.E_GREEN_LIGHT_Spending_Target - 1).Value)
+                                
+                                If CStr(rRef.offset(EVO.E_GREEN_LIGHT_RATE_PRE_SERIAL_div_INIT_PRICE - 1).Value) <> "" Then
+                                    rateSumWithoutTango = rateSumWithoutTango + CDbl(rRef.offset(0, EVO.E_GREEN_LIGHT_RATE_PRE_SERIAL_div_INIT_PRICE - 1).Value)
+                                    rateCountWithoutTango = rateCountWithoutTango + 1
+                                End If
                             Else
-                                If Not countTangoNOK.Exists(key) Then countTangoNOK.Add key, 1
+                            
+                                
+                                
+                                If Not countTango.Exists(key) Then countTango.Add key, 1
+                                
+                                costTango = costTango + CDbl(rRef.offset(0, EVO.E_GREEN_LIGHT_Spending_sigapp - 1).Value)
+                                costTarget = costTarget + CDbl(rRef.offset(0, EVO.E_GREEN_LIGHT_Spending_Target - 1).Value)
+                                
+                            
+                                If rRef.offset(0, EVO.E_GREEN_LIGHT_TANGO_OKNOK - 1).Value = "OK" Then
+                                    If Not countTangoOK.Exists(key) Then countTangoOK.Add key, 1
+                                ElseIf rRef.offset(0, EVO.E_GREEN_LIGHT_TANGO_OKNOK - 1).Value = "NOK" Then
+                                    If Not countTangoNOK.Exists(key) Then countTangoNOK.Add key, 1
+                                End If
                             End If
+                            
+                            ' --------------------------------------------------------------
                         End If
-                        ' --------------------------------------------------------------
+                        
                     End If
                     
-                    
+                
+                ElseIf repsh.name Like "RECEPTION_*" Then
+                
+                
+                
+                    If Trim(Me.TextBoxMag.Value) = "" Or _
+                        rRef.Value Like "*" & Me.TextBoxMag.Value & "*" Then
+                
+                         
+                        If rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - 1).Value = Me.ListBoxScope.Value Then
+                        
+                        
+                            key = rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1).Value
+                            If Not pnCount.Exists(key) Then pnCount.Add key, 1
+                            
+                            ' internal
+                            If rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Interne - 1).Value = "internal" Then
+                                If Not internalCount.Exists(key) Then internalCount.Add key, 1
+                                
+                                costInternal = costInternal + CDbl(rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).Value)
+                            Else
+                                
+                                ' all section which is not internal
+                                ' most important scope
+                                ' --------------------------------------------------------------
+                                
+                                
+                                If Trim(rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Tango - 1).Value) = "" Or _
+                                   Trim(rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_OKNOK - 1).Value) = "NO TANGO" Or _
+                                   Trim(rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_OKNOK - 1).Value) = "TP04 PRICE" Then
+                                
+                                    ' scope only for no tango price PNs
+                                    If Not countNoTango.Exists(key) Then countNoTango.Add key, 1
+                                    costNoTango = costNoTango + CDbl(rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).Value)
+                                    If CStr(rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_cible - 1).Value) <> "" Then
+                                        targetNoTango = targetNoTango + CDbl(rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_cible - 1).Value)
+                                    End If
+                                Else
+                                
+                                    calcOKNOK = CDbl(rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Ecart - 1).Value)
+                                
+                                    
+                                    If Not countTango.Exists(key) Then countTango.Add key, 1
+                                    
+                                    costTango = costTango + CDbl(rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).Value)
+                                    costTarget = costTarget + CDbl(rRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_cible - 1).Value)
+                                    
+                                
+                                    If calcOKNOK < 1.1 Then
+                                        If Not countTangoOK.Exists(key) Then countTangoOK.Add key, 1
+                                    Else
+                                        If Not countTangoNOK.Exists(key) Then countTangoNOK.Add key, 1
+                                    End If
+                                End If
+                                ' --------------------------------------------------------------
+                            End If
+                            
+                            
+                        End If
+                    End If
+                
                 End If
-            
             End If
             
             
-            
-            Set rRef = rRef.Offset(1, 0)
+            Set rRef = rRef.offset(1, 0)
             
         Loop Until Trim(rRef.Value) = ""
         
@@ -378,29 +402,44 @@ Private Sub ListBoxScope_Click()
         Me.TextBox_CountInternal.Value = internalCount.count
         
         Me.TextBox_CostInternal.Value = ""
-        Me.TextBox_CostInternal.Value = costInternal
+        Me.TextBox_CostInternal.Value = Round(costInternal, 2)
         
         Me.TextBox_CountNoTango.Value = countNoTango.count
-        Me.TextBox_CostNoTango.Value = costNoTango
+        Me.TextBox_CostNoTango.Value = Round(costNoTango, 2)
         
         Me.TextBox_RateNoTango.Value = ""
-        If rateCountWithoutTango > 0 Then Me.TextBox_RateNoTango.Value = rateSumWithoutTango / CDbl(rateCountWithoutTango)
+        If rateCountWithoutTango > 0 Then Me.TextBox_RateNoTango.Value = Round(rateSumWithoutTango / CDbl(rateCountWithoutTango), 2)
+        
+        Me.TextBox_TargetNoTango.Value = ""
+        If targetNoTango > 0 Then
+            Me.TextBox_TargetNoTango.Value = Round(targetNoTango, 2)
+            
+            
+            If CStr(Me.TextBox_RateNoTango.Value) = "" Then
+                Me.TextBox_RateNoTango.Value = Round(1# * (costNoTango / targetNoTango), 2)
+            End If
+        End If
+            
         
         
         
-        Me.TextBox_CostTango.Value = costTango
+        
+        Me.TextBox_CostTango.Value = Round(costTango, 2)
         Me.TextBox_CountTango = countTangoOK.count + countTangoNOK.count
         Me.TextBox_CountTangoNOK = countTangoNOK.count
         
-        Me.TextBox_CostTarget.Value = costTarget
+        Me.TextBox_CostTarget.Value = Round(costTarget, 2)
         
-        If costTarget > 0 Then Me.TextBox_RATE = CDbl(costTango / costTarget)
+        If costTarget > 0 Then Me.TextBox_RATE = Round(CDbl(costTango / costTarget), 2)
         
         ' final gap
         costGap = costTango - costTarget
-        Me.TextBox_CostGap.Value = costGap
+        Me.TextBox_CostGap.Value = Round(costGap, 2)
         
 End Sub
 
 
 
+Private Sub TextBoxMag_Change()
+    ListBoxScope_Click
+End Sub

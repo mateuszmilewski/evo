@@ -29,7 +29,7 @@ Option Explicit
 
 Public Sub getDataFromMB51(ictrl As IRibbonControl)
     
-    MB51Form.TextBoxDu01.Value = Format((Date - 30), "dd.mm.yyyy")
+    MB51Form.TextBoxDu01.Value = Format((Date - 14), "dd.mm.yyyy")
     MB51Form.TextBoxAu01.Value = Format(Date, "dd.mm.yyyy")
     MB51Form.TextBoxMvt1_01.Value = "101"
     MB51Form.TextBoxMvt2_01.Value = "102"
@@ -58,8 +58,8 @@ Public Function validMb51data(sh1 As Worksheet, validationRefRef As Range) As Bo
             Exit Do
         End If
     
-        Set validationRef = validationRef.Offset(0, 1)
-        Set labelsRef = labelsRef.Offset(0, 1)
+        Set validationRef = validationRef.offset(0, 1)
+        Set labelsRef = labelsRef.offset(0, 1)
     Loop Until Trim(labelsRef.Value) = ""
     
     

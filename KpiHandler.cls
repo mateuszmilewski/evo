@@ -75,32 +75,32 @@ Public Sub makeRepFromPns()
             Set pi = pns(key)
             
             With refRange
-                .Offset(0, EVO.E_KPI_SRC_REF - 1).Value = pi.pn
-                .Offset(0, EVO.E_KPI_SRC_E_COFOR - 1).Value = pi.COFOR_EXPEDITEUR
-                .Offset(0, EVO.E_KPI_SRC_V_COFOR - 1).Value = pi.COFOR_VENDEUR
+                .offset(0, EVO.E_KPI_SRC_REF - 1).Value = pi.pn
+                .offset(0, EVO.E_KPI_SRC_E_COFOR - 1).Value = pi.COFOR_EXPEDITEUR
+                .offset(0, EVO.E_KPI_SRC_V_COFOR - 1).Value = pi.COFOR_VENDEUR
                 
-                .Offset(0, EVO.E_KPI_SRC_SUPPLIER_NAME - 1).Value = pi.NOM_FOURNISSEUR
+                .offset(0, EVO.E_KPI_SRC_SUPPLIER_NAME - 1).Value = pi.NOM_FOURNISSEUR
                 
                 
-                .Offset(0, EVO.E_KPI_SRC_DAP - 1).Value = Math.Abs(Int(pi.isDap))
+                .offset(0, EVO.E_KPI_SRC_DAP - 1).Value = Math.Abs(Int(pi.isDap))
                 
                 ' negative logic - bi kerfur!
-                .Offset(0, EVO.E_KPI_SRC_NO_DATA - 1).Value = Math.Abs(Int(pi.noDataAvail))
+                .offset(0, EVO.E_KPI_SRC_NO_DATA - 1).Value = Math.Abs(Int(pi.noDataAvail))
                 
                 ' ferrage or montage?
-                .Offset(0, EVO.E_KPI_SRC_TYPE_DE_PIECE - 1).Value = pi.TYPE_DE_PIECE
+                .offset(0, EVO.E_KPI_SRC_TYPE_DE_PIECE - 1).Value = pi.TYPE_DE_PIECE
                 
-                .Offset(0, EVO.E_KPI_SRC_BLUE - 1).Value = Math.Abs(Int(pi.isBlue))
-                .Offset(0, EVO.E_KPI_SRC_GREEN - 1).Value = Math.Abs(Int(pi.isGreen))
-                .Offset(0, EVO.E_KPI_SRC_YELLOW - 1).Value = Math.Abs(Int(pi.isYellow))
+                .offset(0, EVO.E_KPI_SRC_BLUE - 1).Value = Math.Abs(Int(pi.isBlue))
+                .offset(0, EVO.E_KPI_SRC_GREEN - 1).Value = Math.Abs(Int(pi.isGreen))
+                .offset(0, EVO.E_KPI_SRC_YELLOW - 1).Value = Math.Abs(Int(pi.isYellow))
                 
-                .Offset(0, EVO.E_KPI_SRC_PLE - 1).Value = Math.Abs(Int(pi.pleData))
-                .Offset(0, EVO.E_KPI_SRC_UA - 1).Value = Math.Abs(Int(pi.uaData))
+                .offset(0, EVO.E_KPI_SRC_PLE - 1).Value = Math.Abs(Int(pi.pleData))
+                .offset(0, EVO.E_KPI_SRC_UA - 1).Value = Math.Abs(Int(pi.uaData))
                 
                 
             End With
             
-            Set refRange = refRange.Offset(1, 0)
+            Set refRange = refRange.offset(1, 0)
             stHndlr.progress_increase
         Next
         
@@ -220,7 +220,7 @@ Public Sub fillPartNumberDictionary()
 
         End If
     
-        Set r = r.Offset(1, 0)
+        Set r = r.offset(1, 0)
     Loop Until r = ""
     
 

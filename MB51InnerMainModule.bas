@@ -131,6 +131,8 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
 
 
     Application.Calculation = xlCalculationManual
+    
+    EVO.SuppressingMessageModule.KillMessageFilter
 
 
 
@@ -188,12 +190,12 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
     Dim x17 As Variant
     For x17 = 0 To 10
         On Error Resume Next
-        sess.FindById("wnd[0]/tbar[0]/btn[12]").Press
+        sess.FindById("wnd[0]/tbar[0]/btn[12]").press
     Next x17
     ' ----------------------------------------------------
     
     sess.FindById("wnd[0]/tbar[0]/okcd").Text = "MB51"
-    sess.FindById("wnd[0]").SendVKey 0
+    sess.FindById("wnd[0]").sendVKey 0
     
     
     Dim tb_rows As Long
@@ -224,7 +226,7 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
     ' ------------------------------------------------------------------------
     ' ------------------------------------------------------------------------
     Dim autoDecisionOnTableLayout As E_MB51_AUTO_DECISION_LAYOUT
-    Dim offsetForPrice As Integer, offsetForQty As Integer
+    Dim offsetForPrice As Long, offsetForQty As Long
     ' for loop ref
     Dim y_start As Integer, y_end As Integer
     
@@ -263,8 +265,8 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
         sess.FindById("wnd[0]/usr/ctxtALV_DEF").Text = "/STANDARD_2"
             
             
-        sess.FindById("wnd[0]/tbar[1]/btn[8]").Press
-        sess.FindById("wnd[0]/tbar[1]/btn[48]").Press
+        sess.FindById("wnd[0]/tbar[1]/btn[8]").press
+        sess.FindById("wnd[0]/tbar[1]/btn[48]").press
             
             
         Set gv = Nothing
@@ -460,63 +462,63 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
                 
                 y = 0
                 If Trim(gv.getCellValue(x, "MATNR")) = "" Then
-                    orng.Offset(0, 0).Value = "X"
+                    orng.offset(0, 0).Value = "X"
                 Else
-                    orng.Offset(0, 0).Value = gv.getCellValue(x, "MATNR")
+                    orng.offset(0, 0).Value = gv.getCellValue(x, "MATNR")
                 End If
-                orng.Offset(0, 1).Value = gv.getCellValue(x, "MAKTX")
-                orng.Offset(0, 2).Value = gv.getCellValue(x, "WERKS")
-                orng.Offset(0, 3).Value = gv.getCellValue(x, "LGORT")
-                orng.Offset(0, 4).Value = gv.getCellValue(x, "KOSTL")
-                orng.Offset(0, 5).Value = gv.getCellValue(x, "BWART")
-                orng.Offset(0, 6).Value = gv.getCellValue(x, "MBLNR")
-                orng.Offset(0, 7).Value = "'" & CStr(gv.getCellValue(x, "MENGE"))
-                numHandler.parseStringProperlyToNum orng.Offset(0, 7)
+                orng.offset(0, 1).Value = gv.getCellValue(x, "MAKTX")
+                orng.offset(0, 2).Value = gv.getCellValue(x, "WERKS")
+                orng.offset(0, 3).Value = gv.getCellValue(x, "LGORT")
+                orng.offset(0, 4).Value = gv.getCellValue(x, "KOSTL")
+                orng.offset(0, 5).Value = gv.getCellValue(x, "BWART")
+                orng.offset(0, 6).Value = gv.getCellValue(x, "MBLNR")
+                orng.offset(0, 7).Value = "'" & CStr(gv.getCellValue(x, "MENGE"))
+                numHandler.parseStringProperlyToNum orng.offset(0, 7)
                 
                 
                 ' CPUDT - date cpt
                 ' BLDAT - saise le
                 ' CPUTM - date piece
                 ' ERFME - saise a
-                orng.Offset(0, 8).Value = gv.getCellValue(x, "BUDAT")
-                orng.Offset(0, 9).Value = gv.getCellValue(x, "CPUDT")
-                orng.Offset(0, 10).Value = gv.getCellValue(x, "BLDAT")
-                orng.Offset(0, 11).Value = gv.getCellValue(x, "CPUTM")
+                orng.offset(0, 8).Value = gv.getCellValue(x, "BUDAT")
+                orng.offset(0, 9).Value = gv.getCellValue(x, "CPUDT")
+                orng.offset(0, 10).Value = gv.getCellValue(x, "BLDAT")
+                orng.offset(0, 11).Value = gv.getCellValue(x, "CPUTM")
                 
-                orng.Offset(0, 12).Value = "'" & CStr(gv.getCellValue(x, "MENGE"))
-                numHandler.parseStringProperlyToNum orng.Offset(0, 12)
+                orng.offset(0, 12).Value = "'" & CStr(gv.getCellValue(x, "MENGE"))
+                numHandler.parseStringProperlyToNum orng.offset(0, 12)
                 
                 ' BPRME - UQS - my UN
                 ' WAERS - UN2 - dont touch
-                orng.Offset(0, 13).Value = "'" & gv.getCellValue(x, "ERFME")
-                orng.Offset(0, 14).Value = gv.getCellValue(x, "BPRME")
+                orng.offset(0, 13).Value = "'" & gv.getCellValue(x, "ERFME")
+                orng.offset(0, 14).Value = gv.getCellValue(x, "BPRME")
                 
                 ' $
-                orng.Offset(0, 15).Value = "'" & gv.getCellValue(x, "DMBTR")
-                numHandler.parseStringProperlyToNum orng.Offset(0, 15)
+                orng.offset(0, 15).Value = "'" & gv.getCellValue(x, "DMBTR")
+                numHandler.parseStringProperlyToNum orng.offset(0, 15)
                 
                 ' EUR
-                orng.Offset(0, 16).Value = "'" & gv.getCellValue(x, "WAERS")
+                orng.offset(0, 16).Value = "'" & gv.getCellValue(x, "WAERS")
                 
                 
-                orng.Offset(0, 17).Value = "" ' gv.getCellValue(x, "BUKRS")
-                orng.Offset(0, 18).Value = gv.getCellValue(x, "USNAM")
-                orng.Offset(0, 19).Value = "" ' gv.getCellValue(x, "ZEILE")
+                orng.offset(0, 17).Value = "" ' gv.getCellValue(x, "BUKRS")
+                orng.offset(0, 18).Value = gv.getCellValue(x, "USNAM")
+                orng.offset(0, 19).Value = "" ' gv.getCellValue(x, "ZEILE")
                 
                 
                 
                 ' cofor supplier
-                orng.Offset(0, 20).Value = gv.getCellValue(x, "LIFNR")
+                orng.offset(0, 20).Value = gv.getCellValue(x, "LIFNR")
 
                 
                 y = pcsPriceEnum - 1
                         
-                orng.Offset(0, y).FormulaR1C1 = "=RC[-" & CStr(offsetForPrice) & "]" & _
+                orng.offset(0, y).FormulaR1C1 = "=RC[-" & CStr(offsetForPrice) & "]" & _
                     "/RC[-" & CStr(offsetForQty) & "]"
                             
                             
-                If IsError(orng.Offset(0, y).Value) Then
-                    orng.Offset(0, y).Value = 0
+                If IsError(orng.offset(0, y).Value) Then
+                    orng.offset(0, y).Value = 0
                 End If
 
                         
@@ -543,24 +545,24 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
                 ' this loop is only for data from sap sigapp
                 
                 ' price per UN
-                orng.Offset(0, extPcsPrice - 1).Value = _
-                    orng.Offset(0, pcsPriceEnum - 1).Value / (1# * findUnQty(orng.Offset(0, unxEnum - 1).Value))
+                orng.offset(0, extPcsPrice - 1).Value = _
+                    orng.offset(0, pcsPriceEnum - 1).Value / (1# * findUnQty(orng.offset(0, unxEnum - 1).Value))
                     
                 ' original currency
-                orng.Offset(0, pcsPriceCurrency - 1).Value = orng.Offset(0, deviseEnum - 1).Value
+                orng.offset(0, pcsPriceCurrency - 1).Value = orng.offset(0, deviseEnum - 1).Value
                 ' rate on original currency to EUR
-                orng.Offset(0, currencyRateEnum - 1).Value = _
-                    findCurrRate(CStr(orng.Offset(0, deviseEnum - 1).Value))
+                orng.offset(0, currencyRateEnum - 1).Value = _
+                    findCurrRate(CStr(orng.offset(0, deviseEnum - 1).Value))
                 ' final price in eur per UN
-                orng.Offset(0, pcsPriceInEur - 1).Value = _
-                    orng.Offset(0, extPcsPrice - 1).Value / orng.Offset(0, currencyRateEnum - 1).Value
+                orng.offset(0, pcsPriceInEur - 1).Value = _
+                    orng.offset(0, extPcsPrice - 1).Value / orng.offset(0, currencyRateEnum - 1).Value
                 
                     
                 ' BOOL fields
                 ' E_MB51_IS_WITH_INDEX
                 ' E_MB51_IS_CANCELLED
-                orng.Offset(0, withIndexEnum - 1).Value = _
-                    withIndex(CStr(orng.Offset(0, articleEnum - 1)))
+                orng.offset(0, withIndexEnum - 1).Value = _
+                    withIndex(CStr(orng.offset(0, articleEnum - 1)))
                     
                 
                 ' you need to make it after all loop ready with data
@@ -572,7 +574,7 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
         
             
                 
-                Set orng = orng.Offset(1, 0)
+                Set orng = orng.offset(1, 0)
                 
                 
                 
@@ -605,8 +607,8 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
 
         
         
-            sess.FindById("wnd[0]/tbar[0]/btn[15]").Press
-            sess.FindById("wnd[0]/tbar[0]/btn[15]").Press
+            sess.FindById("wnd[0]/tbar[0]/btn[15]").press
+            sess.FindById("wnd[0]/tbar[0]/btn[15]").press
         
         End If
         
@@ -633,7 +635,8 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
     
     ' need to be outside of major loop
     For Each orng In osh.Range(osh.Range("A2"), osh.Range("A1").End(xlDown))
-        orng.Offset(0, isCancelledEnum - 1).Value = _
+    
+        orng.offset(0, isCancelledEnum - 1).Value = _
             isCancelled(orng, _
                 osh.Range(osh.Range("A2"), osh.Range("A2").End(xlDown)), _
                 mvtEnum, montantDiEnum, refEnum)
@@ -644,19 +647,26 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
         '    Year(orng.Offset(0, EVO.E_MB51_DATE_CPT - 1).Value) & " CW" & _
         '    Application.WorksheetFunction.IsoWeekNum(CDbl(orng.Offset(0, EVO.E_MB51_DATE_CPT - 1).Value))
         
-        orng.Offset(0, cwEnum - 1).Value = tryToAssignYearAndCW(orng, dateEnum)
+        orng.offset(0, cwEnum - 1).Value = tryToAssignYearAndCW(orng, dateEnum)
         
         
         '  Application.Calculation = xlCalculationManual
         
-        If orng.row Mod 50 = 0 Then
+        If orng.row Mod 100 = 0 Then
             On Error Resume Next
             st_h.progress_increase
+            
+            On Error Resume Next
+            sess.FindById("wnd[0]/tbar[0]/btn[12]").press
         End If
     Next orng
     
     st_h.hide
     Set st_h = Nothing
+    
+    
+    
+    ThisWorkbook.Save
     
     
     If avoidFinalMsgBox Then
@@ -665,6 +675,8 @@ Public Sub runMainMB51Logic(d As Dictionary, Optional avoidFinalMsgBox As Boolea
     End If
     
     
+    
+    EVO.SuppressingMessageModule.RestoreMessageFilter
     Application.Calculation = xlCalculationAutomatic
     
 End Sub
@@ -674,7 +686,7 @@ Private Function tryToAssignYearAndCW(orng As Range, dateEnum As Integer) As Str
     tryToAssignYearAndCW = ""
     
     Dim strD As String, y As String, cw As String
-    strD = CStr(orng.Offset(0, dateEnum - 1).Value)
+    strD = CStr(orng.offset(0, dateEnum - 1).Value)
     
     If IsDate(strD) Then
         
@@ -698,25 +710,30 @@ Private Function isCancelled(ar As Range, br As Range, _
     ' Debug.Print br.Address
     
     Dim rMvt As Range
-    Set rMvt = ar.Offset(0, mvtEnum - 1)
+    Set rMvt = ar.offset(0, mvtEnum - 1)
     
-    isCancelled = 0
+    isCancelled = 3
     
+    If CStr(rMvt.Value) = "101" Then
+        isCancelled = 0
+    End If
     
     If CStr(rMvt.Value) = "102" Then
+        isCancelled = 2
+    ElseIf CStr(rMvt.Value) = "122" Then
         isCancelled = 2
     ElseIf CStr(rMvt.Value) = "101" Then
         
         Dim ir As Range
         For Each ir In br
-            If CStr(ir.Offset(0, mvtEnum - 1).Value) = "102" Then
-                If Math.Abs(CDbl(ir.Offset(0, montantDiEnum - 1).Value)) = _
-                    Math.Abs(CDbl(rMvt.Offset(0, montantDiEnum - mvtEnum).Value)) Then
+            If (CStr(ir.offset(0, mvtEnum - 1).Value) = "102") Or (CStr(ir.offset(0, mvtEnum - 1).Value) = "122") Then
+                If Math.Abs(CDbl(ir.offset(0, montantDiEnum - 1).Value)) = _
+                    Math.Abs(CDbl(rMvt.offset(0, montantDiEnum - mvtEnum).Value)) Then
                     
                     
                     ' same ref as well
-                    If CStr(ir.Offset(0, refEnum - 1).Value) = _
-                        CStr(rMvt.Offset(0, refEnum - mvtEnum).Value) Then
+                    If CStr(ir.offset(0, refEnum - 1).Value) = _
+                        CStr(rMvt.offset(0, refEnum - mvtEnum).Value) Then
                         isCancelled = 1
                     End If
                     
@@ -725,6 +742,102 @@ Private Function isCancelled(ar As Range, br As Range, _
         Next ir
     End If
 End Function
+
+
+Public Sub isCancelled__GLOBAL_bySelection()
+
+
+    ThisWorkbook.Activate
+    
+
+    Dim sel As Range
+    Set sel = Selection
+    
+    If sel.Column = 1 Then
+        
+        Dim isc As Range, wholeScope As Range
+        
+        Set wholeScope = sel.Parent.Range("A2")
+        Set wholeScope = sel.Parent.Range(wholeScope, wholeScope.End(xlDown))
+        
+        Dim ir As Range, iir As Range
+        
+        
+        For Each ir In sel
+        
+            Set isc = ir.offset(0, EVO.E_MB51_0_IS_CANCELLED - 1)
+            
+            If ir.offset(0, EVO.E_MB51_0_MVT - 1).Value = "102" Then
+                isc.Value = 2
+            ElseIf ir.offset(0, EVO.E_MB51_0_MVT - 1).Value = "122" Then
+                isc.Value = 2
+            ElseIf ir.offset(0, EVO.E_MB51_0_MVT - 1).Value = "101" Then
+                isc.Value = 0
+            End If
+        Next
+        
+        
+        Dim firstAddress As String, c As Range
+        For Each ir In sel
+        
+            Set isc = ir.offset(0, EVO.E_MB51_0_IS_CANCELLED - 1)
+            
+            'isc.Select
+            
+            If ir.offset(0, EVO.E_MB51_0_MVT - 1).Value = "101" Then
+                
+                firstAddress = ir.Address
+                Set c = Nothing
+                
+                Do
+                    If c Is Nothing Then
+                        Set c = wholeScope.Find(ir)
+                    Else
+                        Set c = wholeScope.FindNext(c)
+                    End If
+                    
+                    
+                    If Not c Is Nothing Then
+                    
+                        'c.Select
+                    
+                        If c.Value = ir.Value Then
+                            If Math.Abs(c.offset(0, EVO.E_MB51_0_MONTANT_DI - 1).Value) = Math.Abs(ir.offset(0, EVO.E_MB51_0_MONTANT_DI - 1).Value) Then
+                            
+                                'isc.Select
+                            
+                                If c.offset(0, EVO.E_MB51_0_MVT - 1).Value = "122" Then
+                                    isc.Value = 1
+                                End If
+                                
+                                If c.offset(0, EVO.E_MB51_0_MVT - 1).Value = "102" Then
+                                    isc.Value = 1
+                                End If
+                            End If
+                        End If
+                    End If
+                    
+                    If c Is Nothing Then
+                        Exit Do
+                    End If
+                    
+                Loop Until c Is Nothing Or c.Address = firstAddress
+            End If
+            
+            
+            If ir.row Mod 100 = 0 Then
+                Debug.Print ir.Address
+            End If
+            
+            
+            
+        Next ir
+    Else
+        MsgBox "Only first column possible!", vbInformation
+    End If
+    
+
+End Sub
 
 
 Private Function withIndex(strArticle As String) As Integer
@@ -751,11 +864,11 @@ Private Function findUnQty(strUn As String) As Long
     
     Do
         If UCase(Trim(ref.Value)) = UCase(Trim(strUn)) Then
-            findUnQty = CLng(ref.Offset(0, 1).Value)
+            findUnQty = CLng(ref.offset(0, 1).Value)
             Exit Function
         End If
         
-        Set ref = ref.Offset(1, 0)
+        Set ref = ref.offset(1, 0)
     Loop Until Trim(ref.Value) = ""
     
 End Function
@@ -795,8 +908,8 @@ Private Sub mb51__fillLabels(labelRefRange As Range, autoDecisionOnTableLayout A
         ref.Value = rfv.Value
         ref.Interior.Color = rfv.Interior.Color
     
-        Set rfv = rfv.Offset(0, 1)
-        Set ref = ref.Offset(0, 1)
+        Set rfv = rfv.offset(0, 1)
+        Set ref = ref.offset(0, 1)
         
     Loop While Trim(rfv.Value) <> ""
 

@@ -356,7 +356,7 @@ Private Function innerCalcKpi(srcSh As Worksheet, strTypeDePiece As String, e1 A
             End If
         End If
     
-        Set rng = rng.Offset(1, 0)
+        Set rng = rng.offset(1, 0)
         wiersz = wiersz + 1
     Loop Until CStr(rng) = ""
 End Function
@@ -389,7 +389,7 @@ Private Function innerCalcKpi2ForNoDapOnly(srcSh As Worksheet, strTypeDePiece As
             End If
         End If
     
-        Set rng = rng.Offset(1, 0)
+        Set rng = rng.offset(1, 0)
         wiersz = wiersz + 1
     Loop Until CStr(rng) = ""
 End Function

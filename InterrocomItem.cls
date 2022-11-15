@@ -53,7 +53,7 @@ Public orgPrixToEur As Double
 Public repartition As Integer
 
 
-Public UN As String
+Public un As String
 Public qtyUN As String
 
 

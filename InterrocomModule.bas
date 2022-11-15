@@ -41,19 +41,19 @@ Public Function notValidInterrocomFile(strValue As String) As Boolean
         Set potInterrSh = Workbooks(strValue).ActiveSheet
         Set potInterrRng = potInterrSh.Cells(1, 1)
         
-        Dim tmpR As Range
-        Set tmpR = validationReference
+        Dim tmpr As Range
+        Set tmpr = validationReference
         Do
-            If CStr(tmpR.Value) = CStr(potInterrRng.Value) Then
+            If CStr(tmpr.Value) = CStr(potInterrRng.Value) Then
                 notValidInterrocomFile = False
             Else
                 notValidInterrocomFile = True
                 Exit Function
             End If
             
-            Set tmpR = tmpR.Offset(0, 1)
-            Set potInterrRng = potInterrRng.Offset(0, 1)
-        Loop Until Trim(tmpR.Value) = ""
+            Set tmpr = tmpr.offset(0, 1)
+            Set potInterrRng = potInterrRng.offset(0, 1)
+        Loop Until Trim(tmpr.Value) = ""
     End If
 End Function
 

@@ -107,7 +107,7 @@ Public Sub putCollectionIntoEvo(Optional auto1 As Boolean, Optional projectAlias
                 .Cells(row, EVO.E_OUT_INTERROCOM_DIV).Value = i.div
                 .Cells(row, EVO.E_OUT_INTERROCOM_FINAL_PRIX).Value = i.finalPrix
                 .Cells(row, EVO.E_OUT_INTERROCOM_REP).Value = i.repartition
-                .Cells(row, EVO.E_OUT_INTERROCOM_UN).Value = i.UN
+                .Cells(row, EVO.E_OUT_INTERROCOM_UN).Value = i.un
             
                 row = row + 1
             Next i
@@ -159,8 +159,8 @@ Public Sub makeLoop()
             End If
             
             
-            .UN = CStr(sh1.Cells(row, EVO.INTERROCOM_Un).Value)
-            .qtyUN = CLng(parseUN(.UN))
+            .un = CStr(sh1.Cells(row, EVO.INTERROCOM_Un).Value)
+            .qtyUN = CLng(parseUN(.un))
             
             
             .finalPrix = .orgPrixToEur / .qtyUN
@@ -174,7 +174,7 @@ Public Sub makeLoop()
         ' ------------------------------------------------------
         
         row = row + 1
-        Set rng = rng.Offset(1, 0)
+        Set rng = rng.offset(1, 0)
     Loop Until Trim(rng.Value) = ""
     
     
@@ -195,7 +195,7 @@ Private Function parseUN(unStr As String) As Long
         End If
         
         If Trim(ir.Value) = unStr Then
-            parseUN = CLng(ir.Offset(0, 1).Value)
+            parseUN = CLng(ir.offset(0, 1).Value)
             Exit Function
         End If
     Next ir

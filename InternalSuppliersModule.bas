@@ -146,23 +146,23 @@ Public Sub runMatchingLogicOnInternalSuppliers(sh As Worksheet, nData As Workshe
     Dim e As E_MB51_AUTO_DECISION_LAYOUT
     
     If sh.name Like "TP04*" Then
-        Set rng = sh.Range("A2").Offset(0, EVO.E_ADJUSTED_SQ01_COFOR - 1)
-        Set bottomRng = sh.Range("A2").End(xlDown).Offset(0, EVO.E_ADJUSTED_SQ01_COFOR - 1)
+        Set rng = sh.Range("A2").offset(0, EVO.E_ADJUSTED_SQ01_COFOR - 1)
+        Set bottomRng = sh.Range("A1048576").End(xlUp).offset(0, EVO.E_ADJUSTED_SQ01_COFOR - 1)
     Else
     
         If sh.Range("A1").Value = "Article" Then
-            Set rng = sh.Range("A2").Offset(0, EVO.E_MB51_0_FOUR - 1)
+            Set rng = sh.Range("A2").offset(0, EVO.E_MB51_0_FOUR - 1)
             e = E_MB51_AUTO_DECISION_LAYOUT_0
         Else
-            Set rng = sh.Range("A2").Offset(0, EVO.E_MB51_NEW_FOUR - 1)
+            Set rng = sh.Range("A2").offset(0, EVO.E_MB51_NEW_FOUR - 1)
             e = E_MB51_AUTO_DECISION_LAYOUT_NEW
         End If
         
         
         If e = E_MB51_AUTO_DECISION_LAYOUT_0 Then
-            Set bottomRng = sh.Range("A2").End(xlDown).Offset(0, EVO.E_MB51_0_FOUR - 1)
+            Set bottomRng = sh.Range("A1048576").End(xlUp).offset(0, EVO.E_MB51_0_FOUR - 1)
         Else
-            Set bottomRng = sh.Range("A2").End(xlDown).Offset(0, EVO.E_MB51_NEW_FOUR - 1)
+            Set bottomRng = sh.Range("A1048576").End(xlUp).offset(0, EVO.E_MB51_NEW_FOUR - 1)
         End If
     End If
     
@@ -175,8 +175,8 @@ Public Sub runMatchingLogicOnInternalSuppliers(sh As Worksheet, nData As Workshe
     ' and N data will be all the time the same
     
     Dim nrng As Range, bottom_nrng As Range, n_area As Range
-    Set nrng = nData.Range("A2").Offset(0, EVO.E_N_SUPPLIERS_COFOR - 1)
-    Set bottom_nrng = nrng.End(xlDown)
+    Set nrng = nData.Range("A2").offset(0, EVO.E_N_SUPPLIERS_COFOR - 1)
+    Set bottom_nrng = nData.Range("A1048576").End(xlUp)
     Set n_area = nData.Range(nrng, bottom_nrng)
     
     If sh.name Like "TP04*" Then
@@ -184,14 +184,14 @@ Public Sub runMatchingLogicOnInternalSuppliers(sh As Worksheet, nData As Workshe
         For Each rng In area
         
         
-            rng.Offset(0, EVO.E_ADJUSTED_SQ01_IS_INTERNAL - EVO.E_ADJUSTED_SQ01_COFOR).Value = ""
+            rng.offset(0, EVO.E_ADJUSTED_SQ01_IS_INTERNAL - EVO.E_ADJUSTED_SQ01_COFOR).Value = ""
         
             For Each nrng In n_area
             
                 ' Application.Calculation = xlCalculationManual
             
                 If Trim(nrng.Value) = Trim(rng.Value) Then
-                    rng.Offset(0, EVO.E_ADJUSTED_SQ01_IS_INTERNAL - EVO.E_ADJUSTED_SQ01_COFOR).Value = "internal"
+                    rng.offset(0, EVO.E_ADJUSTED_SQ01_IS_INTERNAL - EVO.E_ADJUSTED_SQ01_COFOR).Value = "internal"
                 End If
             Next nrng
         Next rng
@@ -205,7 +205,7 @@ Public Sub runMatchingLogicOnInternalSuppliers(sh As Worksheet, nData As Workshe
             If e = E_MB51_AUTO_DECISION_LAYOUT_NEW Then
         
             
-                rng.Offset(0, EVO.E_MB51_NEW_IS_INTERNAL - EVO.E_MB51_NEW_FOUR).Value = ""
+                rng.offset(0, EVO.E_MB51_NEW_IS_INTERNAL - EVO.E_MB51_NEW_FOUR).Value = ""
                 
                 If rng.Value <> "" Then
             
@@ -214,7 +214,7 @@ Public Sub runMatchingLogicOnInternalSuppliers(sh As Worksheet, nData As Workshe
                         ' Debug.Print nrng.row & " " & rng.row
                     
                         If Trim(nrng.Value) = Trim(rng.Value) Then
-                            rng.Offset(0, EVO.E_MB51_NEW_IS_INTERNAL - EVO.E_MB51_NEW_FOUR).Value = "internal"
+                            rng.offset(0, EVO.E_MB51_NEW_IS_INTERNAL - EVO.E_MB51_NEW_FOUR).Value = "internal"
                         End If
                     Next nrng
                 Else
@@ -224,7 +224,7 @@ Public Sub runMatchingLogicOnInternalSuppliers(sh As Worksheet, nData As Workshe
                 
             ElseIf e = E_MB51_AUTO_DECISION_LAYOUT_0 Then
             
-                rng.Offset(0, EVO.E_MB51_0_IS_INTERNAL - EVO.E_MB51_0_FOUR).Value = ""
+                rng.offset(0, EVO.E_MB51_0_IS_INTERNAL - EVO.E_MB51_0_FOUR).Value = ""
                 
                 If rng.Value <> "" Then
             
@@ -233,7 +233,7 @@ Public Sub runMatchingLogicOnInternalSuppliers(sh As Worksheet, nData As Workshe
                         ' Debug.Print nrng.row & " " & rng.row
                     
                         If Trim(nrng.Value) = Trim(rng.Value) Then
-                            rng.Offset(0, EVO.E_MB51_0_IS_INTERNAL - EVO.E_MB51_0_FOUR).Value = "internal"
+                            rng.offset(0, EVO.E_MB51_0_IS_INTERNAL - EVO.E_MB51_0_FOUR).Value = "internal"
                         End If
                     Next nrng
                 Else

@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "NumberHandler"
+Attribute VB_Name = "ME33K_Item"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -31,28 +31,58 @@ Option Explicit
 'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 'SOFTWARE.
-
-Private separator As String
-Private sigappSeparator As String
-Private s As String
-Private ss As String
+'
+'
+' THE EVO TOOL
 
 
+' TANGO_TP04
+Public pos As String
+Public article As String
+Public nm As String
+Public qty As String
 
-Private Sub Class_Initialize()
-    separator = Application.DecimalSeparator
-    s = separator
-    sigappSeparator = ","
-    ss = sigappSeparator
+Public ua As String
+Public up As String
+
+Public strPrice As String
+Public price As Double
+Public curr As String
+
+Public Sub makePriceByUnit()
+    
+    If up <> "" Then
+        
+        If EVO.calcUnSpecial(up) > 0 Then
+            price = price / EVO.calcUnSpecial(up)
+        End If
+    End If
 End Sub
 
-Public Sub parseStringProperlyToNum(ByRef r As Range)
-    
-    Dim tmpString As String
-    tmpString = CStr(r.Value)
+Public Sub parsePrice()
 
-    tmpString = Replace(tmpString, ".", "")
+    price = 0#
     
-    If tmpString <> "" Then r.Value = CDbl(tmpString)
+    On Error Resume Next
+    price = CDbl(strPrice)
     
+    If price = 0 Then
+        
+        If IsNumeric(strPrice) Then
+            Debug.Print "is numeric, but it is not working!"
+            
+            
+        Else
+            
+            Debug.Print "is not numeric!"
+            
+            If CStr(strPrice) Like "*.???,??" Then
+                
+                strPrice = Replace(strPrice, ".", "")
+                On Error Resume Next
+                price = CDbl(strPrice)
+                
+            End If
+        End If
+    End If
 End Sub

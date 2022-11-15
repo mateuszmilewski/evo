@@ -74,7 +74,7 @@ Private Function defineDoKoGoList() As String
     Set r = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("B3")
     Do
         defineDoKoGoList = defineDoKoGoList & CStr(r) & " ; "
-        Set r = r.Offset(1, 0)
+        Set r = r.offset(1, 0)
     Loop Until CStr(r) = vbNullString
 End Function
 

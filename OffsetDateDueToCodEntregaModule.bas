@@ -41,6 +41,7 @@ Public Function offsetDate(kod As String, mon As Date) As Date
         If CStr(kod) = CStr(x) Then
         
             ofst = x - 111
+            Exit For
         End If
     Next x
     '-----------------------------------------
