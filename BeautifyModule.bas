@@ -41,7 +41,7 @@ Attribute beautifyGreenLightList.VB_ProcData.VB_Invoke_Func = " \n14"
     Selection.ColumnWidth = 8
     columns("AD:AE").Select
     Selection.EntireColumn.Hidden = True
-    columns("AF:AH").Select
+    columns("AF:AJ").Select
     Selection.ColumnWidth = 4
     With Selection.Font
         .name = "Calibri"
@@ -115,6 +115,23 @@ Attribute beautifyReceptionList.VB_ProcData.VB_Invoke_Func = " \n14"
     Selection.EntireColumn.Hidden = True
     columns("I:I").Select
     Range("N1").Select
+    
+    
+    columns("W:X").Select
+    Range("B1").Activate
+    With Selection.Font
+        .name = "Calibri"
+        .Size = 8
+        .Strikethrough = False
+        .Superscript = False
+        .Subscript = False
+        .OutlineFont = False
+        .Shadow = False
+        .Underline = xlUnderlineStyleNone
+        .TintAndShade = 0
+        .ThemeFont = xlThemeFontMinor
+    End With
+    
     Selection.AutoFilter
     
     'ActiveSheet.Range("$A$1:$V$190").AutoFilter Field:=20, Criteria1:="="

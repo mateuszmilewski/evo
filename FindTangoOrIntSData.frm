@@ -15,6 +15,9 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+
+Public typ As String
+
 Private Sub BtnMatch_Click()
 
     If checkInputs(ActiveSheet, ThisWorkbook.Sheets(Me.ComboBox1.Value)) Then
@@ -23,6 +26,14 @@ Private Sub BtnMatch_Click()
     
         If Me.Caption Like "*TANGO*" Then
             runMatchingLogicOnTango ActiveSheet, ThisWorkbook.Sheets(Me.ComboBox1.Value)
+        ElseIf Me.Caption = "MANAGERS_DA_" Then
+        
+            If typ = "SQ01" Then
+                fillGreenLightManagersDaColumn ActiveSheet, ThisWorkbook.Sheets(Me.ComboBox1.Value)
+            Else
+                fillReceptionManagersDaColumn ActiveSheet, ThisWorkbook.Sheets(Me.ComboBox1.Value)
+            End If
+            
         Else
             runMatchingLogicOnInternalSuppliers ActiveSheet, ThisWorkbook.Sheets(Me.ComboBox1.Value)
         End If
@@ -48,6 +59,10 @@ Private Function checkInputs(sh As Worksheet, interrocomData As Worksheet) As Bo
             ' but quality DRY
             If UCase(interrocomData.name) Like "N_*" Then
                 checkInputs = True
+            Else
+                If UCase(interrocomData.name) Like "MANAGERS_DA_*" Then
+                    checkInputs = True
+                End If
             End If
         End If
     End If

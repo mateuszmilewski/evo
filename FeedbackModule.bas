@@ -80,7 +80,7 @@ Private Sub innerMakeSomeFeedback(Optional sh1 As Worksheet, Optional sh2 As Wor
                 Set fi = Nothing
                 
                 
-                If Trim(glRef.Offset(0, EVO.E_GREEN_LIGHT_IS_INTERNAL - 1).Value) = "" Then
+                If Trim(glRef.offset(0, EVO.E_GREEN_LIGHT_IS_INTERNAL - 1).Value) = "" Then
                 
                 
                     Set fi = New FeedbackItem
@@ -89,16 +89,16 @@ Private Sub innerMakeSomeFeedback(Optional sh1 As Worksheet, Optional sh2 As Wor
                     
                     Do
                     
-                        If CStr(glRef.Offset(0, EVO.E_GREEN_LIGHT_Reference - 1).Value) = _
-                            CStr(recRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1).Value) Then
+                        If CStr(glRef.offset(0, EVO.E_GREEN_LIGHT_Reference - 1).Value) = _
+                            CStr(recRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1).Value) Then
                             
                             
-                                fi.dictionaryOfMatchesFromReception.Add CStr(recRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1).row), _
-                                    recRef.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1)
+                                fi.dictionaryOfMatchesFromReception.Add CStr(recRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1).row), _
+                                    recRef.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1)
                             
                         End If
                         
-                        Set recRef = recRef.Offset(1, 0)
+                        Set recRef = recRef.offset(1, 0)
                     Loop Until Trim(recRef.Value) = ""
                     
                     ' OK
@@ -108,7 +108,7 @@ Private Sub innerMakeSomeFeedback(Optional sh1 As Worksheet, Optional sh2 As Wor
                 
                 progBar.progress_increase
             
-                Set glRef = glRef.Offset(1, 0)
+                Set glRef = glRef.offset(1, 0)
             Loop Until Trim(glRef.Value) = ""
             
             
@@ -123,14 +123,14 @@ Private Sub innerMakeSomeFeedback(Optional sh1 As Worksheet, Optional sh2 As Wor
                 If Not fi Is Nothing Then
                     
                     cmntTxt = ""
-                    If Not glRef.Offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1).Comment Is Nothing Then
+                    If Not glRef.offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1).Comment Is Nothing Then
                         cmntTxt = glRef.Comment.Text
-                        glRef.Offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1).Comment.Delete
+                        glRef.offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1).Comment.Delete
                     Else
                         
                     End If
                     
-                    With glRef.Offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1)
+                    With glRef.offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1)
                         
                         
                         ' parseToText has side effects - for example calc trigger
@@ -153,7 +153,7 @@ Private Sub innerMakeSomeFeedback(Optional sh1 As Worksheet, Optional sh2 As Wor
                 End If
                 
                 progBar.progress_increase
-                Set glRef = glRef.Offset(1, 0)
+                Set glRef = glRef.offset(1, 0)
             Loop Until Trim(glRef.Value) = ""
             
             

@@ -105,9 +105,9 @@ Public Sub showComboFormForReceptionReport()
         Set rr = ThisWorkbook.Sheets("register").Range("AD2")
         Do
             If rr.Value = "R" Then
-                .ComboBoxPRE_DEF.addItem rr.Offset(0, 1).Value
+                .ComboBoxPRE_DEF.addItem rr.offset(0, 1).Value
             End If
-            Set rr = rr.Offset(1, 0)
+            Set rr = rr.offset(1, 0)
         Loop Until Trim(rr.Value) = ""
     End With
     

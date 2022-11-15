@@ -71,8 +71,15 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
     sh.Cells(linia, EVO.E_PIVOT_SRC_REF).Value = li.pn
     sh.Cells(linia, EVO.E_PIVOT_SRC_COFOR_VENDEUR).Value = Split(li.COFOR_COFOR, "_")(0)
     sh.Cells(linia, EVO.E_PIVOT_SRC_COFOR_EXPEDITEUR).Value = li.cofor
-    sh.Cells(linia, EVO.E_PIVOT_SRC_SUPPLIER_NAME).Value = _
-        li.supplementForPivotSource.refRangeForPLE.Offset(0, -2).Value
+    
+    
+    If Not li.supplementForPivotSource.refRangeForPLE Is Nothing Then
+        sh.Cells(linia, EVO.E_PIVOT_SRC_SUPPLIER_NAME).Value = _
+            li.supplementForPivotSource.refRangeForPLE.offset(0, -2).Value
+    Else
+        
+        
+    End If
         
         
 
@@ -84,14 +91,14 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
     ' this is some extra data based on sourceRng
     
     sh.Cells(linia, EVO.E_PIVOT_SRC____TYPE_DE_PIECE).Value = _
-        li.sourceRng.Offset(0, diffE).Value
+        li.sourceRng.offset(0, diffE).Value
         
     ' based on sourceRng starting from 0.8x
     sh.Cells(linia, EVO.E_PIVOT_SRC__lb_COFOR_HYBRID).Value = _
-        li.sourceRng.Offset(0, diff_for_cofor_hybrid).Value
+        li.sourceRng.offset(0, diff_for_cofor_hybrid).Value
         
     sh.Cells(linia, EVO.E_PIVOT_SRC__lb_INCOTERM).Value = _
-        li.sourceRng.Offset(0, diff_for_incoterm).Value
+        li.sourceRng.offset(0, diff_for_incoterm).Value
         
     ' -------------------------------------------------------------------------------
     ' -------------------------------------------------------------------------------
@@ -181,20 +188,20 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
     'E_PIVOT_SRC_PILOT
     'E_PIVOT_SRC_ROUTE_AND_PILOT
     sh.Cells(linia, EVO.E_PIVOT_SRC_ROUTE).Value = _
-        li.supplementForPivotSource.refRangeForCloe.Offset(0, 2).Value
+        li.supplementForPivotSource.refRangeForCloe.offset(0, 2).Value
     sh.Cells(linia, EVO.E_PIVOT_SRC_PILOT).Value = _
-        li.supplementForPivotSource.refRangeForCloe.Offset(0, 3).Value
+        li.supplementForPivotSource.refRangeForCloe.offset(0, 3).Value
         
     ' CLOE PRICE
     ' -------------------------------------------------------------------------------------------------------------
     ' -------------------------------------------------------------------------------------------------------------
     sh.Cells(linia, EVO.E_PIVOT_SRC____CLOE_COL_E_PRICE).Value = 0
-    If Application.WorksheetFunction.IsErr(li.supplementForPivotSource.refRangeForCloe.Offset(0, 4).Value) Then
+    If Application.WorksheetFunction.IsErr(li.supplementForPivotSource.refRangeForCloe.offset(0, 4).Value) Then
         On Error Resume Next
         sh.Cells(linia, EVO.E_PIVOT_SRC____CLOE_COL_E_PRICE).Value = 0
-    ElseIf IsNumeric(li.supplementForPivotSource.refRangeForCloe.Offset(0, 4).Value) Then
+    ElseIf IsNumeric(li.supplementForPivotSource.refRangeForCloe.offset(0, 4).Value) Then
         sh.Cells(linia, EVO.E_PIVOT_SRC____CLOE_COL_E_PRICE).Value = _
-            li.supplementForPivotSource.refRangeForCloe.Offset(0, 4).Value
+            li.supplementForPivotSource.refRangeForCloe.offset(0, 4).Value
     Else
         On Error Resume Next
         sh.Cells(linia, EVO.E_PIVOT_SRC____CLOE_COL_E_PRICE).Value = 0
@@ -204,17 +211,17 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
         
         
     sh.Cells(linia, EVO.E_PIVOT_SRC_ROUTE_AND_PILOT).Value = "" & _
-        li.supplementForPivotSource.refRangeForCloe.Offset(0, 2).Value & _
+        li.supplementForPivotSource.refRangeForCloe.offset(0, 2).Value & _
         " - " & _
-        li.supplementForPivotSource.refRangeForCloe.Offset(0, 3).Value
+        li.supplementForPivotSource.refRangeForCloe.offset(0, 3).Value
         
     ' again splitted data - need to see it
     ' new in 0.8x
     ' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     sh.Cells(linia, EVO.E_PIVOT_SRC__lb_PILOT).Value = _
-        li.supplementForPivotSource.refRangeForCloe.Offset(0, 3).Value
+        li.supplementForPivotSource.refRangeForCloe.offset(0, 3).Value
     sh.Cells(linia, EVO.E_PIVOT_SRC__lb_ROUTE).Value = _
-        li.supplementForPivotSource.refRangeForCloe.Offset(0, 2).Value
+        li.supplementForPivotSource.refRangeForCloe.offset(0, 2).Value
     ' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         
     ' QTY
@@ -266,15 +273,15 @@ Public Sub D_copyIterationForPivotSource(master As Worksheet, sh As Worksheet, B
         'E_PIVOT_SRC_UA_MAX_CAPACITY
         
         sh.Cells(linia, EVO.E_PIVOT_SRC_UA_PC_GV).Value = _
-            li.supplementForPivotSource.refRaneForCondi.Offset(0, 1).Value
+            li.supplementForPivotSource.refRaneForCondi.offset(0, 1).Value
         sh.Cells(linia, EVO.E_PIVOT_SRC_UA_BPC).Value = _
-            li.supplementForPivotSource.refRaneForCondi.Offset(0, 2).Value
+            li.supplementForPivotSource.refRaneForCondi.offset(0, 2).Value
         sh.Cells(linia, EVO.E_PIVOT_SRC_UA_MC).Value = _
-            li.supplementForPivotSource.refRaneForCondi.Offset(0, 3).Value
+            li.supplementForPivotSource.refRaneForCondi.offset(0, 3).Value
         sh.Cells(linia, EVO.E_PIVOT_SRC_UA_MBU).Value = _
-            li.supplementForPivotSource.refRaneForCondi.Offset(0, 4).Value
+            li.supplementForPivotSource.refRaneForCondi.offset(0, 4).Value
         sh.Cells(linia, EVO.E_PIVOT_SRC_UA_MAX_CAPACITY).Value = _
-            li.supplementForPivotSource.refRaneForCondi.Offset(0, 5).Value
+            li.supplementForPivotSource.refRaneForCondi.offset(0, 5).Value
 
     End If
     

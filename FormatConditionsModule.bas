@@ -36,6 +36,8 @@ Public Sub addFormatConditionsForReceptionReport()
     addCondFrmt3939 "K:K", "3939"
     addCondFrmt1 "S:S", "NOK", RGB(255, 0, 0)
     addCondFrmt1 "S:S", "NO TANGO PRICE", RGB(255, 128, 0)
+    addCondFrmt1 "S:S", "NO TANGO", RGB(255, 128, 0)
+    addCondFrmt1 "S:S", "TP04 PRICE", RGB(240, 40, 0)
 End Sub
 
 Public Sub addFormatConditionsForGreenLightReport()

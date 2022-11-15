@@ -28,7 +28,7 @@ Option Explicit
 ' THE EVO TOOL
 
 ' working great!
-Global Const REPO_PATH = "C:\WORKSPACE\dev\c41_tools\evo\repo\"
+Global Const REPO_PATH = "C:\WORKSPACE\dev\EVO\repo\"
 
 Private Sub export_this_project()
 

@@ -74,33 +74,33 @@ Private Sub ComboBoxPRE_DEF_Change()
     
     Do
         If rr.Value = "F" Then
-            If CStr(rr.Offset(0, 1).Value) = CStr(tmp) Then
+            If CStr(rr.offset(0, 1).Value) = CStr(tmp) Then
                 
                 With sq01PatternRef
                     Me.TextBox11.Value = .Value
-                    Me.TextBox12.Value = .Offset(0, 1).Value
+                    Me.TextBox12.Value = .offset(0, 1).Value
                     Me.TextBox13.Value = _
-                        Replace(CStr(.Offset(0, 2).Value), "XXX", CStr(rr.Offset(0, 2).Value))
+                        Replace(CStr(.offset(0, 2).Value), "XXX", CStr(rr.offset(0, 2).Value))
                     Me.TextBox14.Value = _
-                        Replace(CStr(.Offset(0, 3).Value), "XXX", CStr(rr.Offset(0, 2).Value))
+                        Replace(CStr(.offset(0, 3).Value), "XXX", CStr(rr.offset(0, 2).Value))
                     Me.TextBox15.Value = _
-                        Replace(CStr(.Offset(0, 4).Value), "XXX", CStr(rr.Offset(0, 2).Value))
+                        Replace(CStr(.offset(0, 4).Value), "XXX", CStr(rr.offset(0, 2).Value))
                 End With
                 
                 With sq01PatternRef
                     Me.TextBox21.Value = .Value
-                    Me.TextBox22.Value = .Offset(0, 1).Value
+                    Me.TextBox22.Value = .offset(0, 1).Value
                     Me.TextBox23.Value = _
-                        Replace(CStr(.Offset(0, 2).Value), "XXX", CStr(rr.Offset(0, 3).Value))
+                        Replace(CStr(.offset(0, 2).Value), "XXX", CStr(rr.offset(0, 3).Value))
                     Me.TextBox24.Value = _
-                        Replace(CStr(.Offset(0, 3).Value), "XXX", CStr(rr.Offset(0, 3).Value))
+                        Replace(CStr(.offset(0, 3).Value), "XXX", CStr(rr.offset(0, 3).Value))
                     Me.TextBox25.Value = _
-                        Replace(CStr(.Offset(0, 4).Value), "XXX", CStr(rr.Offset(0, 3).Value))
+                        Replace(CStr(.offset(0, 4).Value), "XXX", CStr(rr.offset(0, 3).Value))
                 End With
                 
                 
                 ' P81  for P2QO for example!
-                Me.TxtBoxPricePattern.Value = rr.Offset(0, 4).Value
+                Me.TxtBoxPricePattern.Value = rr.offset(0, 4).Value
                 Me.TxtBoxProjectNameAlias.Value = CStr(tmp)
                 
                 Exit Do
@@ -108,7 +108,7 @@ Private Sub ComboBoxPRE_DEF_Change()
             End If
         End If
         
-        Set rr = rr.Offset(1, 0)
+        Set rr = rr.offset(1, 0)
         
     Loop Until Trim(rr.Value) = ""
     
@@ -122,11 +122,11 @@ Private Sub ComboBoxPRE_DEF_Change()
     Dim x As Variant
 
     For x = 0 To 4
-        ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(0, x).Value = _
+        ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").offset(0, x).Value = _
             Me.Controls("TextBox1" & CStr(x + 1)).Text
            
         On Error Resume Next
-        ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(1, x).Value = _
+        ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").offset(1, x).Value = _
             Me.Controls("TextBox2" & CStr(x + 1)).Text
     Next x
     
@@ -153,10 +153,11 @@ Private Sub SubmitBtn_Click()
     Set EVO.GlobalSapModule.sapGuiAuto = Nothing
     
     
-    Dim alias As String, pusName As String, divForInterrocom As String
+    Dim alias As String, pusName As String, divForInterrocom As String, tp04_ready As String
     alias = Me.TxtBoxProjectNameAlias.Value
     pusName = Me.ComboBoxPUS.Value
     divForInterrocom = Me.TxtBoxPricePattern.Value
+    tp04_ready = Me.ComboBoxTP04Ready.Value
     
     
     Dim v As New Validator
@@ -261,11 +262,17 @@ Private Sub SubmitBtn_Click()
         
         ThisWorkbook.Activate
         
-        currentStep = E_GREEN_LIGHT_REPORT_STEP_GET_SQ01
-        innerMainForSq01 True, Me.TextBox13.Value, Me.TextBox23.Value, sq01_sh1, sq01_sh2, True
+        If Me.ComboBoxTP04Ready.Value = "" Then
         
-        currentStep = E_GREEN_LIGHT_REPORT_STEP_CONCAT
-        concatAndStd sq01_sh1, sq01_sh2, concatSh
+            currentStep = E_GREEN_LIGHT_REPORT_STEP_GET_SQ01
+            innerMainForSq01 True, Me.TextBox13.Value, Me.TextBox23.Value, sq01_sh1, sq01_sh2, True
+        
+            currentStep = E_GREEN_LIGHT_REPORT_STEP_CONCAT
+            concatAndStd sq01_sh1, sq01_sh2, concatSh
+        Else
+            
+            Set concatSh = ThisWorkbook.Sheets(Me.ComboBoxTP04Ready.Value)
+        End If
         
         concatSh.Activate
         

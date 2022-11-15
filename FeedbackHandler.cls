@@ -98,8 +98,8 @@ Public Function checkIfReallyGreenLight(sh1 As Worksheet) As Boolean
             Exit Function
         End If
         
-        Set ref = ref.Offset(0, 1)
-        Set r1 = r1.Offset(0, 1)
+        Set ref = ref.offset(0, 1)
+        Set r1 = r1.offset(0, 1)
     Loop Until Trim(r1) = ""
 End Function
 
@@ -127,8 +127,8 @@ Public Function checkIfReallyReception(sh1 As Worksheet) As Boolean
             Exit Function
         End If
         
-        Set ref = ref.Offset(0, 1)
-        Set r1 = r1.Offset(0, 1)
+        Set ref = ref.offset(0, 1)
+        Set r1 = r1.offset(0, 1)
     Loop Until Trim(r1) = ""
 End Function
 

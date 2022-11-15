@@ -89,8 +89,8 @@ Public Sub innerCatchDocInfoFiles()
         Set r = regSh.Range("N2")
         Do
         
-            r.Offset(0, -1).Value = ""
-            r.Offset(0, -2).Value = ""
+            r.offset(0, -1).Value = ""
+            r.offset(0, -2).Value = ""
         
             If CStr(r.Value) Like "*docinfogroupe*" Then
             
@@ -103,15 +103,15 @@ Public Sub innerCatchDocInfoFiles()
                     DoEvents
                 Loop While externalWorkbook Is Nothing
                 
-                r.Offset(0, -2).Value = externalWorkbook.Path
-                r.Offset(0, -1).Value = externalWorkbook.FullName
+                r.offset(0, -2).Value = externalWorkbook.Path
+                r.offset(0, -1).Value = externalWorkbook.FullName
                 
                 logMsg = logMsg & externalWorkbook.FullName & ", " & Chr(10)
                 
                 
             End If
             
-            Set r = r.Offset(1, 0)
+            Set r = r.offset(1, 0)
             
         Loop Until CStr(r) = ""
     Else
@@ -122,8 +122,8 @@ Public Sub innerCatchDocInfoFiles()
         Set r = regSh.Range("T2")
         Do
         
-            r.Offset(0, -1).Value = ""
-            r.Offset(0, -2).Value = ""
+            r.offset(0, -1).Value = ""
+            r.offset(0, -2).Value = ""
         
             If CStr(r.Value) Like "C:\*" Then
             
@@ -136,15 +136,15 @@ Public Sub innerCatchDocInfoFiles()
                     DoEvents
                 Loop While externalWorkbook Is Nothing
                 
-                r.Offset(0, -2).Value = externalWorkbook.Path
-                r.Offset(0, -1).Value = externalWorkbook.FullName
+                r.offset(0, -2).Value = externalWorkbook.Path
+                r.offset(0, -1).Value = externalWorkbook.FullName
                 
                 logMsg = logMsg & externalWorkbook.FullName & ", " & Chr(10)
                 
                 
             End If
             
-            Set r = r.Offset(1, 0)
+            Set r = r.offset(1, 0)
             
         Loop Until CStr(r) = ""
     
@@ -208,13 +208,13 @@ Public Sub innerVerifyDocInfoFiles()
         
         If Not wrk Is Nothing Then
         
-            verifyThisFile wrk, CStr(r.Offset(0, 2)), logMsg
+            verifyThisFile wrk, CStr(r.offset(0, 2)), logMsg
         Else
             MsgBox "Macro stops! sth wrong with the: " & r.Value & " please verify if it is available or process", vbCritical
             End
         End If
         
-        Set r = r.Offset(1, 0)
+        Set r = r.offset(1, 0)
     Loop Until CStr(r) = ""
     
     
