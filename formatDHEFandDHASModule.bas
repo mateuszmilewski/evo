@@ -69,7 +69,7 @@ Public Sub innerformatDHEFandDHAS()
             Set r = sh.Cells(3, 1)
             Do
             
-                Set dh = r.Offset(0, EVO.G_DHEF_COL - 1)
+                Set dh = r.offset(0, EVO.G_DHEF_COL - 1)
                 
                 If IsDate(dh) Then
                     
@@ -79,15 +79,15 @@ Public Sub innerformatDHEFandDHAS()
                     
                 End If
                 
-                If IsDate(dh.Offset(0, 1)) Then
+                If IsDate(dh.offset(0, 1)) Then
                 
                     ' dh.Offset(0, 1).Value = CStr(Cstr(Format(dh.Offset(0, 1), "dd/mm/yyyy  hh:mm:ss")))
-                    iterDate = CDate(dh.Offset(0, 1))
-                    dh.Offset(0, 1).Value = CStr(parseStdDateToStrangeFormat(iterDate))
+                    iterDate = CDate(dh.offset(0, 1))
+                    dh.offset(0, 1).Value = CStr(parseStdDateToStrangeFormat(iterDate))
                 End If
             
             
-                Set r = r.Offset(1, 0)
+                Set r = r.offset(1, 0)
             Loop Until CStr(r) = ""
         Else
             MsgBox "Wrong file!", vbCritical

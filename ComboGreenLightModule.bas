@@ -48,9 +48,9 @@ Public Sub showComboFormForReceptionReport()
             
             Do
                 If preDef.Value = "F" Then
-                    .addItem preDef.Offset(0, 1).Value
+                    .addItem preDef.offset(0, 1).Value
                 End If
-                Set preDef = preDef.Offset(1, 0)
+                Set preDef = preDef.offset(1, 0)
             Loop Until Trim(preDef) = ""
         End With
         
@@ -65,10 +65,10 @@ Public Sub showComboFormForReceptionReport()
     With ComboFormGreenLightReport
         For x = 1 To 5
             On Error Resume Next
-            .Controls("TextBox1" & CStr(x)).Value = CStr(refReg.Offset(0, x - 1).Value)
+            .Controls("TextBox1" & CStr(x)).Value = CStr(refReg.offset(0, x - 1).Value)
             
             On Error Resume Next
-            .Controls("TextBox2" & CStr(x)).Value = CStr(refReg.Offset(1, x - 1).Value)
+            .Controls("TextBox2" & CStr(x)).Value = CStr(refReg.offset(1, x - 1).Value)
         Next x
     End With
     
@@ -93,6 +93,11 @@ Public Sub showComboFormForReceptionReport()
             If sh.name Like "MANAGERS_DA_*" Then
                 .ComboBoxManagersDA.addItem sh.name
                 .ComboBoxManagersDA.Value = sh.name
+            End If
+            
+            If sh.name Like "CONCAT_*" Then
+                .ComboBoxTP04Ready.addItem sh.name
+                .ComboBoxTP04Ready.Value = sh.name
             End If
         Next sh
         

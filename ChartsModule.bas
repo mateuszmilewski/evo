@@ -50,23 +50,23 @@ Public Sub addCharts(sh As Worksheet, rng1 As Range)
     Dim myTempChart1 As Chart, myTempChart2 As Chart, myTempChart3 As Chart
     
     
-    sh.Shapes.AddChart2(201, xlColumnClustered, rng1.Offset(0, 4).Left, rng1.Top, 200, 100).Select
-    ActiveChart.SetSourceData sh.Range(rng1, rng1.Offset(2, 2))
+    sh.Shapes.AddChart2(201, xlColumnClustered, rng1.offset(0, 4).Left, rng1.Top, 200, 100).Select
+    ActiveChart.SetSourceData sh.Range(rng1, rng1.offset(2, 2))
     ActiveChart.HasTitle = False
     ActiveChart.HasLegend = True
     
     
     Set rng1 = rng1.End(xlDown).End(xlDown)
     
-    sh.Shapes.AddChart2(201, xlColumnClustered, rng1.Offset(0, 4).Left, rng1.Offset(2, 3).Top, 200, 100).Select
-    ActiveChart.SetSourceData sh.Range(rng1, rng1.Offset(2, 2))
+    sh.Shapes.AddChart2(201, xlColumnClustered, rng1.offset(0, 4).Left, rng1.offset(2, 3).Top, 200, 100).Select
+    ActiveChart.SetSourceData sh.Range(rng1, rng1.offset(2, 2))
     ActiveChart.HasTitle = False
     ActiveChart.HasLegend = True
 
     Set rng1 = rng1.End(xlDown).End(xlDown)
     
-    sh.Shapes.AddChart2(201, xlColumnClustered, rng1.Offset(0, 4).Left, rng1.Offset(5, 3).Top, 200, 100).Select
-    ActiveChart.SetSourceData sh.Range(rng1, rng1.Offset(2, 2))
+    sh.Shapes.AddChart2(201, xlColumnClustered, rng1.offset(0, 4).Left, rng1.offset(5, 3).Top, 200, 100).Select
+    ActiveChart.SetSourceData sh.Range(rng1, rng1.offset(2, 2))
     ActiveChart.HasTitle = False
     ActiveChart.HasLegend = True
 

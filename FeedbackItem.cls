@@ -28,7 +28,7 @@ Public Function parseToText() As String
 
     Dim parseSummary As String
     Dim getPriceFromGreenLight As Range
-    Set getPriceFromGreenLight = rangeRefernceInGreen.Offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1)
+    Set getPriceFromGreenLight = rangeRefernceInGreen.offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1)
     
     parseSummary = parseSummary & " receptions: " & dictionaryOfMatchesFromReception.count
     
@@ -59,17 +59,17 @@ Public Function parseToText() As String
             ' calcul!
             ' ---------------------------------------------------------------------------------------------------------------------
             On Error Resume Next
-            numRE_price = CDbl(r.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Sigapp - EVO.E_FINAL_TOUCH_RECEPTION_article).Value)
+            numRE_price = CDbl(r.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Sigapp - EVO.E_FINAL_TOUCH_RECEPTION_article).Value)
             
             
             If yyyycw = 0 And yyyycwCurr = 0 Then
                 ' sem : std: 2020 CW19 YYYY CWXX
-                yyyycw = CLng(Replace(r.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - EVO.E_FINAL_TOUCH_RECEPTION_article).Value, " CW", ""))
-                yyyycwCurr = CLng(Replace(r.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - EVO.E_FINAL_TOUCH_RECEPTION_article).Value, " CW", ""))
+                yyyycw = CLng(Replace(r.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - EVO.E_FINAL_TOUCH_RECEPTION_article).Value, " CW", ""))
+                yyyycwCurr = CLng(Replace(r.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - EVO.E_FINAL_TOUCH_RECEPTION_article).Value, " CW", ""))
                 lastPriceFromReception = numRE_price
             Else
                 
-                yyyycwCurr = CLng(Replace(r.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - EVO.E_FINAL_TOUCH_RECEPTION_article).Value, " CW", ""))
+                yyyycwCurr = CLng(Replace(r.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - EVO.E_FINAL_TOUCH_RECEPTION_article).Value, " CW", ""))
                 
                 If yyyycwCurr > yyyycw Then
                     lastPriceFromReception = numRE_price
@@ -89,8 +89,8 @@ Public Function parseToText() As String
         
             tmpStr = tmpStr & Chr(10) & _
                 "reception src-row: " & key & _
-                ", cw: " & CStr(r.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - EVO.E_FINAL_TOUCH_RECEPTION_article)) & _
-                ", prix sigapp: " & CStr(r.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Sigapp - EVO.E_FINAL_TOUCH_RECEPTION_article))
+                ", cw: " & CStr(r.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - EVO.E_FINAL_TOUCH_RECEPTION_article)) & _
+                ", prix sigapp: " & CStr(r.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Sigapp - EVO.E_FINAL_TOUCH_RECEPTION_article))
         End If
     Next
     
@@ -134,7 +134,7 @@ Public Function parseSummary() As String
     parseSummary = ""
     
     Dim getPriceFromGreenLight As Range
-    Set getPriceFromGreenLight = rangeRefernceInGreen.Offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1)
+    Set getPriceFromGreenLight = rangeRefernceInGreen.offset(0, EVO.E_GREEN_LIGHT_PRE_SERIAL_PRICE_YPRS_contract - 1)
     
     parseSummary = parseSummary & " receptions: " & dictionaryOfMatchesFromReception.count
     
@@ -155,7 +155,7 @@ Public Function parseSummary() As String
         If Not r Is Nothing Then
         
             On Error Resume Next
-            numRE_price = CDbl(r.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Sigapp - EVO.E_FINAL_TOUCH_RECEPTION_article).Value)
+            numRE_price = CDbl(r.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Sigapp - EVO.E_FINAL_TOUCH_RECEPTION_article).Value)
             
             
             If numGL_price > 0 And numRE_price > 0 Then

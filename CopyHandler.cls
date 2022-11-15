@@ -67,6 +67,9 @@ Private v As Validator
 
 Private e As E_ECHANCIER_ONL_semaine_SCENARIO
 
+' new from 199.2 - for missing data from PLE - put artificial 999
+Private HEO_decalage_JX As Integer
+
 
 Private xtraRep As XtraCopyDataReport
 
@@ -117,6 +120,375 @@ Private Sub Class_Terminate()
     
     Set xtraRep = Nothing
 End Sub
+
+
+
+Public Sub optimise_BB(sh As StatusHandler)
+
+    Dim li As LineItem
+    Dim byTMC As Dictionary
+    Dim innerDicForByTMC As Dictionary
+    Dim k1 As Variant, k2 As Variant, k3 As Variant, k4 As Variant
+    Dim tmcKey As String
+
+    
+    If Not pns2 Is Nothing Then
+        If pns2.count > 0 Then
+        
+            sh.init_statusbar (pns2.count + 1)
+            sh.show
+            sh.progress_increase
+            
+            
+            
+            Dim yyyycw_fromBB As Long, yyyycw_fromDHxx As Long, diff_on_yyyycw As Long, tmpRng As Range
+            
+            
+            
+            
+            For Each k1 In pns2.Keys
+            
+                Debug.Print k1
+                
+                Set linesIter = pns2(k1)
+                
+                For Each k2 In linesIter.Keys
+                
+                    Set li = linesIter(k2)
+                    
+                    
+                    
+                    
+                    If (CLng(li.delDate) = 0) Or (CLng(li.puDate) = 0) Then
+                    
+                        
+                        ' special full empty case
+                        If (CLng(li.delDate) = 0) And (CLng(li.puDate) = 0) Then
+                    
+                            ' Debug.Print "no dates - nothing to update!"
+                            ' --------------------------------------------------------
+                            
+                        Else
+                            ' special partial empty case - to be def
+                            
+                            ' for now no operation
+                            ' ---------------------
+                        End If
+                        
+                        
+                    Else
+                        
+                        Debug.Print "we have both dates to optimse!"
+                        ' --------------------------------------------------------
+                        ''
+                        '
+                        Debug.Print "li.bb: " & li.bb & " li.pn: " & li.pn
+                        Debug.Print "li.delDate: " & li.delDate & " , li.puDate: " & li.puDate & " , li.monday: " & li.monday
+                        
+                        ' del date as reference -
+                        ' static BB recognition as YY-CWXX (optional YY-CWX)
+                        
+                        yyyycw_fromBB = makeYYYYCWfromStr(Trim(li.bb))
+                        yyyycw_fromDHxx = makeYYYYCWfromDH(li.delDate)
+                        
+                        
+                        ' calc how many weeks to move! (be careful -> negative logic on math in weeks)
+                        diff_on_yyyycw = yyyycw_fromDHxx - yyyycw_fromBB
+                        
+                        
+                        If Left("" & yyyycw_fromDHxx, 4) <> Left("" & yyyycw_fromBB, 4) Then
+                            diff_on_yyyycw = extraCalculationREq(yyyycw_fromDHxx, li.delDate, yyyycw_fromBB)
+                        End If
+                        
+                        If diff_on_yyyycw = 0 Then
+                            ' data from col BB and timings in DHxx columns having same CW - so nothing to do
+                            master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF).Interior.Color = RGB(255, 255, 254)
+                            master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS).Interior.Color = RGB(255, 255, 254)
+                            
+                            ' movePlusWeekIfPast master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF), master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS)
+                        Else
+                        
+                            If diff_on_yyyycw > 0 Then
+                            
+                                ' DHxx later is means that we need to move DHxx to be ealier inline with BB column
+                                ' this is diff_on_yyyycw : how many weeks go to the past
+                            
+                            Else ' diff_on_yyycw < 0
+                                
+                                ' DHxx ealier than BB - so some kind of past due -> we need to put DHxx dates to the future
+                                ' this is diff_on_yyyycw : how many weeks go to the future
+                                
+                            End If
+                            
+                            addCommentsToDHxx li
+                            changeDatesInDHxx li, diff_on_yyyycw
+                        End If
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        '
+                        ''
+                        ' --------------------------------------------------------
+                    End If
+                Next
+            
+            Next
+        
+        End If
+    End If
+End Sub
+
+
+
+
+
+Private Function extraCalculationREq(yyyycw_fromDHxx As Long, delDate1 As Date, yyyycw_fromBB As Long) As Long
+    extraCalculationREq = 0
+    
+    
+    Dim tempBBDate As Date, yyyycw_fromTempBB As Long, differenceHelper As Long
+    
+    differenceHelper = 0
+    
+    ' tmpBBdate is pair with yyyycw_fromTempBB
+    tempBBDate = delDate1
+    
+    If yyyycw_fromDHxx > yyyycw_fromBB Then
+    
+        
+        Do
+            tempBBDate = tempBBDate - 7
+            differenceHelper = differenceHelper + 1
+            yyyycw_fromTempBB = Year(tempBBDate) * 100
+            yyyycw_fromTempBB = yyyycw_fromTempBB + CLng(Application.WorksheetFunction.IsoWeekNum(CDbl(tempBBDate)))
+            
+        Loop Until yyyycw_fromBB = yyyycw_fromTempBB
+        
+        
+    Else
+    
+        Do
+            tempBBDate = tempBBDate + 7
+            differenceHelper = differenceHelper - 1
+            yyyycw_fromTempBB = Year(tempBBDate) * 100
+            yyyycw_fromTempBB = yyyycw_fromTempBB + CLng(Application.WorksheetFunction.IsoWeekNum(CDbl(tempBBDate)))
+            
+        Loop Until yyyycw_fromBB = yyyycw_fromTempBB
+    End If
+    
+    extraCalculationREq = differenceHelper
+    
+End Function
+
+
+Private Sub changeDatesInDHxx(li As LineItem, diff As Long)
+    
+    Dim newDate As Date
+    
+    newDate = innerCalcDate(li, diff, li.puDate, li.puTime)
+    master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF).Value = newDate
+    newDate = innerCalcDate(li, diff, li.delDate, li.delTime)
+    master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS).Value = newDate
+    
+    master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF).Interior.Color = RGB(200, 200, 220)
+    master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS).Interior.Color = RGB(200, 200, 220)
+    
+    
+    ' movePlusWeekIfPast master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF), master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS)
+    
+End Sub
+
+Private Sub movePlusWeekIfPast(rPu As Range, rDel As Range)
+
+    If CDate(rPu.Value) < Date Then
+    
+    
+        Debug.Print "If CDate(rPu.Value) < Date Then == is TRUE"
+    
+    
+        rPu.Value = CDate(rPu.Value + 7)
+        rDel.Value = CDate(rDel.Value + 7)
+    
+    
+        rPu.Interior.Color = RGB(200, 80, 200)
+        rDel.Interior.Color = RGB(200, 80, 200)
+        
+        If rPu.Comment Is Nothing Then
+            rPu.AddComment Chr(10) & "past trigger!" & Chr(10)
+        Else
+            rPu.Comment.Text Chr(10) & "past trigger!" & Chr(10)
+        End If
+        
+        If rDel.Comment Is Nothing Then
+            rDel.AddComment Chr(10) & "past trigger!" & Chr(10)
+        Else
+            rDel.Comment.Text Chr(10) & "past trigger!" & Chr(10)
+        End If
+        
+        movePlusWeekIfPast rPu, rDel
+    Else
+        ' no operation
+    End If
+    
+End Sub
+
+Private Function innerCalcDate(li As LineItem, diff As Long, d1 As Date, d2 As Date) As Date
+
+    innerCalcDate = d1 + d2
+    
+    innerCalcDate = innerCalcDate - (diff * 7)
+    
+End Function
+
+
+Private Sub addCommentsToDHxx(li As LineItem)
+
+    Dim cmnt As Comment
+    Dim prevString As String
+    
+    prevString = Chr(10) & "prev: " & Trim(master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS).Value) & Chr(10) & Chr(10)
+    
+    If master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS).Comment Is Nothing Then
+        master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS).AddComment CStr(Date) & prevString
+    Else
+        master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS).Comment.Text CStr(Date) & prevString, 1, False
+    End If
+    
+    master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS).Comment.Shape.TextFrame.AutoSize = True
+    
+    prevString = Chr(10) & "prev: " & Trim(master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF).Value) & Chr(10) & Chr(10)
+    
+    If master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF).Comment Is Nothing Then
+        master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF).AddComment CStr(Date) & prevString
+    Else
+        master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF).Comment.Text CStr(Date) & prevString, 1, False
+    End If
+    
+    master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF).Comment.Shape.TextFrame.AutoSize = True
+    
+    ' for nothing - just text helper
+    'Set cmnt = master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS).Comment
+    'cmnt.Shape.TextFrame.AutoSize = True
+End Sub
+
+
+Private Function makeYYYYCWfromStr(bb As String) As Long
+
+
+    Dim tmplong As Long
+    tmplong = 200000
+    
+    Dim tmpCw As String
+    
+    If bb Like "??-CW??" Or bb Like "??-CW?" Then
+    
+        tmplong = tmplong + (CLng(Left(bb, 2)) * 100)
+        tmpCw = Split(bb, "-CW")(1)
+        
+        If IsNumeric(tmpCw) Then
+            tmplong = tmplong + CLng(tmpCw)
+        Else
+            ' nop -> in this case CW artificial zero (nothing to add -> back door helper)
+        End If
+    End If
+    
+    makeYYYYCWfromStr = tmplong
+End Function
+
+Private Function makeYYYYCWfromDH(del1 As Date) As Long
+
+    Dim tmplong As Long
+    
+    tmplong = CLng(Year(del1) * 100)
+    
+    tmplong = tmplong + Application.WorksheetFunction.IsoWeekNum(CDbl(del1))
+    
+    makeYYYYCWfromDH = tmplong
+End Function
+
+
+
+
+Public Sub moveDatesFromThePastToPresent()
+
+    Dim li As LineItem
+    Dim byTMC As Dictionary
+    Dim innerDicForByTMC As Dictionary
+    Dim k1 As Variant, k2 As Variant, k3 As Variant, k4 As Variant
+    Dim tmcKey As String
+
+    
+    If Not pns2 Is Nothing Then
+        If pns2.count > 0 Then
+            
+            
+            
+            Dim yyyycw_fromBB As Long, yyyycw_fromDHxx As Long, diff_on_yyyycw As Long, tmpRng As Range
+            
+            
+            
+            
+            For Each k1 In pns2.Keys
+            
+                Debug.Print k1
+                
+                Set linesIter = pns2(k1)
+                
+                For Each k2 In linesIter.Keys
+                
+                    Set li = linesIter(k2)
+                    
+                    
+                    
+                    
+                    If (CLng(li.delDate) = 0) Or (CLng(li.puDate) = 0) Then
+                    
+                        
+                        ' special full empty case
+                        If (CLng(li.delDate) = 0) And (CLng(li.puDate) = 0) Then
+                    
+                            ' Debug.Print "no dates - nothing to update!"
+                            ' --------------------------------------------------------
+                            
+                        Else
+                            ' special partial empty case - to be def
+                            
+                            ' for now no operation
+                            ' ---------------------
+                        End If
+                        
+                        
+                    Else
+                        
+                        Debug.Print "we have both dates to optimse!"
+                        ' --------------------------------------------------------
+                        ''
+                        '
+                        ' Debug.Print "li.bb: " & li.bb & " li.pn: " & li.pn
+                        Debug.Print "li.delDate: " & li.delDate & " , li.puDate: " & li.puDate & " , li.monday: " & li.monday
+                        
+                        movePlusWeekIfPast master.Cells(li.wiersz, EVO.E_MASTER_2_DHEF), master.Cells(li.wiersz, EVO.E_MASTER_2_DHAS)
+                        
+                        
+
+                        
+                        
+                        '
+                        ''
+                        ' --------------------------------------------------------
+                    End If
+                Next
+            
+            Next
+        
+        End If
+    End If
+End Sub
+
 
 
 Public Sub optimise(sh As StatusHandler)
@@ -624,7 +996,7 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                                         xadr1 = findByExpCoforInPle.Address
                                     
                                         tmp_x = _
-                                            findByExpCoforInPle.Offset(0, G_PLE_VEN_COFOR - G_PLE_SHIPPER_COFOR).Value & "_" & _
+                                            findByExpCoforInPle.offset(0, G_PLE_VEN_COFOR - G_PLE_SHIPPER_COFOR).Value & "_" & _
                                             CStr(findByExpCoforInPle.Value)
                                             
                                         If tmp_x <> cofors1 Then
@@ -636,7 +1008,7 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                                                 xadr2 = findByExpCoforInPle.Address
                                             
                                                 tmp_x2 = _
-                                                    findByExpCoforInPle.Offset(0, G_PLE_VEN_COFOR - G_PLE_SHIPPER_COFOR).Value & "_" & _
+                                                    findByExpCoforInPle.offset(0, G_PLE_VEN_COFOR - G_PLE_SHIPPER_COFOR).Value & "_" & _
                                                     CStr(findByExpCoforInPle.Value)
                                                     
                                                 If xadr1 = xadr2 Or tmp_x2 = cofors1 Then
@@ -668,7 +1040,7 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                                         xadr1 = findByExpCoforInCloe.Address
                                     
                                         tmp_x = _
-                                            findByExpCoforInCloe.Offset(0, G_CLOE_COFORS - G_CLOE_SHIPPER_COFOR).Value
+                                            findByExpCoforInCloe.offset(0, G_CLOE_COFORS - G_CLOE_SHIPPER_COFOR).Value
                                             
                                         If tmp_x <> cofors2 Then
                                         
@@ -679,7 +1051,7 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                                                 xadr2 = findByExpCoforInCloe.Address
                                             
                                                 tmp_x2 = _
-                                                    findByExpCoforInCloe.Offset(0, G_CLOE_COFORS - G_CLOE_SHIPPER_COFOR).Value
+                                                    findByExpCoforInCloe.offset(0, G_CLOE_COFORS - G_CLOE_SHIPPER_COFOR).Value
                                                     
                                                 If xadr1 = xadr2 Or tmp_x2 = cofors2 Then
                                                     Exit Do
@@ -707,7 +1079,7 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                                         xadr1 = findByExpCoforInMain.Address
                                     
                                         tmp_x = _
-                                            findByExpCoforInMain.Offset(0, G_FEED_MAIN_SH_VEN_COFOR - G_FEED_MAIN_SH_SHIPPER_COFOR).Value & "_" & _
+                                            findByExpCoforInMain.offset(0, G_FEED_MAIN_SH_VEN_COFOR - G_FEED_MAIN_SH_SHIPPER_COFOR).Value & "_" & _
                                             CStr(findByExpCoforInMain.Value)
                                             
                                         If tmp_x <> cofors1 Then
@@ -719,7 +1091,7 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                                                 xadr2 = findByExpCoforInMain.Address
                                             
                                                 tmp_x2 = _
-                                                    findByExpCoforInMain.Offset(0, G_FEED_MAIN_SH_VEN_COFOR - G_FEED_MAIN_SH_SHIPPER_COFOR).Value & _
+                                                    findByExpCoforInMain.offset(0, G_FEED_MAIN_SH_VEN_COFOR - G_FEED_MAIN_SH_SHIPPER_COFOR).Value & _
                                                     "_" & _
                                                     CStr(findByExpCoforInMain.Value)
                                                     
@@ -743,10 +1115,11 @@ Public Sub copyForSourcePivot(ByRef ph As PivotHandler, sh As StatusHandler)
                                     Set findByCondiInUa = condiRng.Find(condi)
                                     
                                     
-                                    If operacja.validateSearching(findByExpCoforInPle, _
+                                    If operacja.validateSearchingWith999(findByExpCoforInPle, _
                                         findByExpCoforInCloe, _
                                         findByExpCoforInMain, _
-                                        findByCondiInUa) Then
+                                        findByCondiInUa, _
+                                        HEO_decalage_JX) Then
                                     
                                             li.validationForPivotSource = True
                                             Set li.supplementForPivotSource = New LineItemPivotSrouceSupplement
@@ -879,7 +1252,7 @@ Public Sub copyData(sh As StatusHandler)
                 Set srcRng = feed.Cells(2, 1)
                 ' Set srcRng = srcRng.EntireColumn ' ?
                 
-                If srcRng.Offset(1, 0).Value <> "" Then
+                If srcRng.offset(1, 0).Value <> "" Then
                     Set srcRng = feed.Range(srcRng, srcRng.End(xlDown))
                 End If
                 
@@ -1046,16 +1419,27 @@ End Sub
 Private Function calculateOrderDate(li As LineItem, pleSh As Worksheet) As Date
 
 
-    Dim cellWithProperValue As Range
-    Set cellWithProperValue = _
-        pleSh.Cells(li.supplementForPivotSource.refRangeForPLE.row, EVO.G_PLE_SUB_FOR_ORDER_COLUMN)
-
     Dim howManyDaysOfOffset As Integer
+
+    If Not li.supplementForPivotSource.refRangeForPLE Is Nothing Then
+
     
-    If IsNumeric(cellWithProperValue) Then
-        howManyDaysOfOffset = Int(cellWithProperValue.Value)
+        Dim cellWithProperValue As Range
+        Set cellWithProperValue = _
+            pleSh.Cells(li.supplementForPivotSource.refRangeForPLE.row, EVO.G_PLE_SUB_FOR_ORDER_COLUMN)
+    
+        
+        
+        If IsNumeric(cellWithProperValue) Then
+            howManyDaysOfOffset = Int(cellWithProperValue.Value)
+        Else
+            howManyDaysOfOffset = -1
+        End If
     Else
-        howManyDaysOfOffset = -1
+    
+    
+        howManyDaysOfOffset = HEO_decalage_JX
+        
     End If
     
     
@@ -1086,7 +1470,10 @@ Private Function calculateOrderDate(li As LineItem, pleSh As Worksheet) As Date
         ElseIf isSunday(tmpdate) Then
             calculateOrderDate = CDate(tmpdate) - 2
         Else
-            calculateOrderDate = CDate(tmpdate)
+            If CLng(tmpdate) < 0 Then
+            Else
+                calculateOrderDate = CDate(tmpdate)
+            End If
         End If
     End If
 End Function
@@ -1154,13 +1541,13 @@ Private Sub doubleLoopForNOKrepForTCAMLogic(mmk1 As Variant, mmk2 As Variant, _
     Dim r1 As Range
     Set r1 = shnok.Cells(1, 1)
     r1.Value = "REF"
-    r1.Offset(0, 1).Value = "ROW"
-    r1.Offset(0, 2).Value = "CC"
-    r1.Offset(0, 3).Value = "CONDI NOK"
-    r1.Offset(0, 4).Value = "CLOE NOK"
-    r1.Offset(0, 5).Value = "PLE NOK"
+    r1.offset(0, 1).Value = "ROW"
+    r1.offset(0, 2).Value = "CC"
+    r1.offset(0, 3).Value = "CONDI NOK"
+    r1.offset(0, 4).Value = "CLOE NOK"
+    r1.offset(0, 5).Value = "PLE NOK"
     
-    Set r1 = r1.Offset(1, 0)
+    Set r1 = r1.offset(1, 0)
     
     
 
@@ -1178,33 +1565,33 @@ Private Sub doubleLoopForNOKrepForTCAMLogic(mmk1 As Variant, mmk2 As Variant, _
             
             If Not mmli.validationForPivotSource Then
                 r1.Value = mmli.masterRng.Value
-                r1.Offset(0, 1).Value = mmli.masterRng.row
-                r1.Offset(0, 2).Value = mmli.COFOR_COFOR
+                r1.offset(0, 1).Value = mmli.masterRng.row
+                r1.offset(0, 2).Value = mmli.COFOR_COFOR
                 
                 If Not mmli.supplementForPivotSource Is Nothing Then
                 
                     If mmli.supplementForPivotSource.refRaneForCondi Is Nothing Then
-                        r1.Offset(0, 3).Value = "CONDI NOK"
+                        r1.offset(0, 3).Value = "CONDI NOK"
                     Else
-                        r1.Offset(0, 3).Value = mmli.supplementForPivotSource.refRaneForCondi.Value
+                        r1.offset(0, 3).Value = mmli.supplementForPivotSource.refRaneForCondi.Value
                     End If
                     
                     If mmli.supplementForPivotSource.refRangeForCloe Is Nothing Then
-                        r1.Offset(0, 4).Value = "CLOE NOK"
+                        r1.offset(0, 4).Value = "CLOE NOK"
                     Else
-                        r1.Offset(0, 4).Value = mmli.supplementForPivotSource.refRangeForCloe.Value
+                        r1.offset(0, 4).Value = mmli.supplementForPivotSource.refRangeForCloe.Value
                     End If
                     
                     If mmli.supplementForPivotSource.refRangeForPLE Is Nothing Then
-                        r1.Offset(0, 5).Value = "PLE NOK"
+                        r1.offset(0, 5).Value = "PLE NOK"
                     Else
-                        r1.Offset(0, 5).Value = mmli.supplementForPivotSource.refRangeForPLE.Value
+                        r1.offset(0, 5).Value = mmli.supplementForPivotSource.refRangeForPLE.Value
                     End If
                 
                 End If
                 
                 
-                Set r1 = r1.Offset(1, 0)
+                Set r1 = r1.offset(1, 0)
             End If
             
             
@@ -1217,7 +1604,7 @@ Private Function checkLineItemIfItMakeAnySense(li As LineItem) As Boolean
     checkLineItemIfItMakeAnySense = False
     
     If Not li.supplementForPivotSource.refRangeForCloe Is Nothing Then
-        If Not li.supplementForPivotSource.refRangeForPLE Is Nothing Then
+        If (Not li.supplementForPivotSource.refRangeForPLE Is Nothing) Or (HEO_decalage_JX = 999) Then
             If Not li.sourceRng Is Nothing Then
                 checkLineItemIfItMakeAnySense = True
             End If
@@ -1256,8 +1643,8 @@ Private Sub mainCopyBasedOnRegisterData(li As LineItem, ByRef linesIter As Dicti
             End
         End If
         
-        If IsNumeric(od.Offset(0, 3).Value) Then
-            kolumna2 = od.Offset(0, 3).Value
+        If IsNumeric(od.offset(0, 3).Value) Then
+            kolumna2 = od.offset(0, 3).Value
         Else
             MsgBox "Fatal type error on CopyHandler line 1112", vbCritical
             End
@@ -1267,10 +1654,10 @@ Private Sub mainCopyBasedOnRegisterData(li As LineItem, ByRef linesIter As Dicti
         'msh.Cells(optWiersz, 1).Font.Color = RGB(0, 0, 0)
         
     
-        If IsNumeric(od.Offset(0, 3).Value) Then
+        If IsNumeric(od.offset(0, 3).Value) Then
             
             'simple copy without X
-            If CStr(od.Offset(0, 5).Value) = "" Then
+            If CStr(od.offset(0, 5).Value) = "" Then
             
                 If IsError(lsh.Cells(optSrcWiersz, kolumna2).Value) Then
                     ' msh.Cells(optWiersz, kolumna1).Value = "error n/a in source file"
@@ -1328,15 +1715,15 @@ Private Sub mainCopyBasedOnRegisterData(li As LineItem, ByRef linesIter As Dicti
                         
                     End If
                 End If
-            ElseIf CStr(od.Offset(0, 5).Value) = "X" Then
+            ElseIf CStr(od.offset(0, 5).Value) = "X" Then
 
-                calculationForDH li, linesIter, CStr(od.Offset(0, 4).Value), lsh, msh, CLng(optWiersz)
+                calculationForDH li, linesIter, CStr(od.offset(0, 4).Value), lsh, msh, CLng(optWiersz)
                 
             End If
         End If
 
     
-        Set od = od.Offset(1, 0)
+        Set od = od.offset(1, 0)
     Loop Until CStr(od) = ""
     
     '
@@ -1543,7 +1930,11 @@ Private Sub tryToAssignProperlyDHxxDatesWithDefaultCalculation(e As E_ECHANCIER_
                 
                     If CLng(li.puDate) = 0 Then
                         
-                        li.puDate = li.delDate - li.delTime - CDate(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value)
+                        Debug.Print CLng(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value)
+                        Debug.Print CDate(Format(li.delDate, "yyyy-mm-dd"))
+                        
+                        ' li.puDate = li.delDate - li.delTime - CDate(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value)
+                        li.puDate = CDate(Format(li.delDate, "yyyy-mm-dd")) - CDate(lsh.Cells(li.sourceRow, EVO.G_T_TIME_COLUMN).Value)
                         li.puTime = CDate(lsh.Cells(li.sourceRow, EVO.G_PU_TIME_COLUMN).Value)
                         li.puDate = li.puDate + li.puTime
                         
@@ -1695,13 +2086,37 @@ Private Sub tryToAssignProperlyDHxxDatesWithDefaultCalculation(e As E_ECHANCIER_
 End Sub
 
 
-Public Sub init(m_master As Worksheet, m_feed As Worksheet, Optional dwa As E_COPY_HANDLER_INIT, Optional eAnswer As E_ECHANCIER_ONL_semaine_SCENARIO)
+
+Public Sub init_BB(m_master As Worksheet)
+
+
+    Set master = m_master
+    Set feed = Nothing
+    
+    If (Not master Is Nothing) Then
+        
+        initAllDictionaries E_COPY_HANDLER_BY_BB
+    Else
+        ' NOK situation
+        MsgBox "Sth went wrong with crucial data!", vbCritical
+        End
+    End If
+End Sub
+
+
+Public Sub init(m_master As Worksheet, m_feed As Worksheet, Optional dwa As E_COPY_HANDLER_INIT, Optional eAnswer As E_ECHANCIER_ONL_semaine_SCENARIO, Optional ak999 As Boolean)
 
 
     ' just setting private field
     ' e as E_ECHANCIER_ONL_semaine_SCENARIO
     ' just choosing treatment for column in PUS file
     e = eAnswer
+    
+    If ak999 Then
+        HEO_decalage_JX = 999
+    Else
+        HEO_decalage_JX = -1
+    End If
 
 
     Set master = m_master
@@ -1761,6 +2176,14 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
     Dim base As Worksheet
     Set base = master
     
+    ' for optimse tmc and bb
+    ' --------------------------------
+    Dim strTempPn As String
+    Dim strTempCoforInner As String
+    Dim strTempPnAndCofor As String
+    ' --------------------------------
+    
+    
     Dim r As Range
     Set r = base.Cells(3, EVO.E_MASTER_Reference)
 
@@ -1777,8 +2200,10 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                 ' main logic for dwa = 3 internal joke ;)
                 ' ------------------------------------------------------------
                 
-                strTempExpCofor = CStr(CStr(r.Offset(0, EVO.G_COFOR_EXPEDITEUR_COL - 1).Value))
-                strTempVenCofor = CStr(CStr(r.Offset(0, EVO.G_COFOR_VENDEUR_COL - 1).Value))
+                
+                
+                strTempExpCofor = CStr(CStr(r.offset(0, EVO.G_COFOR_EXPEDITEUR_COL - 1).Value))
+                strTempVenCofor = CStr(CStr(r.offset(0, EVO.G_COFOR_VENDEUR_COL - 1).Value))
                 
                 If Not expCofors.Exists(strTempVenCofor & "_" & strTempExpCofor) Then
                 
@@ -1795,24 +2220,24 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                         Set .masterRng = r
                         '
                         .wiersz = CLng(r.row)
-                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
-                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .tmc = CStr(CStr(r.offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         On Error Resume Next
-                        .puDate = CDate(r.Offset(0, EVO.G_DHEF_COL - 1).Value)
+                        .puDate = CDate(r.offset(0, EVO.G_DHEF_COL - 1).Value)
                         On Error Resume Next
-                        .delDate = CDate(r.Offset(0, EVO.G_DHAS_COL - 1).Value)
+                        .delDate = CDate(r.offset(0, EVO.G_DHAS_COL - 1).Value)
                         .isPast = CBool(operacja.isThisLineIsPast2(.puDate))
                         
                         
                         ' new from 0.16
                         ' -------------------------------------------------------------------
-                        If IsNumeric(r.Offset(0, EVO.E_MASTER_QTY - 1).Value) Then
-                            .qty2 = CLng(r.Offset(0, EVO.E_MASTER_QTY - 1).Value)
+                        If IsNumeric(r.offset(0, EVO.E_MASTER_QTY - 1).Value) Then
+                            .qty2 = CLng(r.offset(0, EVO.E_MASTER_QTY - 1).Value)
                         End If
                         
-                        If IsNumeric(r.Offset(0, EVO.E_MASTER_CQTY - 1).Value) Then
-                            .confirmedQty = r.Offset(0, EVO.E_MASTER_CQTY - 1).Value
+                        If IsNumeric(r.offset(0, EVO.E_MASTER_CQTY - 1).Value) Then
+                            .confirmedQty = r.offset(0, EVO.E_MASTER_CQTY - 1).Value
                         End If
                         
                         .condi = master.Cells(r.row, EVO.G_CONDI_COL).Value
@@ -1836,26 +2261,26 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                         Set .masterRng = r
                         '
                         .wiersz = CLng(r.row)
-                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .tmc = CStr(CStr(r.offset(0, EVO.E_MASTER_TMC - 1).Value))
                         
-                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         On Error Resume Next
-                        .puDate = CDate(r.Offset(0, EVO.G_DHEF_COL - 1).Value)
+                        .puDate = CDate(r.offset(0, EVO.G_DHEF_COL - 1).Value)
                         On Error Resume Next
-                        .delDate = CDate(r.Offset(0, EVO.G_DHAS_COL - 1).Value)
+                        .delDate = CDate(r.offset(0, EVO.G_DHAS_COL - 1).Value)
                         .isPast = CBool(operacja.isThisLineIsPast2(.puDate))
                         
                         
                         
                         ' new from 0.16
                         ' -------------------------------------------------------------------
-                        If IsNumeric(r.Offset(0, EVO.E_MASTER_QTY - 1).Value) Then
-                            .qty2 = CLng(r.Offset(0, EVO.E_MASTER_QTY - 1).Value)
+                        If IsNumeric(r.offset(0, EVO.E_MASTER_QTY - 1).Value) Then
+                            .qty2 = CLng(r.offset(0, EVO.E_MASTER_QTY - 1).Value)
                         End If
                         
-                        If IsNumeric(r.Offset(0, EVO.E_MASTER_CQTY - 1).Value) Then
-                            .confirmedQty = r.Offset(0, EVO.E_MASTER_CQTY - 1).Value
+                        If IsNumeric(r.offset(0, EVO.E_MASTER_CQTY - 1).Value) Then
+                            .confirmedQty = r.offset(0, EVO.E_MASTER_CQTY - 1).Value
                         End If
                         
                         .condi = master.Cells(r.row, EVO.G_CONDI_COL).Value
@@ -1873,15 +2298,13 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                 
                 ' ------------------------------------------------------------
             End If
-            Set r = r.Offset(1, 0)
+            Set r = r.offset(1, 0)
         Loop Until CStr(r) = ""
     
         
 
     ElseIf dwa = E_COPY_HANDLER_BY_TMC_OPT Then
-        Dim strTempPn As String
-        Dim strTempCoforInner As String
-        Dim strTempPnAndCofor As String
+
         Set pns2 = New Dictionary
         
         Do
@@ -1890,8 +2313,11 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                 ' no operation req for filter out data!
             Else
             
+            
+                Debug.Print r.Value & " " & r.row
+            
                 strTempPn = CStr(r.Value)
-                strTempCoforInner = CStr(CStr(r.Offset(0, EVO.G_COFOR_VENDEUR_COL - 1).Value))
+                strTempCoforInner = CStr(CStr(r.offset(0, EVO.G_COFOR_VENDEUR_COL - 1).Value))
                 strTempCoforInner = operacja.adjustStringCofor(CStr(strTempCoforInner))
                 
                 strTempPnAndCofor = strTempPn & "_" & strTempCoforInner
@@ -1910,13 +2336,13 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                         Set .masterRng = r
                         '
                         .wiersz = CLng(r.row)
-                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
-                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .tmc = CStr(CStr(r.offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         On Error Resume Next
-                        .puDate = CDate(r.Offset(0, EVO.G_DHEF_COL - 1).Value)
+                        .puDate = CDate(r.offset(0, EVO.G_DHEF_COL - 1).Value)
                         On Error Resume Next
-                        .delDate = CDate(r.Offset(0, EVO.G_DHAS_COL - 1).Value)
+                        .delDate = CDate(r.offset(0, EVO.G_DHAS_COL - 1).Value)
                         .isPast = CBool(operacja.isThisLineIsPast2(.puDate))
                         
                     End With
@@ -1935,14 +2361,14 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                         Set .masterRng = r
                         '
                         .wiersz = CLng(r.row)
-                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .tmc = CStr(CStr(r.offset(0, EVO.E_MASTER_TMC - 1).Value))
                         
-                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         On Error Resume Next
-                        .puDate = CDate(r.Offset(0, EVO.G_DHEF_COL - 1).Value)
+                        .puDate = CDate(r.offset(0, EVO.G_DHEF_COL - 1).Value)
                         On Error Resume Next
-                        .delDate = CDate(r.Offset(0, EVO.G_DHAS_COL - 1).Value)
+                        .delDate = CDate(r.offset(0, EVO.G_DHAS_COL - 1).Value)
                         .isPast = CBool(operacja.isThisLineIsPast2(.puDate))
                         
                     End With
@@ -1952,7 +2378,94 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                 End If
             End If
             
-            Set r = r.Offset(1, 0)
+            Set r = r.offset(1, 0)
+        Loop Until CStr(r) = ""
+        
+        
+    ElseIf dwa = E_COPY_HANDLER_BY_BB Then
+    
+
+        Set pns2 = New Dictionary
+        
+        Do
+        
+            If r.EntireRow.Hidden Then
+                ' no operation req for filter out data!
+            Else
+            
+            
+                Debug.Print r.Value & " " & r.row
+            
+                strTempPn = CStr(r.Value)
+                strTempCoforInner = CStr(CStr(r.offset(0, EVO.G_COFOR_VENDEUR_COL - 1).Value))
+                strTempCoforInner = operacja.adjustStringCofor(CStr(strTempCoforInner))
+                
+                strTempPnAndCofor = strTempPn & "_" & strTempCoforInner
+                
+                If Not pns2.Exists(strTempPnAndCofor) Then
+                
+                
+                    Set linesIter = Nothing
+                    Set linesIter = New Dictionary
+                    Set thisLine = New LineItem
+                    
+                    With thisLine
+                        .pn = strTempPn
+                        .cofor = strTempCoforInner
+                        ' !!!
+                        Set .masterRng = r
+                        '
+                        .wiersz = CLng(r.row)
+                        .tmc = CStr(CStr(r.offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        ' E_MASTER_3_Echeanciers_regroupés_par_TMC
+                        .tmc2 = CStr(r.offset(0, EVO.E_MASTER_3_Echeanciers_regroupés_par_TMC - 1).Value)
+                        .bb = CStr(r.offset(0, EVO.E_MASTER_3_Echeanciers_regroupés_par_TMC - 1).Value)
+                        
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
+                        On Error Resume Next
+                        .puDate = CDate(r.offset(0, EVO.G_DHEF_COL - 1).Value)
+                        On Error Resume Next
+                        .delDate = CDate(r.offset(0, EVO.G_DHAS_COL - 1).Value)
+                        .isPast = CBool(operacja.isThisLineIsPast2(.puDate))
+                        
+                    End With
+                    
+                    linesIter.Add r.row, thisLine
+                    pns2.Add strTempPnAndCofor, linesIter
+                Else
+                
+                    Set linesIter = pns2(strTempPnAndCofor)
+                    Set thisLine = New LineItem
+                
+                    With thisLine
+                        .pn = strTempPn
+                        .cofor = strTempCoforInner
+                        ' !!!
+                        Set .masterRng = r
+                        '
+                        .wiersz = CLng(r.row)
+                        .tmc = CStr(CStr(r.offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        ' E_MASTER_3_Echeanciers_regroupés_par_TMC
+                        .tmc2 = CStr(r.offset(0, EVO.E_MASTER_3_Echeanciers_regroupés_par_TMC - 1).Value)
+                        .bb = CStr(r.offset(0, EVO.E_MASTER_3_Echeanciers_regroupés_par_TMC - 1).Value)
+                        
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
+                        On Error Resume Next
+                        .puDate = CDate(r.offset(0, EVO.G_DHEF_COL - 1).Value)
+                        On Error Resume Next
+                        .delDate = CDate(r.offset(0, EVO.G_DHAS_COL - 1).Value)
+                        .isPast = CBool(operacja.isThisLineIsPast2(.puDate))
+                        
+                    End With
+                    
+                    linesIter.Add r.row, thisLine
+                    
+                End If
+            End If
+            
+            Set r = r.offset(1, 0)
         Loop Until CStr(r) = ""
 
     ElseIf dwa = E_COPY_HANDLER_COPY_ONE Then
@@ -1969,7 +2482,7 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
             Else
         
         
-                strTempCofor = CStr(CStr(r.Offset(0, EVO.E_MASTER_cofor - 1).Value))
+                strTempCofor = CStr(CStr(r.offset(0, EVO.E_MASTER_cofor - 1).Value))
             
                 If Not cofors.Exists(strTempCofor) Then
                 
@@ -1981,18 +2494,18 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                     
                     With thisLine
                         .cofor = strTempCofor
-                        .pn = CStr(CStr(r.Offset(0, EVO.E_MASTER_Reference - 1).Value))
+                        .pn = CStr(CStr(r.offset(0, EVO.E_MASTER_Reference - 1).Value))
                         ' !!!
                         Set .masterRng = r
                         '
                         .wiersz = CLng(r.row)
-                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
-                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .tmc = CStr(CStr(r.offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         .isPast = CBool(operacja.isThisLineIsPast(CLng(.yyyycw)))
                         
                         ' new one starting from 0.85
-                        .tmc2 = CStr(CStr(r.Offset(0, EVO.E_MASTER_3_Echeanciers_regroupés_par_TMC - 1).Value))
+                        .tmc2 = CStr(CStr(r.offset(0, EVO.E_MASTER_3_Echeanciers_regroupés_par_TMC - 1).Value))
                     End With
                     
                     linesIter.Add r.row, thisLine
@@ -2008,19 +2521,19 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                     
                     With thisLine
                         .cofor = strTempCofor
-                        .pn = CStr(CStr(r.Offset(0, EVO.E_MASTER_Reference - 1).Value))
+                        .pn = CStr(CStr(r.offset(0, EVO.E_MASTER_Reference - 1).Value))
                         ' !!!
                         Set .masterRng = r
                         '
                         .wiersz = CLng(r.row)
-                        .tmc = CStr(CStr(r.Offset(0, EVO.E_MASTER_TMC - 1).Value))
-                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.Offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
+                        .tmc = CStr(CStr(r.offset(0, EVO.E_MASTER_TMC - 1).Value))
+                        .yyyycw = CLng(operacja.calculateYYYYCW(CStr(CStr(r.offset(0, EVO.E_MASTER_ECHANCIER_ONL_S - 1).Value))))
                         .monday = CDate(operacja.getMondayFromYYYYCW(CLng(.yyyycw)))
                         .isPast = CBool(operacja.isThisLineIsPast(CLng(.yyyycw)))
                         
                         
                         ' new one starting from 0.85
-                        .tmc2 = CStr(CStr(r.Offset(0, EVO.E_MASTER_3_Echeanciers_regroupés_par_TMC - 1).Value))
+                        .tmc2 = CStr(CStr(r.offset(0, EVO.E_MASTER_3_Echeanciers_regroupés_par_TMC - 1).Value))
                         
                     End With
                     
@@ -2031,7 +2544,7 @@ Private Sub initAllDictionaries(dwa As E_COPY_HANDLER_INIT)
                 End If
             End If
         
-            Set r = r.Offset(1, 0)
+            Set r = r.offset(1, 0)
         Loop Until CStr(r) = ""
         
         

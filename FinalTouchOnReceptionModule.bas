@@ -111,15 +111,15 @@ Private Function defineTiming(sh1 As Worksheet, Optional ycw As String) As Colle
         ElseIf ycw = "" Then
         
             Do
-                If ir.Offset(0, EVO.E_MB51_NEW_CW - 1).Value Like "*CW*" Then
-                    If Not dic.Exists(CStr(ir.Offset(0, EVO.E_MB51_NEW_CW - 1).Value)) Then
-                        dic.Add CStr(ir.Offset(0, EVO.E_MB51_NEW_CW - 1).Value), 1
+                If ir.offset(0, EVO.E_MB51_NEW_CW - 1).Value Like "*CW*" Then
+                    If Not dic.Exists(CStr(ir.offset(0, EVO.E_MB51_NEW_CW - 1).Value)) Then
+                        dic.Add CStr(ir.offset(0, EVO.E_MB51_NEW_CW - 1).Value), 1
                     Else
                         'dic(CStr(ir.Offset(0, EVO.E_MB51_CW - 1).Value)) = _
                         '    dic(CStr(ir.Offset(0, EVO.E_MB51_CW - 1).Value)) + 1
                     End If
                 End If
-                Set ir = ir.Offset(1, 0)
+                Set ir = ir.offset(1, 0)
             Loop Until Trim(ir.Value) = ""
             
         
@@ -140,12 +140,12 @@ Private Function defineTiming(sh1 As Worksheet, Optional ycw As String) As Colle
             ' going directly to timing collection
             Do
             
-                If ir.Offset(0, EVO.E_MB51_NEW_CW - 1).Value Like "*CW*" Then
+                If ir.offset(0, EVO.E_MB51_NEW_CW - 1).Value Like "*CW*" Then
                 
-                    If ir.Offset(0, EVO.E_MB51_NEW_CW - 1).Value = CStr(ycw) Then
+                    If ir.offset(0, EVO.E_MB51_NEW_CW - 1).Value = CStr(ycw) Then
                 
-                        If Not dic.Exists(CStr(ir.Offset(0, EVO.E_MB51_NEW_CW - 1).Value)) Then
-                            dic.Add CStr(ir.Offset(0, EVO.E_MB51_NEW_CW - 1).Value), 1
+                        If Not dic.Exists(CStr(ir.offset(0, EVO.E_MB51_NEW_CW - 1).Value)) Then
+                            dic.Add CStr(ir.offset(0, EVO.E_MB51_NEW_CW - 1).Value), 1
                         Else
                             'dic(CStr(ir.Offset(0, EVO.E_MB51_CW - 1).Value)) = _
                             '    dic(CStr(ir.Offset(0, EVO.E_MB51_CW - 1).Value)) + 1
@@ -153,7 +153,7 @@ Private Function defineTiming(sh1 As Worksheet, Optional ycw As String) As Colle
                     End If
                 End If
                 
-                Set ir = ir.Offset(1, 0)
+                Set ir = ir.offset(1, 0)
                 
             Loop Until Trim(ir.Value) = ""
             
@@ -174,15 +174,15 @@ Private Function defineTiming(sh1 As Worksheet, Optional ycw As String) As Colle
         ElseIf ycw = "" Then
         
             Do
-                If ir.Offset(0, EVO.E_MB51_0_CW - 1).Value Like "*CW*" Then
-                    If Not dic.Exists(CStr(ir.Offset(0, EVO.E_MB51_0_CW - 1).Value)) Then
-                        dic.Add CStr(ir.Offset(0, EVO.E_MB51_0_CW - 1).Value), 1
+                If ir.offset(0, EVO.E_MB51_0_CW - 1).Value Like "*CW*" Then
+                    If Not dic.Exists(CStr(ir.offset(0, EVO.E_MB51_0_CW - 1).Value)) Then
+                        dic.Add CStr(ir.offset(0, EVO.E_MB51_0_CW - 1).Value), 1
                     Else
                         'dic(CStr(ir.Offset(0, EVO.E_MB51_CW - 1).Value)) = _
                         '    dic(CStr(ir.Offset(0, EVO.E_MB51_CW - 1).Value)) + 1
                     End If
                 End If
-                Set ir = ir.Offset(1, 0)
+                Set ir = ir.offset(1, 0)
             Loop Until Trim(ir.Value) = ""
             
         
@@ -203,12 +203,12 @@ Private Function defineTiming(sh1 As Worksheet, Optional ycw As String) As Colle
             ' going directly to timing collection
             Do
             
-                If ir.Offset(0, EVO.E_MB51_0_CW - 1).Value Like "*CW*" Then
+                If ir.offset(0, EVO.E_MB51_0_CW - 1).Value Like "*CW*" Then
                 
-                    If ir.Offset(0, EVO.E_MB51_0_CW - 1).Value = CStr(ycw) Then
+                    If ir.offset(0, EVO.E_MB51_0_CW - 1).Value = CStr(ycw) Then
                 
-                        If Not dic.Exists(CStr(ir.Offset(0, EVO.E_MB51_0_CW - 1).Value)) Then
-                            dic.Add CStr(ir.Offset(0, EVO.E_MB51_0_CW - 1).Value), 1
+                        If Not dic.Exists(CStr(ir.offset(0, EVO.E_MB51_0_CW - 1).Value)) Then
+                            dic.Add CStr(ir.offset(0, EVO.E_MB51_0_CW - 1).Value), 1
                         Else
                             'dic(CStr(ir.Offset(0, EVO.E_MB51_CW - 1).Value)) = _
                             '    dic(CStr(ir.Offset(0, EVO.E_MB51_CW - 1).Value)) + 1
@@ -216,7 +216,7 @@ Private Function defineTiming(sh1 As Worksheet, Optional ycw As String) As Colle
                     End If
                 End If
                 
-                Set ir = ir.Offset(1, 0)
+                Set ir = ir.offset(1, 0)
                 
             Loop Until Trim(ir.Value) = ""
             
@@ -276,156 +276,177 @@ Private Sub goThroughMb51Data(sh1 As Worksheet, out As Worksheet, coll As Collec
             If e = E_MB51_AUTO_DECISION_LAYOUT_NEW Then
             
                 'E_FINAL_TOUCH_RECEPTION_Mag = 1
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Mag - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_MAG - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Mag - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_MAG - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Mvt
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Mvt - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_MVT - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Mvt - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_MVT - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Designation_article
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Designation_article - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_DESC - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Designation_article - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_DESC - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Qte_UAc
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Qte_UAc - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_QTY - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Qte_UAc - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_QTY - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_UAc
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_UAc - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_UNX - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_UAc - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_UNX - 1).Value
                 
                 'E_FINAL_TOUCH_RECEPTION_Montant_di
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Montant_di - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_MONTANT_DI - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Montant_di - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_MONTANT_DI - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Dev
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Dev - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_DEVISE - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Dev - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_DEVISE - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_article
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_ARTICLE - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_ARTICLE - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Date_cpt
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Date_cpt - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_DATE_PIECE - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Date_cpt - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_DATE_PIECE - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Fourn
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Fourn - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_FOUR - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Fourn - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_FOUR - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Cde_achat
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Cde_achat - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_CDE_ACHAT - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Cde_achat - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_CDE_ACHAT - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_prix_Sigapp
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Sigapp - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_EXT_PCS_PRICE_IN_EUR - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Sigapp - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_EXT_PCS_PRICE_IN_EUR - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_prix_Tango
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Tango - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_TANGO_PCS_PRICE - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Tango - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_TANGO_PCS_PRICE - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Ecart
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Ecart - 1).FormulaR1C1Local = _
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Ecart - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z11").FormulaR1C1Local
                 'E_FINAL_TOUCH_RECEPTION_RU
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_RU - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_RU - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_RU - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_RU - 1).Value
                 
                 'E_FINAL_TOUCH_RECEPTION_prix_cible
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_cible - 1).FormulaR1C1Local = _
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_cible - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z12").FormulaR1C1Local
                 'E_FINAL_TOUCH_RECEPTION_Sigapp
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).FormulaR1C1Local = _
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z13").FormulaR1C1Local
                     
                 'E_FINAL_TOUCH_RECEPTION_GAP
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_GAP - 1).FormulaR1C1Local = _
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_GAP - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z21").FormulaR1C1Local
                     
                 'E_FINAL_TOUCH_RECEPTION_OKNOK
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_OKNOK - 1).FormulaR1C1Local = _
-                    ThisWorkbook.Sheets("register").Range("Z22").FormulaR1C1Local
+                If r1.offset(0, EVO.E_MB51_NEW_IS_IN_TANGO - 1).Value = "" Then
+                    r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_OKNOK - 1).FormulaR1C1Local = _
+                        ThisWorkbook.Sheets("register").Range("Z22").FormulaR1C1Local
+                Else
+                    r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_OKNOK - 1).FormulaR1C1Local = _
+                        r1.offset(0, EVO.E_MB51_NEW_IS_IN_TANGO - 1).Value
+                End If
                     
                 'E_FINAL_TOUCH_RECEPTION_Interne
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Interne - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_IS_INTERNAL - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Interne - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_IS_INTERNAL - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Sem
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_NEW_CW - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_NEW_CW - 1).Value
                 ' manager
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Manager_DA - 1).Value = "tbd"
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Manager_DA - 1).Value = "tbd"
+                
+                ' family and group
+                ' not defined
             
             ElseIf e = E_MB51_AUTO_DECISION_LAYOUT_0 Then
             
             
                 'E_FINAL_TOUCH_RECEPTION_Mag = 1
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Mag - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_MAG - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Mag - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_MAG - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Mvt
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Mvt - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_MVT - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Mvt - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_MVT - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Designation_article
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Designation_article - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_DESC - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Designation_article - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_DESC - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Qte_UAc
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Qte_UAc - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_QTY - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Qte_UAc - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_QTY - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_UAc
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_UAc - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_UN - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_UAc - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_UN - 1).Value
                 
                 'E_FINAL_TOUCH_RECEPTION_Montant_di
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Montant_di - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_MONTANT_DI - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Montant_di - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_MONTANT_DI - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Dev
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Dev - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_DEVISE - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Dev - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_DEVISE - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_article
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_ARTICLE - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_article - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_ARTICLE - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Date_cpt
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Date_cpt - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_DATE_PIECE - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Date_cpt - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_DATE_PIECE - 1).Value
                     
                     
                 ' Application.Calculation = xlCalculationManual
                     
                 'E_FINAL_TOUCH_RECEPTION_Fourn
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Fourn - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_FOUR - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Fourn - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_FOUR - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Cde_achat
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Cde_achat - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_CDE_ACHAT - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Cde_achat - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_CDE_ACHAT - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_prix_Sigapp
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Sigapp - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_EXT_PCS_PRICE_IN_EUR - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Sigapp - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_EXT_PCS_PRICE_IN_EUR - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_prix_Tango
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Tango - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_TANGO_PCS_PRICE - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_Tango - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_TANGO_PCS_PRICE - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Ecart
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Ecart - 1).FormulaR1C1Local = _
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Ecart - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z11").FormulaR1C1Local
                 'E_FINAL_TOUCH_RECEPTION_RU
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_RU - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_RU - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_RU - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_RU - 1).Value
                 
                 'E_FINAL_TOUCH_RECEPTION_prix_cible
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_cible - 1).FormulaR1C1Local = _
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_prix_cible - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z12").FormulaR1C1Local
                 'E_FINAL_TOUCH_RECEPTION_Sigapp
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).FormulaR1C1Local = _
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sigapp - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z13").FormulaR1C1Local
                     
                     
                 'E_FINAL_TOUCH_RECEPTION_GAP
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_GAP - 1).FormulaR1C1Local = _
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_GAP - 1).FormulaR1C1Local = _
                     ThisWorkbook.Sheets("register").Range("Z21").FormulaR1C1Local
                     
                 'E_FINAL_TOUCH_RECEPTION_OKNOK
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_OKNOK - 1).FormulaR1C1Local = _
-                    ThisWorkbook.Sheets("register").Range("Z22").FormulaR1C1Local
+                If r1.offset(0, EVO.E_MB51_0_IS_IN_TANGO - 1).Value = "" Then
+                    r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_OKNOK - 1).FormulaR1C1Local = _
+                        ThisWorkbook.Sheets("register").Range("Z22").FormulaR1C1Local
+                Else
+                    r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_OKNOK - 1).FormulaR1C1Local = _
+                        r1.offset(0, EVO.E_MB51_0_IS_IN_TANGO - 1).Value
+                End If
                     
                     
                 'E_FINAL_TOUCH_RECEPTION_Interne
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Interne - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_IS_INTERNAL - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Interne - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_IS_INTERNAL - 1).Value
                 'E_FINAL_TOUCH_RECEPTION_Sem
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_CW - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Sem - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_CW - 1).Value
                 ' manager
-                r2.Offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Manager_DA - 1).Value = _
-                    r1.Offset(0, EVO.E_MB51_0_MANAGER_DA - 1).Value
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION_Manager_DA - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_MANAGER_DA - 1).Value
+                    
+                    
+                ' new 092
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION.E_FINAL_TOUCH_RECEPTION_FAMILY - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_FAMILY - 1).Value
+                    
+                r2.offset(0, EVO.E_FINAL_TOUCH_RECEPTION.E_FINAL_TOUCH_RECEPTION_GROUP - 1).Value = _
+                    r1.offset(0, EVO.E_MB51_0_GROUP - 1).Value
             Else
             
                 MsgBox "Critical auto decision on reception output layout!", vbCritical
@@ -434,12 +455,12 @@ Private Sub goThroughMb51Data(sh1 As Worksheet, out As Worksheet, coll As Collec
             
             ' -------------------------------------
             
-            Set r2 = r2.Offset(1, 0)
+            Set r2 = r2.offset(1, 0)
         End If
         
         ' -----------------------------------------
         
-        Set r1 = r1.Offset(1, 0)
+        Set r1 = r1.offset(1, 0)
     Loop Until Trim(r1.Value) = ""
     
     
@@ -515,7 +536,7 @@ Private Sub fillLabelsForReceptions(sh2 As Worksheet)
         sh2.Cells(1, iter).Font.Color = finalReceptionValidationRef.Font.Color
 
         iter = iter + 1
-        Set finalReceptionValidationRef = finalReceptionValidationRef.Offset(0, 1)
+        Set finalReceptionValidationRef = finalReceptionValidationRef.offset(0, 1)
     Loop Until Trim(finalReceptionValidationRef.Value) = ""
 End Sub
 

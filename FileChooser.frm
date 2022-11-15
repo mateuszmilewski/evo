@@ -65,6 +65,14 @@ Private Sub BtnCopy_Click()
         innerAfterTP04Logic Me.ComboBoxMaster.Value, Me.ComboBoxFeed.Value
     ElseIf Me.scenarioType = E_FORM_SCENATIO_PRICE_MATCHING_FOR_SQ01 Then
         innerAfterSQ01Logic Me.ComboBoxMaster.Value, Me.ComboBoxFeed.Value
+    ElseIf Me.scenarioType = E_FORM_SCENARIO_CLEAR_COLORS Then
+        ' nop
+    ElseIf Me.scenarioType = E_FORM_SCENARIO_CLEAR_COMMENTS Then
+        ' nop
+    ElseIf Me.scenarioType = E_FORM_SCENARIO_OPT_BY_BB Then
+        ' nop
+    ElseIf Me.scenarioType = E_FORM_SCENARIO_OPT_BY_TMC Then
+        ' nop
     Else
         MsgBox "Not possible - no such scenario defined!"
     End If
@@ -82,7 +90,35 @@ Private Sub BtnValid_Click()
     Dim answer As Boolean
     answer = True
     
-    If Me.scenarioType = E_FORM_SCENATIO_PRICE_MATCHING_FOR_SQ01 Then
+    
+    If (Me.scenarioType = E_FORM_SCENARIO_CLEAR_COLORS) Or (Me.scenarioType = E_FORM_SCENARIO_CLEAR_COMMENTS) Then
+    
+    
+        answer = v.getWorksheetForValidation(Me.ComboBoxMaster.Value, E_MASTER_PUS)
+        
+        'MsgBox "Chosen files valideted! OK!", vbInformation
+        Me.BtnCopy.Enabled = True
+        
+        If answer Then
+            ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value = Me.ComboBoxMaster.Value
+        Else
+            MsgBox "Chosen files are not in standard!", vbCritical
+        End If
+    
+    ElseIf (Me.scenarioType = E_FORM_SCENARIO_OPT_BY_BB) Or (Me.scenarioType = E_FORM_SCENARIO_OPT_BY_TMC) Then
+    
+        answer = v.getWorksheetForValidation(Me.ComboBoxMaster.Value, E_MASTER_PUS)
+        
+        'MsgBox "Chosen files valideted! OK!", vbInformation
+        Me.BtnCopy.Enabled = True
+        
+        If answer Then
+            ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value = Me.ComboBoxMaster.Value
+        Else
+            MsgBox "Chosen files are not in standard!", vbCritical
+        End If
+        
+    ElseIf Me.scenarioType = E_FORM_SCENATIO_PRICE_MATCHING_FOR_SQ01 Then
     
         answer = answer And v.getWorksheetForValidation(Me.ComboBoxFeed.Value, E_SQ01)
         answer = answer And v.getWorksheetForValidation(Me.ComboBoxMaster.Value, E_MASTER_PUS)
@@ -107,7 +143,7 @@ Private Sub BtnValid_Click()
         answer = answer And v.getWorksheetForValidation(Me.ComboBoxMaster.Value, E_MASTER_PUS)
         
         If answer Then
-            MsgBox "Chosen files valideted! OK!", vbInformation
+            'MsgBox "Chosen files valideted! OK!", vbInformation
             Me.BtnCopy.Enabled = True
             
             
@@ -127,7 +163,7 @@ Private Sub BtnValid_Click()
         answer = answer And v.getWorksheetForValidation(Me.ComboBoxMaster.Value, E_MASTER_PUS)
         
         If answer Then
-            MsgBox "Chosen files valideted! OK!", vbInformation
+            'MsgBox "Chosen files valideted! OK!", vbInformation
             Me.BtnCopy.Enabled = True
             
             

@@ -84,7 +84,7 @@ Public Sub innerAddLine()
         
     
     ' artificial limitation - only two possible!
-    If howManyLinesAlready < 3 Then
+    'If howManyLinesAlready < 3 Then
         
             
         Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxMag0" & CStr(howManyLinesAlready + 1), True)
@@ -116,19 +116,14 @@ Public Sub innerAddLine()
         tbxMvt2.Value = "102"
         
         Me.Height = Me.Height + 18
-    End If
+    'End If
 
 End Sub
 
 
 Private Sub AddLineBtn_Click()
 
-    Dim c As Control
-    Set c = Nothing
-    On Error Resume Next
-    Set c = Me.Controls("TextBoxMag02")
-        
-    If c Is Nothing Then innerAddLine
+    innerAddLine
 
 End Sub
 
@@ -149,28 +144,28 @@ Private Sub ComboBoxPRE_DEF_Change()
     Set rr = ThisWorkbook.Sheets("register").Range("AD2")
     
     Do
-        If CStr(rr.Offset(0, 1).Value) = CStr(tmp) Then
+        If CStr(rr.offset(0, 1).Value) = CStr(tmp) Then
             On Error Resume Next
-            Me.TextBoxMag01.Value = rr.Offset(0, 2).Value
+            Me.TextBoxMag01.Value = rr.offset(0, 2).Value
             'On Error Resume Next
             'Me.TextBoxMag02.Value = rr.Offset(0, 3).Value
             For Each c In cs
             
                 If c.name = "TextBoxMag02" Then
-                    c.Value = rr.Offset(0, 3).Value
+                    c.Value = rr.offset(0, 3).Value
                     Exit For
                 End If
             Next c
             
             
             ' P81  for P2QO for example!
-            Me.TxtBoxPricePattern.Value = rr.Offset(0, 4).Value
+            Me.TxtBoxPricePattern.Value = rr.offset(0, 4).Value
             Me.TxtBoxProjectNameAlias.Value = CStr(tmp)
             
             Exit Do
             
         End If
-        Set rr = rr.Offset(1, 0)
+        Set rr = rr.offset(1, 0)
     Loop Until Trim(rr.Value) = ""
     
 End Sub
@@ -194,6 +189,8 @@ Private Sub SubmitBtn_Click()
     Dim alias As String
     alias = Me.TxtBoxProjectNameAlias.Value
     Dim divForInterrocom As String
+    
+    ' new xx??xx - new logic then
     divForInterrocom = Me.TxtBoxPricePattern.Value
     
     
@@ -322,6 +319,10 @@ Private Sub SubmitBtn_Click()
         
         currentStep = E_RECEPTION_REPORT_STEP_MATCH_WITH_INTERROCOM
         runMatchingLogicOnTango mb51_output, lean_tango, True, divForInterrocom
+        
+        
+        ' new step - taking info from TP04 if there is no tango price
+        innerAdjustSq01DataForReception mb51_output, Nothing
         
         currentStep = E_RECEPTION_REPORT_STEP_FINAL_TOUCH
         innerFinalTouchOnReceptionReport mb51_output, True, Me.TextBoxYYYYCW.Value

@@ -129,3 +129,20 @@ Global Const G_COL_IS_INTERNAL_GREEN_LIGHT = 21
 Global Const G_COL_IS_TANGO_GREEN_LIGHT = 22
 
 
+
+
+Public Function calcUnSpecial(param As Variant) As Double
+    calcUnSpecial = 1#
+    
+    Dim regRef As Range
+    Set regRef = ThisWorkbook.Sheets("register").Range("UN_REF")
+    
+    Do
+        If CStr(regRef.Value) = CStr(param) Then
+            calcUnSpecial = CDbl(regRef.offset(0, 1).Value)
+            Exit Do
+        End If
+        Set regRef = regRef.offset(1, 0)
+    Loop Until Trim(regRef.Value) = ""
+End Function
+

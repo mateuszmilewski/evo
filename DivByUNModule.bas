@@ -37,9 +37,9 @@ Public Function dividerByUn(unRng As Range) As Double
     
     Do
         If CStr(unRng) = CStr(refFromReg) Then
-            dividerByUn = CDbl(refFromReg.Offset(0, 1))
+            dividerByUn = CDbl(refFromReg.offset(0, 1))
             Exit Function
         End If
-        Set refFromReg = refFromReg.Offset(1, 0)
+        Set refFromReg = refFromReg.offset(1, 0)
     Loop Until CStr(refFromReg) = ""
 End Function

@@ -88,3 +88,11 @@ Private Function checkIfYouCanDelete(sh As Worksheet) As Boolean
     
     checkIfYouCanDelete = False
 End Function
+
+
+
+
+
+
+
+

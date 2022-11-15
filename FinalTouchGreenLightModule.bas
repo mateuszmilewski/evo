@@ -96,15 +96,15 @@ Private Function defineTimingInGreenLight(sh1 As Worksheet, auto1 As Boolean) As
     Set ir = sh1.Cells(2, 1)
     
     Do
-        If ir.Offset(0, EVO.E_ADJUSTED_SQ01_CW - 1).Value Like "*CW*" Or ir.Offset(0, EVO.E_ADJUSTED_SQ01_CW - 1).Value Like "*S*/*" Then
-            If Not dic.Exists(CStr(ir.Offset(0, EVO.E_ADJUSTED_SQ01_CW - 1).Value)) Then
-                dic.Add CStr(ir.Offset(0, EVO.E_ADJUSTED_SQ01_CW - 1).Value), 1
+        If ir.offset(0, EVO.E_ADJUSTED_SQ01_CW - 1).Value Like "*CW*" Or ir.offset(0, EVO.E_ADJUSTED_SQ01_CW - 1).Value Like "*S*/*" Then
+            If Not dic.Exists(CStr(ir.offset(0, EVO.E_ADJUSTED_SQ01_CW - 1).Value)) Then
+                dic.Add CStr(ir.offset(0, EVO.E_ADJUSTED_SQ01_CW - 1).Value), 1
             Else
                 'dic(CStr(ir.Offset(0, EVO.E_MB51_CW - 1).Value)) = _
                 '    dic(CStr(ir.Offset(0, EVO.E_MB51_CW - 1).Value)) + 1
             End If
         End If
-        Set ir = ir.Offset(1, 0)
+        Set ir = ir.offset(1, 0)
     Loop Until Trim(ir.Value) = ""
     
 
@@ -175,76 +175,86 @@ Private Sub goThroughTP04Data(sh1 As Worksheet, out As Worksheet, coll As Collec
             
             For x = EVO.E_ADJUSTED_SQ01_Reference To EVO.E_ADJUSTED_SQ01_OKNOK
             
-                r2.Offset(0, x - 1).Value = r1.Offset(0, x - 1).Value
+                r2.offset(0, x - 1).Value = r1.offset(0, x - 1).Value
             Next x
             
             'E_GREEN_LIGHT_TANGO_PRICE
-            r2.Offset(0, E_GREEN_LIGHT_TANGO_PRICE - 1).Value = _
-                r1.Offset(0, EVO.E_ADJUSTED_SQ01_TANGO_PCS_PRICE - 1).Value
+            r2.offset(0, E_GREEN_LIGHT_TANGO_PRICE - 1).Value = _
+                r1.offset(0, EVO.E_ADJUSTED_SQ01_TANGO_PCS_PRICE - 1).Value
             
             'E_GREEN_LIGHT_TANGO_RATE
-            r2.Offset(0, E_GREEN_LIGHT_TANGO_RATE - 1).FormulaR1C1Local = _
+            r2.offset(0, E_GREEN_LIGHT_TANGO_RATE - 1).FormulaR1C1Local = _
                 ThisWorkbook.Sheets("register").Range("Z14").FormulaR1C1Local
                 
             'E_GREEN_LIGHT_TANGO_OKNOK
-            r2.Offset(0, E_GREEN_LIGHT_TANGO_OKNOK - 1).FormulaR1C1Local = _
+            r2.offset(0, E_GREEN_LIGHT_TANGO_OKNOK - 1).FormulaR1C1Local = _
                 ThisWorkbook.Sheets("register").Range("Z15").FormulaR1C1Local
                 
             'E_GREEN_LIGHT_MANAGER
-            r2.Offset(0, E_GREEN_LIGHT_MANAGER - 1).Value = _
-                r1.Offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_DA - 1).Value
+            r2.offset(0, E_GREEN_LIGHT_MANAGER - 1).Value = _
+                r1.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_DA - 1).Value
             
             'E_GREEN_LIGHT_Spending_Sigapp
-            r2.Offset(0, E_GREEN_LIGHT_Spending_sigapp - 1).FormulaR1C1Local = _
+            r2.offset(0, E_GREEN_LIGHT_Spending_sigapp - 1).FormulaR1C1Local = _
                 ThisWorkbook.Sheets("register").Range("Z16").FormulaR1C1Local
             
             'E_GREEN_LIGHT_Spending_Target
-            r2.Offset(0, E_GREEN_LIGHT_Spending_Target - 1).FormulaR1C1Local = _
+            r2.offset(0, E_GREEN_LIGHT_Spending_Target - 1).FormulaR1C1Local = _
                 ThisWorkbook.Sheets("register").Range("Z17").FormulaR1C1Local
                 
             'E_GREEN_LIGHT_Gap
-            r2.Offset(0, E_GREEN_LIGHT_Gap - 1).FormulaR1C1Local = _
+            r2.offset(0, E_GREEN_LIGHT_Gap - 1).FormulaR1C1Local = _
                 ThisWorkbook.Sheets("register").Range("Z18").FormulaR1C1Local
                 
             'E_GREEN_LIGHT_rate
-            r2.Offset(0, E_GREEN_LIGHT_rate - 1).FormulaR1C1Local = _
+            r2.offset(0, E_GREEN_LIGHT_rate - 1).FormulaR1C1Local = _
                 ThisWorkbook.Sheets("register").Range("Z19").FormulaR1C1Local
                 
             'E_GREEN_LIGHT_INTERNAL
-            r2.Offset(0, EVO.E_GREEN_LIGHT_IS_INTERNAL - 1).Value = _
-                r1.Offset(0, EVO.E_ADJUSTED_SQ01_IS_INTERNAL - 1).Value
+            r2.offset(0, EVO.E_GREEN_LIGHT_IS_INTERNAL - 1).Value = _
+                r1.offset(0, EVO.E_ADJUSTED_SQ01_IS_INTERNAL - 1).Value
             
             'E_GREEN_LIGHT_WITH_INDEX
-            r2.Offset(0, EVO.E_GREEN_LIGHT_WITH_INDEX - 1).Value = _
-                r1.Offset(0, EVO.E_ADJUSTED_SQ01_WITH_INDEX - 1).Value
+            r2.offset(0, EVO.E_GREEN_LIGHT_WITH_INDEX - 1).Value = _
+                r1.offset(0, EVO.E_ADJUSTED_SQ01_WITH_INDEX - 1).Value
             
             'E_GREEN_LIGHT_IS_IN_TANGO
-            r2.Offset(0, E_GREEN_LIGHT_IS_IN_TANGO - 1).Value = _
-                r1.Offset(0, EVO.E_ADJUSTED_SQ01_IS_IN_TANGO - 1).Value
+            r2.offset(0, E_GREEN_LIGHT_IS_IN_TANGO - 1).Value = _
+                r1.offset(0, EVO.E_ADJUSTED_SQ01_IS_IN_TANGO - 1).Value
                 
                 
                 
             ' new from 060
             ' =============================================================
             ' =============================================================
-            r2.Offset(0, EVO.E_GREEN_LIGHT_DOMAIN - 1).Value = _
-                r1.Offset(0, EVO.E_ADJUSTED_SQ01_DOMAIN - 1).Value
-            r2.Offset(0, EVO.E_GREEN_LIGHT_RU - 1).Value = _
-                r1.Offset(0, EVO.E_ADJUSTED_SQ01_RU - 1).Value
-            r2.Offset(0, EVO.E_GREEN_LIGHT_DIV - 1).Value = _
-                r1.Offset(0, EVO.E_ADJUSTED_SQ01_DIV - 1).Value
+            r2.offset(0, EVO.E_GREEN_LIGHT_DOMAIN - 1).Value = _
+                r1.offset(0, EVO.E_ADJUSTED_SQ01_DOMAIN - 1).Value
+            r2.offset(0, EVO.E_GREEN_LIGHT_RU - 1).Value = _
+                r1.offset(0, EVO.E_ADJUSTED_SQ01_RU - 1).Value
+            r2.offset(0, EVO.E_GREEN_LIGHT_DIV - 1).Value = _
+                r1.offset(0, EVO.E_ADJUSTED_SQ01_DIV - 1).Value
+            ' =============================================================
+            ' =============================================================
+            
+            ' new from 092
+            ' =============================================================
+            ' =============================================================
+            r2.offset(0, EVO.E_GREEN_LIGHT_FAMILY - 1).Value = _
+                r1.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_FAMILY - 1).Value
+            r2.offset(0, EVO.E_GREEN_LIGHT_GROUP - 1).Value = _
+                r1.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_GROUP - 1).Value
             ' =============================================================
             ' =============================================================
 
            
             ' -------------------------------------
             
-            Set r2 = r2.Offset(1, 0)
+            Set r2 = r2.offset(1, 0)
         End If
         
         ' -----------------------------------------
         
-        Set r1 = r1.Offset(1, 0)
+        Set r1 = r1.offset(1, 0)
     Loop Until Trim(r1.Value) = ""
     
     
@@ -296,7 +306,7 @@ Private Sub fillLabelsForGreenLight(sh2 As Worksheet)
         sh2.Cells(1, iter).Font.Bold = True
 
         iter = iter + 1
-        Set finalValidationRef = finalValidationRef.Offset(0, 1)
+        Set finalValidationRef = finalValidationRef.offset(0, 1)
     Loop Until Trim(finalValidationRef.Value) = ""
 End Sub
 
@@ -319,8 +329,8 @@ Public Function valid_TP04_data(sh1 As Worksheet) As Boolean
             Exit Do
         End If
     
-        Set validationRef = validationRef.Offset(0, 1)
-        Set labelsRef = labelsRef.Offset(0, 1)
+        Set validationRef = validationRef.offset(0, 1)
+        Set labelsRef = labelsRef.offset(0, 1)
     Loop Until Trim(labelsRef.Value) = ""
     
     

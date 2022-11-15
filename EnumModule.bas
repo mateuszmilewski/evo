@@ -90,6 +90,10 @@ Public Enum E_MASTER_2_ORDER
     E_MASTER_2_ROUTE
     E_MASTER_2_ML
     E_MASTER_3_COM_SECHEL
+    'new
+    '===================================
+    E_MASTER_3_Code_Imputation_i
+    
     E_MASTER_3_Commentaires_RPO
     E_MASTER_3_VOR
     E_MASTER_3_Acteur
@@ -103,12 +107,17 @@ Public Enum E_FORM_SCENARIO_TYPE
     E_FORM_SCENARIO_KPI
     E_FORM_SCENATIO_PRICE_MATCHING_FOR_TP04
     E_FORM_SCENATIO_PRICE_MATCHING_FOR_SQ01
+    E_FORM_SCENARIO_OPT_BY_TMC
+    E_FORM_SCENARIO_OPT_BY_BB
+    E_FORM_SCENARIO_CLEAR_COLORS
+    E_FORM_SCENARIO_CLEAR_COMMENTS
 End Enum
 
 
 Public Enum E_COPY_HANDLER_INIT
     E_COPY_HANDLER_COPY_ONE = 1
     E_COPY_HANDLER_BY_TMC_OPT
+    E_COPY_HANDLER_BY_BB
     E_COPY_HANDLER_FOR_PIVOT_CREATION
 End Enum
 
@@ -304,6 +313,10 @@ Public Enum E_FROM_SQ01_QUASI_TP04
     E_FROM_SQ01_QUASI_TP04_SUM
     E_FROM_SQ01_QUASI_TP04_UNITE2_EMPTY
     E_FROM_SQ01_QUASI_TP04_CURRENCY
+    E_FROM_SQ01_QUASI_TP04_II_RATE_UNIT_VALUE
+    E_FROM_SQ01_QUASI_TP04_II_RATE_TO_EUR
+    E_FROM_SQ01_QUASI_TP04_II_RATE_CALCED_SUM
+    
 End Enum
 
 
@@ -415,6 +428,8 @@ Public Enum E_ORDER_MB51_0
     E_MB51_0_CW
     E_MB51_0_MANAGER_DA
     E_MB51_0_RU
+    E_MB51_0_FAMILY
+    E_MB51_0_GROUP
 End Enum
 
 
@@ -524,6 +539,9 @@ Public Enum E_ADJUSTED_SQ01
     E_ADJUSTED_SQ01_DIV
     ' 061
     E_ADJUSTED_SQ01_MANAGER_DA
+    '092
+    E_ADJUSTED_SQ01_MANAGER_FAMILY
+    E_ADJUSTED_SQ01_MANAGER_GROUP
 End Enum
 
 
@@ -551,6 +569,8 @@ Public Enum E_FINAL_TOUCH_RECEPTION
     E_FINAL_TOUCH_RECEPTION_Interne
     E_FINAL_TOUCH_RECEPTION_Sem
     E_FINAL_TOUCH_RECEPTION_Manager_DA
+    E_FINAL_TOUCH_RECEPTION_FAMILY
+    E_FINAL_TOUCH_RECEPTION_GROUP
 End Enum
 
 
@@ -590,6 +610,9 @@ Public Enum E_GREEN_LIGHT
     E_GREEN_LIGHT_DOMAIN
     E_GREEN_LIGHT_RU
     E_GREEN_LIGHT_DIV
+    ' family and grou[
+    E_GREEN_LIGHT_FAMILY
+    E_GREEN_LIGHT_GROUP
 End Enum
 
 
@@ -616,6 +639,8 @@ Public Enum E_MANAGERS_DA
     E_MANAGERS_DA_ARTICLE = 1
     E_MANAGERS_DA_ACHETEUR
     E_MANAGERS_DA_RU
+    E_MANAGERS_DA_FAMILY
+    E_MANAGERS_DA_GROUP
 End Enum
 
 
@@ -640,13 +665,18 @@ End Enum
 '.Cells(7, 2).Value = "number ref without Tango price"
 '.Cells(8, 2).Value = "rate  : Mass Sigapp pre-serial price / initial price (without Tango price)"
 '
-'.Cells(10, 2).Value = "Mass € Sigapp reception (With Tango price)"
-'.Cells(11, 2).Value = "number ref with Tango price"
-'.Cells(12, 2).Value = "Including number no price * 1"
+'.Cells(11, 2).Value = "Mass € Sigapp reception (With Tango price)"
+'.Cells(12, 2).Value = "number ref with Tango price"
+'.Cells(13, 2).Value = "Including number no price * 1"
 '
-'.Cells(14, 2).Value = "Mass € target Price * 1"
-'.Cells(15, 2).Value = "rate  : Mass reception Sigapp price /target price * 1 (with Tango price)"
-'.Cells(16, 2).Value = "Mass € gap Sigapp price / price *1"
+'.Cells(15, 2).Value = "Mass € target Price * 1"
+'.Cells(16, 2).Value = "rate  : Mass reception Sigapp price /target price * 1 (with Tango price)"
+'.Cells(17, 2).Value = "Mass € gap Sigapp price / price *1"
+
+' NEW NEW
+'.Cells(19, 2).Value rate  : Mass reception Sigapp price /TARGET price * 1
+'.Cells(20, 2).ValueREAL Mass € gap Sigapp price / price *1
+
 Public Enum E_MODELESS_LEAF_ORDER
     E_MODELESS_LEAF_ORDER_DATE = 2
     E_MODELESS_LEAF_ORDER_MASS_EUR_INTERNAL = 3
@@ -655,7 +685,7 @@ Public Enum E_MODELESS_LEAF_ORDER
     E_MODELESS_LEAF_ORDER_PERC_MASS_EUR_WO_TANGO
     E_MODELESS_LEAF_ORDER_NUM_OF_WO_TANGO
     E_MODELESS_LEAF_ORDER_RATE_WO_TANGO
-    E_MODELESS_LEAF_ORDER_EMPTY_1
+    E_MODELESS_LEAF_ORDER_EMPTY_1 ' WO TANGO TARGET PRICE BY INITIAL PRICE
     E_MODELESS_LEAF_ORDER_MASS_EUR_W_TANGO
     E_MODELESS_LEAF_ORDER_NUM_OF_W_TANGO
     E_MODELESS_LEAF_ORDER_NUM_OF_W_TANGO_NOK
@@ -663,4 +693,35 @@ Public Enum E_MODELESS_LEAF_ORDER
     E_MODELESS_LEAF_ORDER_MASS_EUR_TARGET_PRICE
     E_MODELESS_LEAF_ORDER_RATE
     E_MODELESS_LEAF_ORDER_MASS_EUR_GAP
+    E_MODELESS_LEAF_ORDER_EMPTY_3
+    E_MODELESS_LEAF_ORDER_RATE_FINAL
+    E_MODELESS_LEAF_ORDER_MASS_EUR_GAP_FINAL
+End Enum
+
+
+
+
+' TAW
+Public Enum eTawQuery1
+    eTawQuery1MAI = 1
+    eTawQuery2PLT
+    eTawQuery3PLTNM
+    eTawQuery4DOM
+    eTawQuery5DOC
+    eTawQuery6SP
+    eTawQuery7AFF
+    eTawQuery8REF
+    eTawQuery9REFNM
+    eTawQuery10DEBUT
+    eTawQuery11FIN
+    eTawQuery12A1
+    eTawQuery13CODD
+    eTawQuery14RU
+    eTawQuery15VALID
+    eTawQuery16FOUR
+    eTawQuery17DESC
+    eTawQuery18UN
+    eTawQuery19SUM
+    eTawQuery20QTY
+    eTawQuery21Z
 End Enum

@@ -49,7 +49,16 @@ Public Sub copyData(ictrl As IRibbonControl)
         
         For Each w In Application.Workbooks
             .ComboBoxFeed.addItem w.name
+            
+            If checkIfPotentialCPLBase(w) Then
+                .ComboBoxFeed.Value = w.name
+            End If
+            
             .ComboBoxMaster.addItem w.name
+            
+            If checkIfPotentialPUS(w) Then
+                .ComboBoxMaster.Value = w.name
+            End If
         Next w
         
         
@@ -58,6 +67,41 @@ Public Sub copyData(ictrl As IRibbonControl)
     
     MsgBox "GOTOWE!", vbInformation
 End Sub
+
+Private Function checkIfPotentialCPLBase(w1 As Workbook) As Boolean
+    checkIfPotentialCPLBase = False
+    
+    
+    Dim tmpr As Range
+    Set tmpr = Nothing
+    On Error Resume Next
+    Set tmpr = w1.Sheets("MAIN").Range("B1")
+    
+    If Not tmpr Is Nothing Then
+        If tmpr.Value = "DESIGNATION" Then
+            checkIfPotentialCPLBase = True
+        End If
+    End If
+    
+End Function
+
+Private Function checkIfPotentialPUS(w1 As Workbook) As Boolean
+    checkIfPotentialPUS = False
+    
+    ' ECHANCIER ONL (semaine)
+    
+    Dim tmpr As Range
+    Set tmpr = Nothing
+    On Error Resume Next
+    Set tmpr = w1.Sheets("BASE").Range("E2")
+    
+    If Not tmpr Is Nothing Then
+        If tmpr.Value = "ECHANCIER ONL (semaine)" Then
+            checkIfPotentialPUS = True
+        End If
+    End If
+    
+End Function
 
 Public Sub innerCopyData(masterFileName, feedFileName, Optional sh As StatusHandler)
 
@@ -120,13 +164,165 @@ End Sub
 
 
 
+' optimise Dates By TMC (depracated)
+' ----------------------------------------------------------
 
 Public Sub optimiseDatesByTMC(ictrl As IRibbonControl)
 
+
+    ' really now?
+    ' ----------------------------------------------
+    
+    Dim w As Workbook
+    
+    With FileChooser
+        .scenarioType = E_FORM_SCENARIO_OPT_BY_TMC
+        .BtnCopy.Enabled = False
+        .BtnValid.Enabled = True
+        
+        .ComboBoxFeed.Clear
+        .ComboBoxMaster.Clear
+        
+        
+        For Each w In Application.Workbooks
+            ' .ComboBoxFeed.addItem w.name
+            .ComboBoxMaster.addItem w.name
+        Next w
+        
+        
+        .show
+    End With
+    
+
     innerOptimiseData
+    
+    
+    ThisWorkbook.Save
     
     MsgBox "GOTOWE!", vbInformation
 End Sub
+
+
+' optimiseDatesBy_BB ( NEW - starting from EVO 120 - NEW )
+' ----------------------------------------------------------
+
+Public Sub optimiseDatesBy_BB(ictrl As IRibbonControl)
+
+
+    ' really now?
+    ' Echéanciers regroupés par TMC - kolumna BB
+    ' ----------------------------------------------
+    
+    Dim w As Workbook
+    
+    With FileChooser
+        .scenarioType = E_FORM_SCENARIO_OPT_BY_BB
+        .BtnCopy.Enabled = False
+        .BtnValid.Enabled = True
+        
+        .ComboBoxFeed.Clear
+        ' .ComboBoxFeed.Enabled = False
+        .ComboBoxMaster.Clear
+        
+        
+        For Each w In Application.Workbooks
+            ' .ComboBoxFeed.addItem w.name
+            .ComboBoxMaster.addItem w.name
+        Next w
+        
+        
+        .show
+    End With
+    
+
+    innerOptimiseDatesByBB
+    
+    
+    ThisWorkbook.Save
+    
+    MsgBox "GOTOWE!", vbInformation
+End Sub
+
+
+
+Public Sub innerOptimiseDatesByBB(Optional sh As StatusHandler)
+
+
+    Application.ScreenUpdating = False
+    Application.EnableEvents = False
+    Application.Calculation = xlCalculationManual
+
+    
+    If IsMissing(sh) Or (sh Is Nothing) Then
+        Set sh = New StatusHandler
+    End If
+    
+    Dim m As Worksheet, f As Worksheet
+    'ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value
+    Dim masterFileName As String
+    'Dim feedFileName As String
+    masterFileName = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value
+    ' no need for BASE CPL
+    'feedFileName = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M2").Value
+    Set m = Workbooks(masterFileName).Sheets("BASE")
+    ' no need for BASE CPL
+    'Set f = Workbooks(feedFileName).Sheets(G_FEED_SH_MAIN)
+
+    Dim copy_h As CopyHandler
+    Set copy_h = New CopyHandler
+    copy_h.init_BB m
+    
+    copy_h.optimise_BB sh
+    
+    Application.ScreenUpdating = True
+    Application.EnableEvents = True
+    Application.Calculation = xlCalculationAutomatic
+    
+    
+    sh.hide
+    Set sh = Nothing
+
+End Sub
+
+
+
+Public Sub A1_moveDHxxFromThePast__PUS_BASE_must_be_active()
+
+
+    Application.ScreenUpdating = False
+    Application.EnableEvents = False
+    Application.Calculation = xlCalculationManual
+
+    
+
+    Dim m As Worksheet, f As Worksheet
+    'ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value
+    Dim masterFileName As String
+    'Dim feedFileName As String
+    masterFileName = ActiveWorkbook.name
+    ' masterFileName = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value
+    ' no need for BASE CPL
+    'feedFileName = ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M2").Value
+    Set m = Workbooks(masterFileName).Sheets("BASE")
+    ' no need for BASE CPL
+    'Set f = Workbooks(feedFileName).Sheets(G_FEED_SH_MAIN)
+
+    Dim copy_h As CopyHandler
+    Set copy_h = New CopyHandler
+    copy_h.init_BB m
+    
+    copy_h.moveDatesFromThePastToPresent
+    
+    Application.ScreenUpdating = True
+    Application.EnableEvents = True
+    Application.Calculation = xlCalculationAutomatic
+    
+    
+
+End Sub
+
+
+
 
 Public Sub innerOptimiseData(Optional sh As StatusHandler)
 

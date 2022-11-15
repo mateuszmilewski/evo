@@ -42,12 +42,42 @@ Attribute innerClearColors.VB_ProcData.VB_Invoke_Func = " \n14"
 '
 
 '
-    ' Windows("PICK_UP_SHEET_coforTest.xlsm").Activate
-    Dim wrk As Workbook
-    Set wrk = Nothing
-    On Error Resume Next
-    Set wrk = Workbooks(ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value)
+    Dim wrk As Workbook, tmpShBase As Worksheet
+    Dim ans1 As Variant
+    ans1 = MsgBox("Do you want to clear " & CStr(ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value) & " from background colors?", vbYesNo + vbQuestion)
     
+    Set tmpShBase = Nothing
+    
+    If ans1 = vbYes Then
+
+        ' Windows("PICK_UP_SHEET_coforTest.xlsm").Activate
+        
+        Set wrk = Nothing
+        On Error Resume Next
+        Set wrk = Workbooks(ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value)
+    Else
+        
+        For Each wrk In Application.Workbooks
+        
+            
+            For Each tmpShBase In wrk.Sheets
+                If tmpShBase.name = "BASE" Then
+                    
+                    ans1 = MsgBox("Do you want to clear " & CStr(wrk.name) & " from background colors?", vbYesNo + vbQuestion)
+                    
+                    If ans1 = vbYes Then
+                        Exit For
+                    End If
+                End If
+            Next tmpShBase
+            
+            If ans1 = vbYes Then
+                Exit For
+            End If
+            
+            
+        Next wrk
+    End If
     
     If Not wrk Is Nothing Then
     
@@ -72,7 +102,7 @@ Attribute innerClearColors.VB_ProcData.VB_Invoke_Func = " \n14"
             .PatternTintAndShade = 0
         End With
     Else
-        MsgBox "No bind with PUS master workshhet!", vbCritical
+        MsgBox "No bind with PUS master worksheet!", vbCritical
     End If
 End Sub
 
@@ -84,16 +114,47 @@ End Sub
 
 
 Sub innerRemoveAllComments()
-'
-' TestForClearingColorsMacro Macro
-'
+    '
+    ' TestForClearingColorsMacro Macro
+    '
+    
+    '
+    Dim wrk As Workbook, tmpShBase As Worksheet
+    Dim ans1 As Variant
+    ans1 = MsgBox("Do you want to clear " & CStr(ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value) & " from background colors?", vbYesNo + vbQuestion)
+    
+    Set tmpShBase = Nothing
+    
+    If ans1 = vbYes Then
 
-'
-    ' Windows("PICK_UP_SHEET_coforTest.xlsm").Activate
-    Dim wrk As Workbook
-    Set wrk = Nothing
-    On Error Resume Next
-    Set wrk = Workbooks(ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value)
+        ' Windows("PICK_UP_SHEET_coforTest.xlsm").Activate
+        
+        Set wrk = Nothing
+        On Error Resume Next
+        Set wrk = Workbooks(ThisWorkbook.Sheets(EVO.REG_SH_NM).Range("M1").Value)
+    Else
+        
+        For Each wrk In Application.Workbooks
+        
+            
+            For Each tmpShBase In wrk.Sheets
+                If tmpShBase.name = "BASE" Then
+                    
+                    ans1 = MsgBox("Do you want to clear " & CStr(wrk.name) & " from background colors?", vbYesNo + vbQuestion)
+                    
+                    If ans1 = vbYes Then
+                        Exit For
+                    End If
+                End If
+            Next tmpShBase
+            
+            If ans1 = vbYes Then
+                Exit For
+            End If
+            
+            
+        Next wrk
+    End If
     
     
     If Not wrk Is Nothing Then
@@ -118,7 +179,7 @@ Sub innerRemoveAllComments()
         
         rng.ClearComments
     Else
-        MsgBox "No bind with PUS master workshhet!", vbCritical
+        MsgBox "No bind with PUS master worksheet!", vbCritical
         
     End If
 End Sub
