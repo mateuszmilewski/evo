@@ -124,8 +124,8 @@ Public Function getWorksheetForValidation(pusWrkName As String, fileType As E_FI
                     Exit Do
                 End If
                 
-                Set vr = vr.Offset(0, 1)
-                Set srcr = srcr.Offset(0, 1)
+                Set vr = vr.offset(0, 1)
+                Set srcr = srcr.offset(0, 1)
             Loop Until vr.Value = ""
             
             ' check 2nd possibility
@@ -139,17 +139,28 @@ Public Function getWorksheetForValidation(pusWrkName As String, fileType As E_FI
                 Set vr = newRefR
                 Do
                 
-                    ' 100% must be
+                    ' 100% must be for this statement
                     If CStr(vr.Value) = CStr(srcr.Value) Then
                         ' nop required
                     Else
-                        getWorksheetForValidation = False
-                        Exit Do
+                    
+                    
+                        ' because TMC column changing the name all the time - it is req
+                        ' to have extra logic - if for Validation trying to check TMC stuff
+                        ' then just ignore what is inside - empty mask allow to name it
+                        ' however you want!
+                        If vr.Value = "TMC" Or vr.Value = "Delivery's Grouping" Then
+                            ' nop required
+                        Else
+                    
+                            getWorksheetForValidation = False
+                            Exit Do
+                        End If
                     End If
                     
                     
-                    Set vr = vr.Offset(0, 1)
-                    Set srcr = srcr.Offset(0, 1)
+                    Set vr = vr.offset(0, 1)
+                    Set srcr = srcr.offset(0, 1)
                 Loop While vr.Column < (E_MASTER_2_ML + 1) ' 48 + 1
             End If
         

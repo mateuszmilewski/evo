@@ -69,13 +69,22 @@ Public Sub runMatchingLogicOnTango(sh As Worksheet, interrocomData As Worksheet,
     
     
     
-    Dim divPattern As String
+    Dim divPattern As String, specialDivPattern As String
     divPattern = ""
+    specialDivPattern = ""
     
     
     If auto1 Then
         If divStr <> "" Then
-            divPattern = divStr
+        
+        
+            If divStr Like "xx??xx" Then
+                specialDivPattern = divStr
+                divPattern = Mid(divStr, 3, 2)
+            Else
+                divPattern = divStr
+                specialDivPattern = ""
+            End If
         End If
     Else
         On Error Resume Next
@@ -90,7 +99,7 @@ Public Sub runMatchingLogicOnTango(sh As Worksheet, interrocomData As Worksheet,
     
     
     If sh.name Like "TP04*" Then
-        Set rng = sh.Range("A2").Offset(0, EVO.E_ADJUSTED_SQ01_Reference - 1)
+        Set rng = sh.Range("A2").offset(0, EVO.E_ADJUSTED_SQ01_Reference - 1)
     Else
         Set rng = sh.Range("A2")
         
@@ -113,7 +122,7 @@ Public Sub runMatchingLogicOnTango(sh As Worksheet, interrocomData As Worksheet,
     ' and N data will be all the time the same
     
     Dim irng As Range, bottom_irng As Range, i_area As Range
-    Set irng = interrocomData.Range("A2").Offset(0, EVO.E_OUT_INTERROCOM_A - 1)
+    Set irng = interrocomData.Range("A2").offset(0, EVO.E_OUT_INTERROCOM_A - 1)
     Set bottom_irng = irng.End(xlDown)
     Set i_area = interrocomData.Range(irng, bottom_irng)
     
@@ -122,29 +131,57 @@ Public Sub runMatchingLogicOnTango(sh As Worksheet, interrocomData As Worksheet,
         For Each rng In area
         
         
-            rng.Offset(0, EVO.E_ADJUSTED_SQ01_IS_IN_TANGO - EVO.E_ADJUSTED_SQ01_Reference).Value = "NO TANGO"
+            rng.offset(0, EVO.E_ADJUSTED_SQ01_IS_IN_TANGO - EVO.E_ADJUSTED_SQ01_Reference).Value = "NO TANGO"
         
             For Each irng In i_area
             
                 If Trim(rng.Value) Like Trim(irng.Value) & "*" Then
                 
-                    If Trim(irng.Offset(0, EVO.E_OUT_INTERROCOM_REP - 1).Value) = "100" Then
+                    If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_REP - 1).Value) = "100" Then
                         
-                        If Trim(irng.Offset(0, EVO.E_OUT_INTERROCOM_DIV - 1).Value) Like "*" & CStr(divPattern) & "*" Then
+                        If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_DIV - 1).Value) Like "*" & CStr(divPattern) & "*" Then
                 
-                            rng.Offset(0, EVO.E_ADJUSTED_SQ01_IS_IN_TANGO - EVO.E_ADJUSTED_SQ01_Reference).Value = ""
-                            rng.Offset(0, EVO.E_ADJUSTED_SQ01_TANGO_PCS_PRICE - EVO.E_ADJUSTED_SQ01_Reference).Value = _
-                                irng.Offset(0, EVO.E_OUT_INTERROCOM_FINAL_PRIX - EVO.E_OUT_INTERROCOM_A).Value
+                            rng.offset(0, EVO.E_ADJUSTED_SQ01_IS_IN_TANGO - EVO.E_ADJUSTED_SQ01_Reference).Value = ""
+                            rng.offset(0, EVO.E_ADJUSTED_SQ01_TANGO_PCS_PRICE - EVO.E_ADJUSTED_SQ01_Reference).Value = _
+                                irng.offset(0, EVO.E_OUT_INTERROCOM_FINAL_PRIX - EVO.E_OUT_INTERROCOM_A).Value
                         End If
                     End If
                 End If
             Next irng
             
             
+            If rng.offset(0, EVO.E_ADJUSTED_SQ01_IS_IN_TANGO - EVO.E_ADJUSTED_SQ01_Reference).Value = "NO TANGO" Then
+                If specialDivPattern <> "" Then
+            
+            
+                    For Each irng In i_area
+                    
+                        If Trim(rng.Value) Like Trim(irng.Value) & "*" Then
+                        
+                            If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_REP - 1).Value) = "100" Then
+                                
+                                If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_DIV - 1).Value) Like "*" Then
+                        
+                                    rng.offset(0, EVO.E_ADJUSTED_SQ01_IS_IN_TANGO - EVO.E_ADJUSTED_SQ01_Reference).Value = ""
+                                    rng.offset(0, EVO.E_ADJUSTED_SQ01_TANGO_PCS_PRICE - EVO.E_ADJUSTED_SQ01_Reference).Value = _
+                                        irng.offset(0, EVO.E_OUT_INTERROCOM_FINAL_PRIX - EVO.E_OUT_INTERROCOM_A).Value
+                                End If
+                            End If
+                        End If
+                    Next irng
+                
+                
+                End If
+                
+            End If
+            
+            
             If rng.row Mod 10 = 0 Then
                 status_h.progress_increase
             End If
         Next rng
+        
+        
         
     Else
         
@@ -155,48 +192,105 @@ Public Sub runMatchingLogicOnTango(sh As Worksheet, interrocomData As Worksheet,
             If e = E_MB51_AUTO_DECISION_LAYOUT_NEW Then
         
         
-                rng.Offset(0, EVO.E_MB51_NEW_IS_IN_TANGO - EVO.E_MB51_NEW_MVT).Value = "NO TANGO"
+                rng.offset(0, EVO.E_MB51_NEW_IS_IN_TANGO - EVO.E_MB51_NEW_MVT).Value = "NO TANGO"
             
                 For Each irng In i_area
                 
-                    If Trim(rng.Offset(0, EVO.E_MB51_NEW_ARTICLE - EVO.E_MB51_NEW_MVT)) Like Trim(irng.Value) & "*" Then
+                    If Trim(rng.offset(0, EVO.E_MB51_NEW_ARTICLE - EVO.E_MB51_NEW_MVT)) Like Trim(irng.Value) & "*" Then
                     
                     
-                        If Trim(irng.Offset(0, EVO.E_OUT_INTERROCOM_REP - 1).Value) = "100" Then
+                        If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_REP - 1).Value) = "100" Then
                             
-                            If Trim(irng.Offset(0, EVO.E_OUT_INTERROCOM_DIV - 1).Value) Like "*" & CStr(divPattern) & "*" Then
+                            If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_DIV - 1).Value) Like "*" & CStr(divPattern) & "*" Then
                     
                     
-                                rng.Offset(0, EVO.E_MB51_NEW_IS_IN_TANGO - EVO.E_MB51_NEW_MVT).Value = ""
-                                rng.Offset(0, EVO.E_MB51_NEW_TANGO_PCS_PRICE - EVO.E_MB51_NEW_MVT).Value = _
-                                    irng.Offset(0, EVO.E_OUT_INTERROCOM_FINAL_PRIX - EVO.E_OUT_INTERROCOM_A).Value
+                                rng.offset(0, EVO.E_MB51_NEW_IS_IN_TANGO - EVO.E_MB51_NEW_MVT).Value = ""
+                                rng.offset(0, EVO.E_MB51_NEW_TANGO_PCS_PRICE - EVO.E_MB51_NEW_MVT).Value = _
+                                    irng.offset(0, EVO.E_OUT_INTERROCOM_FINAL_PRIX - EVO.E_OUT_INTERROCOM_A).Value
                             End If
                         End If
                     End If
                 Next irng
+                
+                
+                
+                
+                
+                If rng.offset(0, EVO.E_MB51_NEW_IS_IN_TANGO - EVO.E_MB51_NEW_MVT).Value = "NO TANGO" Then
+                
+                    If specialDivPattern <> "" Then
+            
+                        For Each irng In i_area
+                        
+                            If Trim(rng.offset(0, EVO.E_MB51_NEW_ARTICLE - EVO.E_MB51_NEW_MVT)) Like Trim(irng.Value) & "*" Then
+                            
+                            
+                                If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_REP - 1).Value) = "100" Then
+                                    
+                                    If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_DIV - 1).Value) Like "*" Then
+                            
+                            
+                                        rng.offset(0, EVO.E_MB51_NEW_IS_IN_TANGO - EVO.E_MB51_NEW_MVT).Value = ""
+                                        rng.offset(0, EVO.E_MB51_NEW_TANGO_PCS_PRICE - EVO.E_MB51_NEW_MVT).Value = _
+                                            irng.offset(0, EVO.E_OUT_INTERROCOM_FINAL_PRIX - EVO.E_OUT_INTERROCOM_A).Value
+                                    End If
+                                End If
+                            End If
+                        Next irng
+                    End If
+                
+                End If
+                
+                
                 
                 
             ElseIf e = E_MB51_AUTO_DECISION_LAYOUT_0 Then
             
-                rng.Offset(0, EVO.E_MB51_0_IS_IN_TANGO - 1).Value = "NO TANGO"
+                rng.offset(0, EVO.E_MB51_0_IS_IN_TANGO - 1).Value = "NO TANGO"
             
                 For Each irng In i_area
                 
-                    If Trim(rng.Offset(0, EVO.E_MB51_0_ARTICLE - 1)) Like Trim(irng.Value) & "*" Then
+                    If Trim(rng.offset(0, EVO.E_MB51_0_ARTICLE - 1)) Like Trim(irng.Value) & "*" Then
                     
                     
-                        If Trim(irng.Offset(0, EVO.E_OUT_INTERROCOM_REP - 1).Value) = "100" Then
+                        If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_REP - 1).Value) = "100" Then
                             
-                            If Trim(irng.Offset(0, EVO.E_OUT_INTERROCOM_DIV - 1).Value) Like "*" & CStr(divPattern) & "*" Then
+                            If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_DIV - 1).Value) Like "*" & CStr(divPattern) & "*" Then
                     
                     
-                                rng.Offset(0, EVO.E_MB51_0_IS_IN_TANGO - 1).Value = ""
-                                rng.Offset(0, EVO.E_MB51_0_TANGO_PCS_PRICE - 1).Value = _
-                                    irng.Offset(0, EVO.E_OUT_INTERROCOM_FINAL_PRIX - EVO.E_OUT_INTERROCOM_A).Value
+                                rng.offset(0, EVO.E_MB51_0_IS_IN_TANGO - 1).Value = ""
+                                rng.offset(0, EVO.E_MB51_0_TANGO_PCS_PRICE - 1).Value = _
+                                    irng.offset(0, EVO.E_OUT_INTERROCOM_FINAL_PRIX - EVO.E_OUT_INTERROCOM_A).Value
                             End If
                         End If
                     End If
                 Next irng
+                
+                
+                
+                If rng.offset(0, EVO.E_MB51_0_IS_IN_TANGO - 1).Value = "NO TANGO" Then
+                    
+                    If specialDivPattern <> "" Then
+            
+                        For Each irng In i_area
+                        
+                            If Trim(rng.offset(0, EVO.E_MB51_0_ARTICLE - 1)) Like Trim(irng.Value) & "*" Then
+                            
+                            
+                                If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_REP - 1).Value) = "100" Then
+                                    
+                                    If Trim(irng.offset(0, EVO.E_OUT_INTERROCOM_DIV - 1).Value) Like "*" Then
+                            
+                            
+                                        rng.offset(0, EVO.E_MB51_0_IS_IN_TANGO - 1).Value = ""
+                                        rng.offset(0, EVO.E_MB51_0_TANGO_PCS_PRICE - 1).Value = _
+                                            irng.offset(0, EVO.E_OUT_INTERROCOM_FINAL_PRIX - EVO.E_OUT_INTERROCOM_A).Value
+                                    End If
+                                End If
+                            End If
+                        Next irng
+                    End If
+                End If
             
             
             Else
@@ -209,6 +303,8 @@ Public Sub runMatchingLogicOnTango(sh As Worksheet, interrocomData As Worksheet,
                 status_h.progress_increase
             End If
         Next rng
+        
+        
         
     End If
     

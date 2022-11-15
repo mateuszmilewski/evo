@@ -86,7 +86,10 @@ Public Sub innerCreateSourceForPivot(masterFileName, feedFileName, Optional sh A
     Set ch = New CopyHandler
     Set ph = New PivotHandler
     
-    ch.init m, f, E_COPY_HANDLER_FOR_PIVOT_CREATION
+    PLE_NOK.show
+    
+    
+    ch.init m, f, E_COPY_HANDLER_FOR_PIVOT_CREATION, , CBool(PLE_NOK.CheckBox999.Value)
     
     ' MsgBox "implementation under way!", vbInformation
     ch.copyForSourcePivot ph, sh
@@ -388,8 +391,8 @@ Private Function offsetUpForFirstOrderDate(sp As Range, cl As Range) As Date
             offsetUpForFirstOrderDate = CDate(cl.Value)
             Exit Do
         End If
-        Set cl = cl.Offset(-1, 0)
-    Loop Until IsDate(cl.Offset(1, 0).Value) Or Int(cl.row) = Int(sp.Value)
+        Set cl = cl.offset(-1, 0)
+    Loop Until IsDate(cl.offset(1, 0).Value) Or Int(cl.row) = Int(sp.Value)
 End Function
 
 
@@ -429,7 +432,7 @@ Public Function calculateCostForCloe(c1 As Range) As Double
         calculateCostForCloe = CDbl(wynikSzukania.Parent.Cells(wynikSzukania.row, EVO.E_PIVOT_PROXY2____CLOE_COL_E_PRICE).Value)
         
         On Error Resume Next
-        c1.Offset(0, 1).AddComment "colE: " & CStr(calculateCostForCloe) & Chr(10)
+        c1.offset(0, 1).AddComment "colE: " & CStr(calculateCostForCloe) & Chr(10)
         
 '        If c1.Offset(0, 1).Comment Is Nothing Then
 '            c1.Offset(0, 1).AddComment "CLOE_COL_E_PRICE: " & CStr(calculateCostForCloe) & Chr(10)
@@ -454,7 +457,7 @@ Public Function metersForCloe(c2 As Range, Optional allRowForNothing As Range) A
         End If
         
         
-        Set c2 = c2.Offset(0, -1)
+        Set c2 = c2.offset(0, -1)
     Loop While c2.Column > 1
     
     If sum2 > 0 Then

@@ -903,3 +903,190 @@ Option Explicit
 ' hot fix for calcul in DHxx between dates
 ' ' fine tunning the reception ppx1 add to existing one! 2nd
 ' ==============================================================
+
+
+
+' 0.91 + 0.92
+' ==============================================================
+' managers da extenstion - 2 new columns from Y_DI3_80000594
+' ==============================================================
+
+
+
+' 0.93
+' ==============================================================
+' modeless leaf added last item into combo list!
+' this limit data by div
+' ==============================================================
+
+
+' 0.94
+' ==============================================================
+' quite extended version of reception with extra tep for
+' initial price from TP04 data
+' will have also new coefs - one only for NO TANGO
+' second one i overall summary
+' good thing about it that I only require cumulative value
+' from place Initial Serial price - good idea - to go back
+' to the roots - concat worksheet should have already converted
+' price - lets do this.
+
+'IN ENUM extension, new columns II:
+' Public Enum E_FROM_SQ01_QUASI_TP04
+'   ...
+'E_FROM_SQ01_QUASI_TP04_CURRENCY
+'E_FROM_SQ01_QUASI_TP04_II_RATE_UNIT_VALUE
+'E_FROM_SQ01_QUASI_TP04_II_RATE_TO_EUR
+'E_FROM_SQ01_QUASI_TP04_II_RATE_CALCED_SUM
+
+' new fillLabels code as well
+    
+    
+    
+' new logic in SQ01 module
+' priv goThroughListAgainAndTryToCalculPcsPriceinEur
+'
+'
+'
+' ==============================================================
+' ==============================================================
+
+
+' 0.95
+'' ==============================================================
+' modeless leaf visiblity feature!
+' ==============================================================
+
+
+
+'0.99
+' -------------------------------------------------------------------
+' slight test on module CopyAndOptimiseDataModule
+' no change - so only backup copy
+
+' -------------------------------------------------------------------
+
+
+'0.100
+' -------------------------------------------------------------------
+' backup copy with first mass data options (SQ01 mass module)
+
+' -------------------------------------------------------------------
+
+'0.101
+' -------------------------------------------------------------------
+' some upgrades on mass data taking
+' - green light form combo - new combobox for ready tp04 data
+' - already providing extra ready for eK9 which is working
+' currently outside of the sq01 data
+
+' -------------------------------------------------------------------
+
+
+
+'102 version
+' -------------------------------------------------------------------
+' ManagersDAModule big changes from std loop to range find
+' -------------------------------------------------------------------
+
+
+'103 version
+' -------------------------------------------------------------------
+' concat improve
+' change2 : ManagersDAModule big changes from std loop to range find
+' -------------------------------------------------------------------
+
+
+
+' 104
+' review of TP03Module
+' sub general: innerAfterSQ01Logic
+' so basically review of TP04 class
+
+'105
+' add option to remove empty lines before concat
+
+'106
+' fix on ME33K logic - if missing domain
+
+
+
+'107
+' change in ME33K adding DIV option to be more precise
+
+
+' 108 big try on SQ01 without input list
+
+' 109
+' sap4out - new sub - justTouch - sap4out.justTouch
+
+' 111
+' me33k 2 - if missing data - try just to look on plant it self - mag == "*" - in sap handler class
+
+'113 masss sq01 without del empty domain - special sub
+' also internal parts / cofors improve - if there is empty space ignore and go furhter with matching the data
+
+
+' 114 mass sq01 - new mass5__MainForSq01
+
+
+' 115 extra casting for doble in green light and reception final report
+
+' 116 on error goto out loop 1 - huge and agressive!
+
+' 118 taw module - as logic for manual query from sigapp bw
+' fix na modeless leaf
+
+
+' 119 - reception on more than 2 domains (ek9) - now also VS
+
+' 119.1 - intial change to be more universal tool for control tower - mods for x250
+' 119.2 - starting point for new source pivot option - issue with PLE - to be ignored - provided AK = 999 days to solve lack of data in PLE
+' TCAM NOK will still there but at least we can calc some pckg
+'
+' now the story goes if we want to update current logic or provide new one: I choose to update current one - new form asking if NOK PLE treat as 999 days
+
+
+
+' 120 - big changes -
+'   120 feat. -> 1. proxy2 match & comparison logic
+'   120 feat. -> 2. optimse by BB not TMC - new idea of adjusting visible data with what is available in column BB in BASE PUS
+
+
+' 121 - TAW adjustment in TP04
+' 122 - reception feature 101, 102 new 122 - material coming back to supplier
+' new logic in isCancelled - 0,1,2 -> 3 is when mvt is diff from 101,102,122 - in this case should be no action at all - tb tested
+' touch sigapp when longer logic on MB51
+' 123 is cancelled special independent logic
+
+' 124 - issue with opt by BB! - move from past to present is really specific - no button - be careful!
+' for moving from past to present PUS file need to be active and then you need to you list of macros built-in - bad practice!
+
+
+' 125 - in modeless leaf module :
+' Public Sub showSummaryForm(ictrl As IRibbonControl)
+'EVO.startModelessLeaf
+
+
+' 126 = new post prod operations module
+' ctrl shift r - rename active sheet to be synthesis
+' ctrl shift c - copy active sheet to first available ppx1 report - one of the sheets in workbook have name synthesis - really simple rule
+
+
+' 127 0 128
+' update on how data should calculated in case of the dates - something is wrong with calculating how many days
+' should between DHEF and DHAS  - especially if there is some weekend
+
+' 128
+' huge change on tryToAssignProperlyDHxxDatesWithDefaultCalculation
+' there was mistake in the loop if timing was not align - might missing one day from time to time
+' fixed directly on operationshandler class method : operacja.reculculIfBetweenDatesWeekend
+
+
+
+' 129 price match pattern by div in reception xx??xx - here:
+'Module: TangoModule
+'Sub: runMatchingLogicOnTango() ; line 60
+'                For Loop: 151 Line
+
+

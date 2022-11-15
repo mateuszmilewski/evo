@@ -35,7 +35,7 @@ Public Sub tp04Match(ictrl As IRibbonControl)
 End Sub
 
 
-Public Sub innerAfterSQ01Logic(masterFileName As String, feedFileName As String, Optional ByRef aSh As Worksheet, Optional sh As StatusHandler)
+Public Sub innerAfterSQ01Logic(masterFileName As String, feedFileName As String, Optional ByRef ash As Worksheet, Optional sh As StatusHandler)
 
 
     Application.ScreenUpdating = False
@@ -83,9 +83,9 @@ Public Sub innerAfterSQ01Logic(masterFileName As String, feedFileName As String,
         .setStatusHandler sh
         .init m, f, byUnit
         
-        Set aSh = Nothing
+        Set ash = Nothing
         On Error Resume Next
-        Set aSh = .getRepSh()
+        Set ash = .getRepSh()
     End With
     ' ====================================================================
     
@@ -152,4 +152,33 @@ Public Sub innerAfterTP04Logic(masterFileName As String, feedFileName As String,
     Application.ScreenUpdating = True
     Application.EnableEvents = True
     Application.Calculation = xlCalculationAutomatic
+End Sub
+
+
+Private Sub tp04_lean_test()
+
+
+    Dim sth As StatusHandler
+    Set sth = New StatusHandler
+    
+        
+    Dim instance_of_tp04 As TP04
+    Set instance_of_tp04 = New TP04
+    
+    
+    Dim m As Worksheet, f As Worksheet
+    
+    Set m = Nothing
+    On Error Resume Next
+    Set m = Workbooks("20210504_PUS_OV51.xlsm").Sheets(MAIN_SH_BASE)
+    
+    Set f = Nothing
+    On Error Resume Next
+    Set f = ThisWorkbook.Sheets("CONCAT_TEST")
+    
+    
+    With instance_of_tp04
+        .setStatusHandler sth
+        .init m, f, False
+    End With
 End Sub

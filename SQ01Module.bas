@@ -38,11 +38,12 @@ Public Sub concatDataFromSq01(ictrl As IRibbonControl)
     concatAndStd Nothing, Nothing, Nothing
 End Sub
 
-Public Sub concatAndStd(Optional sq01sh1 As Worksheet, Optional sq01sh2 As Worksheet, Optional resultSh As Worksheet)
+Public Sub concatAndStd(Optional sq01sh1 As Worksheet, Optional sq01sh2 As Worksheet, Optional resultSh As Worksheet, Optional sap4out As SAP_Handler)
 
 
 
     Application.Calculation = xlCalculationManual
+    Application.EnableEvents = False
 
 
     Dim whatToConcat As Collection
@@ -134,7 +135,7 @@ Public Sub concatAndStd(Optional sq01sh1 As Worksheet, Optional sq01sh2 As Works
                 leftRng.Value = rightRng.Value
                 
                     
-                Set cr = cr.Offset(1, 0)
+                Set cr = cr.offset(1, 0)
                 
                 ' Application.Calculation = xlCalculationManual
 
@@ -144,6 +145,11 @@ Public Sub concatAndStd(Optional sq01sh1 As Worksheet, Optional sq01sh2 As Works
             
         Next el
         
+        
+        ' now initial table in concat is ready - take some time and add some already converted info
+        ' will help for reception rep ppx1
+        goThroughListAgainAndTryToCalculPcsPriceinEur concatSh, sap4out
+        
         ' MsgBox "READY!", vbInformation
     Else
         MsgBox "list of concat is empty!", vbCritical
@@ -152,8 +158,83 @@ Public Sub concatAndStd(Optional sq01sh1 As Worksheet, Optional sq01sh2 As Works
     
     
     Application.Calculation = xlCalculationAutomatic
+    Application.EnableEvents = False
     
     
+End Sub
+
+
+Private Sub goThroughListAgainAndTryToCalculPcsPriceinEur(ByRef sh1 As Worksheet, Optional sap4out As SAP_Handler)
+
+
+    '.thisLine.price = _
+    '    parsePriceAgain(wynikSzukania1.Offset(0, _
+    '        EVO.E_FROM_SQ01_QUASI_TP04_SUM - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value)
+    '
+    '.thisLine.curr = _
+    '    wynikSzukania1.Offset(0, _
+    '        EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value
+    '
+    '.thisLine.rate = 1
+    'On Error Resume Next
+    '.thisLine.rate = replaceDotWithDecimalPointer(Application.WorksheetFunction.VLookup(UCase(.thisLine.curr), _
+    '    ThisWorkbook.Sheets("register").Range("B98:C500"), 2, False))
+    '
+    '.thisLine.priceInEur = (1# / CDbl(.thisLine.rate)) * 1# * .thisLine.price
+    '
+    '
+    '.thisLine.pckgUn = wynikSzukania1.Offset(0, EVO.E_TP04_01_UNITE_DE_PRIX - EVO.E_TP04_01_ARTICLE).Value
+    '.thisLine.pckgDiv = calcUn(.thisLine.pckgUn)
+    '
+    '
+    '.thisLine.finalPrice = .thisLine.priceInEur / .thisLine.pckgDiv
+    
+    
+    Dim tp04_instance As New TP04
+    Dim ptim As TP04ItemPrimitive
+    
+    Dim r1 As Range
+    Set r1 = sh1.Range("B2")
+    
+    Do
+        Set ptim = Nothing
+        Set ptim = New TP04ItemPrimitive
+        ptim.article = CStr(r1)
+        ptim.price = tp04_instance.parsePriceAgain(r1.offset(0, EVO.E_FROM_SQ01_QUASI_TP04_SUM - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value)
+        ptim.curr = r1.offset(0, EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value
+        ptim.rate = 1
+        On Error Resume Next
+        ptim.rate = replaceDotWithDecimalPointer(Application.WorksheetFunction.VLookup(UCase(ptim.curr), _
+            ThisWorkbook.Sheets("register").Range("B98:C500"), 2, False))
+        ptim.priceInEur = (1# / CDbl(ptim.rate)) * 1# * ptim.price
+        ptim.pckgUn = r1.offset(0, EVO.E_TP04_01_UNITE_DE_PRIX - EVO.E_TP04_01_ARTICLE).Value
+        ptim.pckgDiv = tp04_instance.calcUn(ptim.pckgUn)
+        ptim.finalPrice = ptim.priceInEur / ptim.pckgDiv
+        
+        ' done
+        ' now just put those data in table
+        r1.offset(0, EVO.E_FROM_SQ01_QUASI_TP04.E_FROM_SQ01_QUASI_TP04_II_RATE_TO_EUR - _
+            EVO.E_FROM_SQ01_QUASI_TP04.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value = _
+                ptim.rate
+            
+            
+        r1.offset(0, EVO.E_FROM_SQ01_QUASI_TP04.E_FROM_SQ01_QUASI_TP04_II_RATE_UNIT_VALUE - _
+            EVO.E_FROM_SQ01_QUASI_TP04.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value = _
+                ptim.pckgDiv
+            
+        r1.offset(0, EVO.E_FROM_SQ01_QUASI_TP04.E_FROM_SQ01_QUASI_TP04_II_RATE_CALCED_SUM - _
+            EVO.E_FROM_SQ01_QUASI_TP04.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value = _
+                ptim.finalPrice
+        
+        Set r1 = r1.offset(1, 0)
+        
+        
+        If (r1.row Mod 500) = 0 Then
+            sap4out.justTouch
+        End If
+    Loop Until Trim(r1) = ""
+    
+
 End Sub
 
 
@@ -169,7 +250,7 @@ Private Function isInSq01OutputStd(refSh As Worksheet) As Boolean
     Set refVal = ThisWorkbook.Sheets("forValidation").Range(EVO.G_REF_MOUNT_SQ1_OUT)
     
     For x = EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN To EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY
-        If lr.Offset(0, x - 1).Value = refVal.Offset(0, x - 1).Value Then
+        If lr.offset(0, x - 1).Value = refVal.offset(0, x - 1).Value Then
         Else
             isInSq01OutputStd = False
             Exit For
@@ -200,10 +281,10 @@ Public Sub getDataFromSq01WithPreDefinedParams()
     With SQ01PreDefForm
         For x = 1 To 5
             On Error Resume Next
-            .Controls("TextBox1" & CStr(x)).Value = CStr(refReg.Offset(0, x - 1).Value)
+            .Controls("TextBox1" & CStr(x)).Value = CStr(refReg.offset(0, x - 1).Value)
             
             On Error Resume Next
-            .Controls("TextBox2" & CStr(x)).Value = CStr(refReg.Offset(1, x - 1).Value)
+            .Controls("TextBox2" & CStr(x)).Value = CStr(refReg.offset(1, x - 1).Value)
         Next x
         
         .show
@@ -219,6 +300,9 @@ Public Sub getDataFromSq01(ictrl As IRibbonControl)
     
     innerMainForSq01 False
 End Sub
+
+
+
 
 
 Public Sub innerMainForSq01(Optional preDef As Boolean, _
@@ -343,7 +427,7 @@ End Sub
 
 
 
-Private Sub changePricesIntoDouble(sh1 As Worksheet)
+Public Sub changePricesIntoDouble(sh1 As Worksheet)
 
 
     Application.Calculation = xlCalculationManual
@@ -355,7 +439,7 @@ Private Sub changePricesIntoDouble(sh1 As Worksheet)
     
     Dim ir As Range, priceRng As Range
     For Each ir In r
-        Set priceRng = ir.Offset(0, EVO.E_FROM_SQ01_QUASI_TP04_SUM - 1)
+        Set priceRng = ir.offset(0, EVO.E_FROM_SQ01_QUASI_TP04_SUM - 1)
         
         ' Application.Calculation = xlCalculationManual
         
@@ -378,7 +462,7 @@ Private Sub copyAndPasteAsValues(refRng As Range)
 
     Dim allRange As Range
     
-    If refRng.Offset(1, 0).Value <> "" Then
+    If refRng.offset(1, 0).Value <> "" Then
     
         Set allRange = refRng.Parent.Range(refRng, refRng.End(xlDown))
     Else
@@ -426,9 +510,18 @@ Public Sub fillLabels(labelRefRange As Range)
             
             For x = EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN To EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY
                 
-                .Offset(0, x - 1).Value = refLabelInRegister.Offset(0, x - 1).Value
+                .offset(0, x - 1).Value = refLabelInRegister.offset(0, x - 1).Value
             Next x
         End With
+        
+        If labelRefRange.Parent.name Like "CONCAT_*" Then
+            labelRefRange.offset(0, EVO.E_FROM_SQ01_QUASI_TP04.E_FROM_SQ01_QUASI_TP04_II_RATE_CALCED_SUM - 1).Value = _
+                "SUM2"
+            labelRefRange.offset(0, EVO.E_FROM_SQ01_QUASI_TP04.E_FROM_SQ01_QUASI_TP04_II_RATE_TO_EUR - 1).Value = _
+                "RATE"
+            labelRefRange.offset(0, EVO.E_FROM_SQ01_QUASI_TP04.E_FROM_SQ01_QUASI_TP04_II_RATE_UNIT_VALUE - 1).Value = _
+                "UN3"
+        End If
     
     ElseIf labelRefRange.Parent.name Like "N_*" Then
     
@@ -436,7 +529,7 @@ Public Sub fillLabels(labelRefRange As Range)
         With labelRefRange
         
             For x = EVO.E_N_SUPPLIERS_COFOR To EVO.E_N_SUPPLIERS_INT_EXT_VEN
-                .Offset(0, x - 1).Value = refLabelInRegister.Offset(0, x - 1).Value
+                .offset(0, x - 1).Value = refLabelInRegister.offset(0, x - 1).Value
             Next x
         End With
     
