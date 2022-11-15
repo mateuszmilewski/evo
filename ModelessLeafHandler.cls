@@ -223,6 +223,26 @@ Public Sub makeTotal()
         '--------------------------------------------------------------------------------------------------
         
         
+        
+        ' NEW
+        ' E_MODELESS_LEAF_ORDER_EMPTY_1 WO TANGO TARGET PRICE BY INITIAL PRICE FROM TP04
+        '
+        ' Mass € target tp04 Price * 1
+        '
+        '--------------------------------------------------------------------------------------------------
+        
+        ' average
+        strF = CStr(ThisWorkbook.Sheets("register").Range("Z23").Formula)
+        strF = Replace(strF, "X", startingColumn & CStr(EVO.E_MODELESS_LEAF_ORDER_EMPTY_1))
+        strF = Replace(strF, "Y", sh1.Cells(EVO.E_MODELESS_LEAF_ORDER_EMPTY_1, col - 1).Address)
+        strF = Replace(strF, "$", "")
+        
+        ' Debug.Print strF ' OK
+        sh1.Cells(EVO.E_MODELESS_LEAF_ORDER_EMPTY_1, col).Formula = strF
+        
+        '--------------------------------------------------------------------------------------------------
+        
+        
         ' Mass € Sigapp forecast (With Tango price)
         '--------------------------------------------------------------------------------------------------
         strF = CStr(ThisWorkbook.Sheets("register").Range("Z23").Formula)
@@ -290,6 +310,20 @@ Public Sub makeTotal()
         '--------------------------------------------------------------------------------------------------
         
         
+        
+        ' new 2 rows = extra ratio + extra gap supplied by data from no tango articles
+        '--------------------------------------------------------------------------------------------------
+        
+        sh1.Cells(EVO.E_MODELESS_LEAF_ORDER_MASS_EUR_GAP_FINAL, col).FormulaR1C1Local = _
+            sh1.Cells(EVO.E_MODELESS_LEAF_ORDER_MASS_EUR_GAP_FINAL, col - 2).FormulaR1C1Local
+        
+        sh1.Cells(EVO.E_MODELESS_LEAF_ORDER_RATE_FINAL, col).FormulaR1C1Local = _
+            sh1.Cells(EVO.E_MODELESS_LEAF_ORDER_RATE_FINAL, col - 2).FormulaR1C1Local
+            
+        
+        '--------------------------------------------------------------------------------------------------
+        
+        
         ' ----------------------------------------------------------------
     Else
         
@@ -319,15 +353,15 @@ Private Function setNewPlaceForTotal() As Range
     
         Debug.Print "sh1 is in std!"
         
-        Dim tmpR As Range, ir As Range, txt As String
-        Set tmpR = sh1.Range("C2:C7")
+        Dim tmpr As Range, ir As Range, txt As String
+        Set tmpr = sh1.Range("C2:C7")
         
         Dim iter As Integer
         iter = 0
         ' bardzo na okolo, ale bedzie dzialac napewno dobrze
         Do
             txt = ""
-            For Each ir In tmpR
+            For Each ir In tmpr
                 
                 txt = txt & CStr(ir.Value)
                 
@@ -338,12 +372,12 @@ Private Function setNewPlaceForTotal() As Range
             End If
             
             
-            Set tmpR = tmpR.Offset(0, 1)
+            Set tmpr = tmpr.offset(0, 1)
          
         ' one empty column between data and total column!
         Loop While iter < 1
         
-        Set setNewPlaceForTotal = tmpR.Cells(1, 1)
+        Set setNewPlaceForTotal = tmpr.Cells(1, 1)
         
     Else
         Set setNewPlaceForTotal = Nothing
@@ -369,7 +403,12 @@ Private Sub iinerColorsColors(col1 As Integer, col2 As Integer)
     
     Dim letterForCol1 As String, letterForCol2 As String, letterForTot As String
     letterForCol1 = Chr(64 + col1)
-    letterForCol2 = Chr(64 + col2 + 2)
+    
+    If col2 + 2 < 27 Then
+        letterForCol2 = Chr(64 + col2 + 2)
+    Else
+        letterForCol2 = "A" & Chr(64 + col2 + 2 - 26)
+    End If
     ' not used!
     'letterForTot = Chr(64 + col2 + 2)
     
@@ -377,15 +416,17 @@ Private Sub iinerColorsColors(col1 As Integer, col2 As Integer)
     
 
 
-    Dim wrapRng1 As Range, wrapRng2 As Range
-    Set wrapRng1 = sh1.Range("B8")
-    Set wrapRng2 = sh1.Range("B15")
+    Dim wrArr(1 To 3) As Range
+    
+    Set wrArr(1) = sh1.Range("B8")
+    Set wrArr(2) = sh1.Range("B15")
+    Set wrArr(3) = sh1.Range("B18")
 
 
     Dim adr_str As String, rng1 As Range
     
     ' first adr
-    adr_str = "B3:B16"
+    adr_str = "B3:B19"
     
     sh1.columns("B:B").ColumnWidth = 38
     Set rng1 = sh1.Range(adr_str)
@@ -437,30 +478,32 @@ Private Sub iinerColorsColors(col1 As Integer, col2 As Integer)
     
     ' wrapping row labels for rates
     ' ----------------------------------------------
-    With wrapRng1
-        .HorizontalAlignment = xlGeneral
-        .VerticalAlignment = xlBottom
-        .WrapText = True
-        .Orientation = 0
-        .AddIndent = False
-        .IndentLevel = 0
-        .ShrinkToFit = False
-        .ReadingOrder = xlContext
-        .MergeCells = False
-    End With
     
-
-    With wrapRng2
-        .HorizontalAlignment = xlGeneral
-        .VerticalAlignment = xlBottom
-        .WrapText = True
-        .Orientation = 0
-        .AddIndent = False
-        .IndentLevel = 0
-        .ShrinkToFit = False
-        .ReadingOrder = xlContext
-        .MergeCells = False
-    End With
+    
+    Dim wrapRngIter As Variant
+    Dim wrapRngRngIter As Range
+    
+    For wrapRngIter = LBound(wrArr) To UBound(wrArr)
+    
+        Set wrapRngRngIter = Nothing
+        
+        On Error Resume Next
+        Set wrapRngRngIter = wrArr(wrapRngIter)
+        
+        If Not wrapRngRngIter Is Nothing Then
+            With wrapRngRngIter
+                .HorizontalAlignment = xlGeneral
+                .VerticalAlignment = xlBottom
+                .WrapText = True
+                .Orientation = 0
+                .AddIndent = False
+                .IndentLevel = 0
+                .ShrinkToFit = False
+                .ReadingOrder = xlContext
+                .MergeCells = False
+            End With
+        End If
+    Next wrapRngIter
     ' ----------------------------------------------
     
     Dim secondRow As Range
@@ -714,7 +757,7 @@ Private Sub iinerColorsColors(col1 As Integer, col2 As Integer)
     
     ' Range("C14:R16").Select
     ' Set rng1 = sh1.Range("" & letterForCol1 & "3:" & letterForCol2 & "8")
-    Set rng1 = sh1.Range("" & letterForCol1 & "14:" & letterForCol2 & "16")
+    Set rng1 = sh1.Range("" & letterForCol1 & "14:" & letterForCol2 & "19")
     
     
     With rng1
@@ -797,6 +840,11 @@ Private Sub iinerColorsColors(col1 As Integer, col2 As Integer)
     rng1.Font.Bold = True
     rng1.NumberFormat = "0.00"
     
+    Set rng1 = sh1.Range("" & letterForCol1 & "18:" & letterForCol2 & "18")
+    
+    rng1.Font.Bold = True
+    rng1.NumberFormat = "0.00"
+    
     
     
     
@@ -809,6 +857,15 @@ Private Sub iinerColorsColors(col1 As Integer, col2 As Integer)
         .TintAndShade = 0
     End With
     
+    Set rng1 = sh1.Range("" & letterForCol1 & "19:" & letterForCol2 & "19")
+    
+    With rng1.Font
+        .Color = -16776961
+        .TintAndShade = 0
+    End With
+    
+    
+    
     'Range("C8:R8").Select
     'Range("R8").Activate
     Set rng1 = sh1.Range("" & letterForCol1 & "8:" & letterForCol2 & "8")
@@ -816,6 +873,16 @@ Private Sub iinerColorsColors(col1 As Integer, col2 As Integer)
     
     ' Range("B15:R15").Select
     Set rng1 = sh1.Range("B15:" & letterForCol2 & "15")
+    
+    With rng1.Interior
+        .Pattern = xlSolid
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent6
+        .TintAndShade = 0.799981688894314
+        .PatternTintAndShade = 0
+    End With
+    
+    Set rng1 = sh1.Range("B18:" & letterForCol2 & "18")
     
     With rng1.Interior
         .Pattern = xlSolid
@@ -837,7 +904,12 @@ Private Sub iinerColorsColors(col1 As Integer, col2 As Integer)
     
     ' if reception hide rate for without tango
     If receptionMode Then
-        sh1.rows("8:8").Hidden = True
+        ' not the case anymore
+        ' sh1.rows("8:8").Hidden = True
+    End If
+    
+    If greenLightMode Then
+        sh1.rows("18:19").Hidden = True
     End If
     
 End Sub
@@ -957,7 +1029,7 @@ Private Function insertNewColumn(r As Range) As Range
     
     r.EntireColumn.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
     
-    Set insertNewColumn = tmpPrev.Offset(0, -1)
+    Set insertNewColumn = tmpPrev.offset(0, -1)
 End Function
 
 
@@ -988,13 +1060,13 @@ Private Function findLastEmptyColumn(sh As Worksheet) As Range
     If UCase(rf.Value) = "TOTAL" Then
         ' ok - really good
         
-        Set rf = rf.Offset(0, -1)
+        Set rf = rf.offset(0, -1)
         
         If Trim(rf.Value) = "" Then
             
 
             tmpTxt = ""
-            For Each ir In sh.Range(rf, rf.Offset(10, 0))
+            For Each ir In sh.Range(rf, rf.offset(10, 0))
                 
                 tmpTxt = tmpTxt & Trim(ir.Value)
             Next ir
@@ -1009,7 +1081,7 @@ Private Function findLastEmptyColumn(sh As Worksheet) As Range
     
     
         tmpTxt = ""
-        For Each ir In sh.Range(rf, rf.Offset(10, 0))
+        For Each ir In sh.Range(rf, rf.offset(10, 0))
             
             tmpTxt = tmpTxt & Trim(ir.Value)
         Next ir
@@ -1157,6 +1229,9 @@ Private Sub fillGreenLightLabels(sh1 As Worksheet)
         .Cells(E_MODELESS_LEAF_ORDER_MASS_EUR_TARGET_PRICE, 2).Value = "Mass € target Price * 1"
         .Cells(E_MODELESS_LEAF_ORDER_RATE, 2).Value = "rate  : Mass forecast Sigapp price /target price * 1 (with Tango price)"
         .Cells(E_MODELESS_LEAF_ORDER_MASS_EUR_GAP, 2).Value = "Mass € gap Sigapp price / price *1"
+        
+        .Cells(EVO.E_MODELESS_LEAF_ORDER_RATE_FINAL, 2).Value = "rate  : Mass reception Sigapp price /TARGET price * 1"
+        .Cells(EVO.E_MODELESS_LEAF_ORDER_MASS_EUR_GAP_FINAL, 2).Value = "Mass € gap Sigapp price / price *1"
     End With
     
     sh1.Range("B1:B1").columns.AutoFit
@@ -1209,8 +1284,9 @@ Private Sub fillReceptionLabels(sh1 As Worksheet)
         .Cells(E_MODELESS_LEAF_ORDER_PERC_MASS_EUR_WO_TANGO, 2).Value = "% mass €  without Tango price"
         .Cells(E_MODELESS_LEAF_ORDER_NUM_OF_WO_TANGO, 2).Value = "number ref without Tango price"
         
-        
         .Cells(E_MODELESS_LEAF_ORDER_RATE_WO_TANGO, 2).Value = "rate  : Mass Sigapp pre-serial price / initial price (without Tango price)"
+        
+        .Cells(E_MODELESS_LEAF_ORDER_EMPTY_1, 2).Value = "Mass € target tp04 Price * 1"
         
         .Cells(E_MODELESS_LEAF_ORDER_MASS_EUR_W_TANGO, 2).Value = "Mass € Sigapp reception (With Tango price)"
         .Cells(E_MODELESS_LEAF_ORDER_NUM_OF_W_TANGO, 2).Value = "number ref with Tango price"
@@ -1219,6 +1295,9 @@ Private Sub fillReceptionLabels(sh1 As Worksheet)
         .Cells(E_MODELESS_LEAF_ORDER_MASS_EUR_TARGET_PRICE, 2).Value = "Mass € target Price * 1"
         .Cells(E_MODELESS_LEAF_ORDER_RATE, 2).Value = "rate  : Mass reception Sigapp price /target price * 1 (with Tango price)"
         .Cells(E_MODELESS_LEAF_ORDER_MASS_EUR_GAP, 2).Value = "Mass € gap Sigapp price / price *1"
+        
+        .Cells(EVO.E_MODELESS_LEAF_ORDER_RATE_FINAL, 2).Value = "rate  : Mass reception Sigapp price /TARGET price * 1"
+        .Cells(EVO.E_MODELESS_LEAF_ORDER_MASS_EUR_GAP_FINAL, 2).Value = "Mass € gap Sigapp price / price *1"
     End With
     
     sh1.Range("B1:B1").columns.AutoFit
@@ -1263,6 +1342,8 @@ Private Sub fillWithDataFromForm(sh1 As Worksheet)
     'E_MODELESS_LEAF_ORDER_RATE
     'E_MODELESS_LEAF_ORDER_MASS_EUR_GAP
     
+    ' new to final rate and final gap incl. data with articles wo tango prices
+    
     sh1.Parent.Activate
     sh1.Activate
     
@@ -1271,22 +1352,28 @@ Private Sub fillWithDataFromForm(sh1 As Worksheet)
         .Cells(EVO.E_MODELESS_LEAF_ORDER_DATE, currentColumnToFill).Value = _
             frm1.ListBoxScope.Value
         .Cells(EVO.E_MODELESS_LEAF_ORDER_MASS_EUR_INTERNAL, currentColumnToFill).Value = _
-            frm1.TextBox_CostInternal.Value
+            CDbl(parseTextNum(frm1.TextBox_CostInternal.Value))
         .Cells(EVO.E_MODELESS_LEAF_ORDER_NUM_OF_INTERNAL, currentColumnToFill).Value = _
             frm1.TextBox_CountInternal.Value
         .Cells(EVO.E_MODELESS_LEAF_ORDER_MASS_EUR_WO_TANGO, currentColumnToFill).Value = _
-            frm1.TextBox_CostNoTango.Value
+            CDbl(parseTextNum(frm1.TextBox_CostNoTango.Value))
         .Cells(EVO.E_MODELESS_LEAF_ORDER_PERC_MASS_EUR_WO_TANGO, currentColumnToFill).FormulaR1C1Local = _
             "=R[-1]C/(R[-1]C + R[4]C)"
         .Cells(EVO.E_MODELESS_LEAF_ORDER_NUM_OF_WO_TANGO, currentColumnToFill).Value = _
             frm1.TextBox_CountNoTango.Value
         
+        ' "Mass € target tp04 Price * 1"
+        If IsNumeric(frm1.TextBox_TargetNoTango.Value) Then
+            .Cells(E_MODELESS_LEAF_ORDER_EMPTY_1, currentColumnToFill).Value = CDbl(parseTextNum(frm1.TextBox_TargetNoTango.Value))
+        End If
+        
         ' row 8 - rate for parts without tango GL
         .Cells(E_MODELESS_LEAF_ORDER_RATE_WO_TANGO, currentColumnToFill).Value = _
-            frm1.TextBox_RateNoTango.Value
+            CDbl(parseTextNum(frm1.TextBox_RateNoTango.Value))
         
         .Cells(E_MODELESS_LEAF_ORDER_MASS_EUR_W_TANGO, currentColumnToFill).Value = _
-            frm1.TextBox_CostTango.Value
+            CDbl(parseTextNum(frm1.TextBox_CostTango.Value))
+            
         On Error Resume Next
         .Cells(E_MODELESS_LEAF_ORDER_NUM_OF_W_TANGO, currentColumnToFill).Value = _
             CLng(frm1.TextBox_CountTango.Value) ' + CLng(frm1.TextBox_CountTangoNOK.Value)
@@ -1294,21 +1381,63 @@ Private Sub fillWithDataFromForm(sh1 As Worksheet)
             frm1.TextBox_CountTangoNOK.Value
         
         .Cells(E_MODELESS_LEAF_ORDER_MASS_EUR_TARGET_PRICE, currentColumnToFill).Value = _
-            frm1.TextBox_CostTarget.Value
+            CDbl(parseTextNum(frm1.TextBox_CostTarget.Value))
+            
         .Cells(E_MODELESS_LEAF_ORDER_RATE, currentColumnToFill).FormulaR1C1Local = _
             "=R[-5]C/R[-1]C"
         .Cells(E_MODELESS_LEAF_ORDER_MASS_EUR_GAP, currentColumnToFill).FormulaR1C1Local = _
             "=R[-6]C - R[-2]C"
+            
+        ' NEW FINAL RATE and GAP incl. also now data from articles wo tango prices!
+        ' row for: rate  : Mass reception Sigapp price /TARGET price * 1
+        .Cells(EVO.E_MODELESS_LEAF_ORDER_RATE_FINAL, currentColumnToFill).FormulaR1C1Local = _
+            "=(R[-8]C+R[-13]C)/(R[-4]C+R[-9]C)"
+        ' row for: REAL Mass € gap Sigapp price / price *1
+        .Cells(EVO.E_MODELESS_LEAF_ORDER_MASS_EUR_GAP_FINAL, currentColumnToFill).FormulaR1C1Local = _
+            "=R[-3]C+(R[-14]C-R[-10]C)"
     End With
 End Sub
 
+
+Private Function parseTextNum(txt As String) As Double
+    
+    parseTextNum = 0#
+    
+    On Error Resume Next
+    parseTextNum = CDbl(txt)
+    
+    If parseTextNum = 0 Then
+        
+        If IsNumeric(txt) Then
+            Debug.Print "is numeric, but it is not working!"
+            
+            
+        Else
+            
+            Debug.Print "is not numeric!"
+            
+            If CStr(txt) Like "*.???,??" Then
+                
+                txt = Replace(txt, ".", "")
+                On Error Resume Next
+                parseTextNum = CDbl(txt)
+               
+            ElseIf CStr(txt) Like "*.*" Then
+                
+                Dim tmpArr As Variant
+                tmpArr = Split(txt, ".")
+                parseTextNum = CDbl(tmpArr(0) & Application.DecimalSeparator & Left(tmpArr(1), 2))
+            End If
+        End If
+    End If
+End Function
 
 
 Private Sub addGridlines(r As Range)
 
 
     Dim whatToGrid As Range
-    Set whatToGrid = r.Parent.Range(r, r.Offset(14, 0))
+    Set whatToGrid = r.Parent.Range(r, r.offset(17, 0))
 
     'Range("F2:F16").Select
     whatToGrid.Borders(xlDiagonalDown).LineStyle = xlNone

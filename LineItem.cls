@@ -53,6 +53,7 @@ Public puTime As Date
 
 Public tmc As String
 Public tmc2 As String ' the last column -> Echéanciers regroupés par TMC - new implementation
+Public bb As String ' should match with tmc2
 
 Public pn As String
 Public cofor As String

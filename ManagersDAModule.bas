@@ -29,10 +29,32 @@ Option Explicit
 Global flagForCycle As Boolean
 
 
+
+Public Sub multi__ManagersDa3()
+    
+    innerGetManagersDa3 ThisWorkbook.Sheets("CONCAT_20210719_CJ")
+    innerGetManagersDa3 ThisWorkbook.Sheets("CONCAT_20210719_eK9")
+    innerGetManagersDa3 ThisWorkbook.Sheets("CONCAT_20210719_X250")
+End Sub
+
+
 Public Sub getManagersDa(ictrl As IRibbonControl)
 
     innerGetManagersDa ActiveSheet
     
+End Sub
+
+
+Public Sub loopForAllConcatsForGetManagersDa()
+    
+    Dim sh As Worksheet
+    For Each sh In ThisWorkbook.Sheets
+        
+        If sh.name Like "CONCAT_*" Then
+            sh.Activate
+            innerGetManagersDa ActiveSheet
+        End If
+    Next sh
 End Sub
 
 Public Sub innerGetManagersDa(sh1 As Worksheet, Optional osh As Worksheet)
@@ -43,6 +65,274 @@ Public Sub innerGetManagersDa(sh1 As Worksheet, Optional osh As Worksheet)
     Set mainCollection = prepareInputFOrManagersDa(sh1, semicolonedDomains)
     inner0GetManagersDa semicolonedDomains, mainCollection, sh1, osh
     
+End Sub
+
+Public Sub innerGetManagersDa3(sh1 As Worksheet, Optional osh As Worksheet)
+
+    Dim mainCollection As Collection, semicolonedDomains As String
+    ' semicolonedDomains treated with side effect inside below function
+    semicolonedDomains = ""
+    Set mainCollection = prepareInputFOrManagersDa(sh1, semicolonedDomains)
+    inner0GetManagersDa3 semicolonedDomains, mainCollection, sh1, osh
+    
+End Sub
+
+
+
+Public Sub inner0GetManagersDa3(semicolonedDomains As String, c As Collection, ish As Worksheet, Optional osh As Worksheet)
+
+
+    EVO.SuppressingMessageModule.KillMessageFilter
+    
+    If validateIfTheSemicolonedDomainsAreSemicolonedDomains(semicolonedDomains) Then
+    
+    
+    
+       
+    
+    
+        Dim arr As Variant
+        semicolonedDomains = Replace(semicolonedDomains, " ", "")
+        arr = Split(semicolonedDomains, ";")
+        
+        
+
+        
+        Set osh = ThisWorkbook.Sheets.Add
+        osh.name = tryToRenameWorksheet(osh, "MANAGERS_DA_")
+        
+        Dim rng As Range, orng As Range
+        
+        
+        ' LABLES ------------------------------------------------
+        
+        managers_DA__fillLabels osh.Range("A1")
+        
+        ' -------------------------------------------------------
+        
+        ManagersDaLoading.show vbModeless
+    
+        initManagersDaLoading
+        ' connected with ManagersDaLoading!
+        ManagersDaLoading.Repaint
+        flagForCycle = True
+        cycleForIteration
+        
+        
+        Set orng = osh.Range("A2")
+        orng.Select
+        
+        
+        Dim chbx As Variant '  SAPFEWSELib.GuiCheckBox
+        Dim txt As Variant ' SAPFEWSELib.GuiTextedit
+        
+        
+        If EVO.GlobalSapModule.sapGuiAuto Is Nothing Then
+            Set sapGuiAuto = GetObject("SAPGUI")
+            Set EVO.GlobalSapModule.sapGuiAuto = sapGuiAuto
+            Set sapGui = sapGuiAuto.GetScriptingEngine
+            Set EVO.GlobalSapModule.sapGui = sapGui
+        Else
+            Set sapGuiAuto = EVO.GlobalSapModule.sapGuiAuto
+            Set sapGui = EVO.GlobalSapModule.sapGui
+        End If
+        
+        Dim se As Object
+        
+        
+        Set cnn = sapGui.Connections(0)
+        
+        'Debug.Print cnn.ConnectionString
+        'Debug.Print cnn.Sessions.Count
+    
+        
+        Set sess = cnn.Children(0)
+        Set item = sess.Children(0)
+        ' Debug.Print item.name
+        
+        ' Debug.Print sess.Children.Count
+        
+        
+        ' Set item = sess.Children(0)
+        Set item = sess.FindById("wnd[0]/usr")
+        ' Debug.Print item.Children.Count
+    
+        
+        
+        sess.FindById("wnd[0]").Maximize
+        
+        
+        ' im not proud of this "hack"
+        ' ----------------------------------------------------
+        Dim x17 As Variant
+        For x17 = 0 To 10
+            On Error Resume Next
+            sess.FindById("wnd[0]/tbar[0]/btn[12]").press
+        Next x17
+        ' ----------------------------------------------------
+        
+        ' loop for each domin
+        ' beg of loop
+        Dim cols As Variant
+        Dim x As Variant
+
+        
+        
+        sess.FindById("wnd[0]").Maximize
+        sess.FindById("wnd[0]/tbar[0]/okcd").Text = "Y_DI3_80000594"
+        sess.FindById("wnd[0]").sendVKey 0
+        
+        
+        
+        
+
+        Dim stdStr As String
+
+        
+        
+    
+        ' NOA CODE here
+        ' session.findById("wnd[0]/usr/txtSP$00026-LOW").text = "*"
+        sess.FindById("wnd[0]/usr/txtSP$00026-LOW").Text = "*"
+        
+        ' type of output - darwin manager
+        sess.FindById("wnd[0]/usr/ctxt%ALVL").Text = "/MANAGER"
+          
+        'sess.FindById("wnd[0]/usr/txtSP$00004-LOW").Text = "375" ' this domain should be iterate
+        sess.FindById("wnd[0]/usr/txtSP$00004-LOW").Text = Left(CStr(arr(x)), 3) ' this domain should be iterate
+    
+    
+    
+
+        sess.FindById("wnd[0]/usr/btn%_SP$00004_%_APP_%-VALU_PUSH").press
+        
+        sess.FindById("wnd[1]/tbar[0]/btn[16]").press
+    
+        For x = LBound(arr) To UBound(arr)
+        
+            ' session.
+            '  findById(
+            '   "wnd[1]/usr/tabsTAB_STRIP/tabpSIVA/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/txtRSCSEL-SLOW_I[1,0]")
+            '    .text = "375"
+            'sess.FindById("wnd[1]/usr/tabsTAB_STRIP/tabpSIVA/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/txtRSCSEL-SLOW_I[1," & _
+            '    CStr(x) & "]").SetFocus
+            sess.FindById("wnd[1]/usr/tabsTAB_STRIP/tabpSIVA/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/txtRSCSEL-SLOW_I[1," & _
+                CStr(x) & "]").Text = Left(CStr(arr(x)), 3)
+        
+        Next x
+    
+        sess.FindById("wnd[1]/tbar[0]/btn[0]").press
+        sess.FindById("wnd[1]/tbar[0]/btn[8]").press
+    
+        ' final submit!
+        sess.FindById("wnd[0]/tbar[1]/btn[8]").press
+    
+        
+        
+        ' Debug.Print "inside interation!"
+        orng.Select
+        
+        cycleForIteration
+    
+        
+        Set gv = Nothing
+        Set gv = sess.FindById("wnd[0]/usr/cntlGRID1/shellcont/shell")
+        
+        
+    
+        Set cols = Nothing
+        Set cols = gv.ColumnOrder
+        Debug.Print "gv.RowCount: " & gv.RowCount
+    
+    
+        If Not gv Is Nothing Then
+            Set cols = gv.ColumnOrder
+            Debug.Print "gv.RowCount: " & gv.RowCount
+            
+            'Dim st_h As StatusHandler
+            'Set st_h = Nothing
+            'Set st_h = New StatusHandler
+            'st_h.init_statusbar (gv.RowCount / 50)
+            'st_h.show
+            DoEvents
+        
+        
+            Dim x1 As Variant
+            Dim y1 As Variant
+            Dim tmp As Variant
+        
+        
+            Dim lastNotEmptyPartNumber As String
+            lastNotEmptyPartNumber = ""
+            
+            
+            
+        
+            
+            For x1 = 0 To (gv.RowCount - 1)
+                ' For y = EVO.E_MANAGERS_DA_ARTICLE - 1 To EVO.E_MANAGERS_DA_RU - 1
+                ' next y
+                
+                ' Debug.Print orng.Address
+                
+                With orng
+                
+                    
+                
+                    ' Debug.Print "PN: " & gv.GetCellValue(x1, cols(EVO.E_MANAGERS_DA_ARTICLE - 1))
+                    If Trim(gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_ARTICLE - 1))) <> "" Then
+                        lastNotEmptyPartNumber = Trim(gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_ARTICLE - 1)))
+                    End If
+                    .offset(0, EVO.E_MANAGERS_DA_ARTICLE - 1).Value = lastNotEmptyPartNumber
+                    
+                    
+                    .offset(0, EVO.E_MANAGERS_DA_ACHETEUR - 1).Value = gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_ACHETEUR - 1))
+                    .offset(0, EVO.E_MANAGERS_DA_RU - 1).Value = gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_RU - 1))
+                    
+                    ' new from 0.92
+                    .offset(0, EVO.E_MANAGERS_DA.E_MANAGERS_DA_FAMILY - 1).Value = _
+                        gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA.E_MANAGERS_DA_FAMILY - 1))
+                    .offset(0, EVO.E_MANAGERS_DA.E_MANAGERS_DA_GROUP - 1).Value = _
+                        gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA.E_MANAGERS_DA_GROUP - 1))
+                End With
+                
+                Set orng = orng.offset(1, 0)
+                
+                
+                
+                
+                If x1 Mod 50 = 0 Then
+                
+                
+                    'Debug.Print gv.CurrentCellRow
+                    gv.FirstVisibleRow = x1
+                    gv.CurrentCellRow = x1
+                    'Debug.Print gv.CurrentCellRow
+                    
+                    orng.Select
+                    cycleForIteration
+                    ' ManagersDaLoading.show vbModeless
+                End If
+            Next x1
+                
+            
+            Debug.Print gv.id & Chr(10) & gv.Children.count & " " & gv.ColumnOrder(0)
+            
+            If Not gv Is Nothing Then
+                sess.FindById("wnd[0]/tbar[0]/btn[15]").press
+            End If
+
+        
+        End If
+    End If
+
+
+    
+    flagForCycle = False
+    ManagersDaLoading.hide
+    
+    
+    ' evo.SuppressingMessageModule.RestoreMessageFilter
 End Sub
 
 
@@ -66,7 +356,7 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
         
         Dim el As Variant
         
-        Dim iter As Integer, counterForInnerDic As Integer
+        Dim iter As Long, counterForInnerDic As Long
         iter = 0
         counterForInnerDic = 0
         ' this loop creating batches of input data
@@ -236,7 +526,7 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
         Dim x17 As Variant
         For x17 = 0 To 10
             On Error Resume Next
-            sess.FindById("wnd[0]/tbar[0]/btn[12]").Press
+            sess.FindById("wnd[0]/tbar[0]/btn[12]").press
         Next x17
         ' ----------------------------------------------------
         
@@ -249,7 +539,7 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
         
         sess.FindById("wnd[0]").Maximize
         sess.FindById("wnd[0]/tbar[0]/okcd").Text = "Y_DI3_80000594"
-        sess.FindById("wnd[0]").SendVKey 0
+        sess.FindById("wnd[0]").sendVKey 0
         
         
         
@@ -286,9 +576,9 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
         
         
 
-            sess.FindById("wnd[0]/usr/btn%_SP$00004_%_APP_%-VALU_PUSH").Press
+            sess.FindById("wnd[0]/usr/btn%_SP$00004_%_APP_%-VALU_PUSH").press
             
-            sess.FindById("wnd[1]/tbar[0]/btn[16]").Press
+            sess.FindById("wnd[1]/tbar[0]/btn[16]").press
         
             For x = LBound(arr) To UBound(arr)
             
@@ -303,15 +593,15 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
             
             Next x
         
-            sess.FindById("wnd[1]/tbar[0]/btn[0]").Press
-            sess.FindById("wnd[1]/tbar[0]/btn[8]").Press
+            sess.FindById("wnd[1]/tbar[0]/btn[0]").press
+            sess.FindById("wnd[1]/tbar[0]/btn[8]").press
         
             '
             stdStr = "wnd[1]/usr/tabsTAB_STRIP/tabpSIVA/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/txtRSCSEL-SLOW_I"
             '
             '' list of pns
             With sess
-                .FindById("wnd[0]/usr/btn%_SP$00003_%_APP_%-VALU_PUSH").Press
+                .FindById("wnd[0]/usr/btn%_SP$00003_%_APP_%-VALU_PUSH").press
                 
                 
                 Dim a As Variant, a_i As Long
@@ -322,7 +612,7 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
                 
                 
                 'clear prev list
-                sess.FindById("wnd[1]/tbar[0]/btn[16]").Press
+                sess.FindById("wnd[1]/tbar[0]/btn[16]").press
                 
                 a_i = 0
                 For Each ikey In innerDic.Keys
@@ -363,12 +653,12 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
                 Next
             End With
             
-            sess.FindById("wnd[1]/tbar[0]/btn[0]").Press
-            sess.FindById("wnd[1]/tbar[0]/btn[8]").Press
+            sess.FindById("wnd[1]/tbar[0]/btn[0]").press
+            sess.FindById("wnd[1]/tbar[0]/btn[8]").press
         
         
             ' final submit!
-            sess.FindById("wnd[0]/tbar[1]/btn[8]").Press
+            sess.FindById("wnd[0]/tbar[1]/btn[8]").press
         
             
             
@@ -426,14 +716,20 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
                         If Trim(gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_ARTICLE - 1))) <> "" Then
                             lastNotEmptyPartNumber = Trim(gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_ARTICLE - 1)))
                         End If
-                        .Offset(0, EVO.E_MANAGERS_DA_ARTICLE - 1).Value = lastNotEmptyPartNumber
+                        .offset(0, EVO.E_MANAGERS_DA_ARTICLE - 1).Value = lastNotEmptyPartNumber
                         
                         
-                        .Offset(0, EVO.E_MANAGERS_DA_ACHETEUR - 1).Value = gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_ACHETEUR - 1))
-                        .Offset(0, EVO.E_MANAGERS_DA_RU - 1).Value = gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_RU - 1))
+                        .offset(0, EVO.E_MANAGERS_DA_ACHETEUR - 1).Value = gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_ACHETEUR - 1))
+                        .offset(0, EVO.E_MANAGERS_DA_RU - 1).Value = gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA_RU - 1))
+                        
+                        ' new from 0.92
+                        .offset(0, EVO.E_MANAGERS_DA.E_MANAGERS_DA_FAMILY - 1).Value = _
+                            gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA.E_MANAGERS_DA_FAMILY - 1))
+                        .offset(0, EVO.E_MANAGERS_DA.E_MANAGERS_DA_GROUP - 1).Value = _
+                            gv.getCellValue(x1, cols(EVO.E_MANAGERS_DA.E_MANAGERS_DA_GROUP - 1))
                     End With
                     
-                    Set orng = orng.Offset(1, 0)
+                    Set orng = orng.offset(1, 0)
                     
                     
                     
@@ -456,7 +752,7 @@ Public Sub inner0GetManagersDa(semicolonedDomains As String, c As Collection, is
                 Debug.Print gv.id & Chr(10) & gv.Children.count & " " & gv.ColumnOrder(0)
                 
                 If Not gv Is Nothing Then
-                    sess.FindById("wnd[0]/tbar[0]/btn[15]").Press
+                    sess.FindById("wnd[0]/tbar[0]/btn[15]").press
                 End If
 
             
@@ -483,7 +779,7 @@ Private Function prepareInputFOrManagersDa(ish As Worksheet, ByRef semicolonedDo
     Dim vd As Range
     
     
-    If ish.Cells(1, 1).Value = "Article" Then
+    If UCase(ish.Cells(1, 1).Value) = "ARTICLE" Then
         articleEnum = EVO.E_MB51_0_ARTICLE
         magEnum = EVO.E_MB51_0_MAG
         Set vd = ThisWorkbook.Sheets("forValidation").Range("D38")
@@ -507,20 +803,20 @@ Private Function prepareInputFOrManagersDa(ish As Worksheet, ByRef semicolonedDo
             ' ir is column A so it might be in raw data still some "X"
             ' we need to avoid this...
             If Trim(ir.Value) <> "X" Then
-                tmpColl.Add CStr(ir.Offset(0, articleEnum - 1).Value)
+                tmpColl.Add CStr(ir.offset(0, articleEnum - 1).Value)
             ' -------------------------------------------------------------------
             
                 
                 ' only uniq!
                 ' --------------------------------------------------------------------------------------------------
-                If semicolonedDomains Like "*" & CStr(ir.Offset(0, magEnum - 1).Value) & "*" Then
+                If semicolonedDomains Like "*" & CStr(ir.offset(0, magEnum - 1).Value) & "*" Then
                 Else
-                    semicolonedDomains = semicolonedDomains & CStr(ir.Offset(0, magEnum - 1).Value) & ";"
+                    semicolonedDomains = semicolonedDomains & CStr(ir.offset(0, magEnum - 1).Value) & ";"
                 End If
                 ' --------------------------------------------------------------------------------------------------
             End If
             
-            Set ir = ir.Offset(1, 0)
+            Set ir = ir.offset(1, 0)
         Loop Until Trim(ir.Value) = ""
         
         
@@ -538,21 +834,58 @@ Private Function prepareInputFOrManagersDa(ish As Worksheet, ByRef semicolonedDo
         
         
 
-            tmpColl.Add CStr(ir.Offset(0, articleEnum - 1).Value)
+            tmpColl.Add CStr(ir.offset(0, articleEnum - 1).Value)
             
 
-            If semicolonedDomains Like "*" & CStr(ir.Offset(0, magEnum - 1).Value) & "*" Then
+            If semicolonedDomains Like "*" & CStr(ir.offset(0, magEnum - 1).Value) & "*" Then
             Else
             
-                If Trim(CStr(ir.Offset(0, magEnum - 1).Value)) <> "" Then
-                    If Len(CStr(ir.Offset(0, magEnum - 1).Value)) = 3 Then
-                        semicolonedDomains = semicolonedDomains & CStr(ir.Offset(0, magEnum - 1).Value) & ";"
+                If Trim(CStr(ir.offset(0, magEnum - 1).Value)) <> "" Then
+                    If Len(CStr(ir.offset(0, magEnum - 1).Value)) = 3 Then
+                        semicolonedDomains = semicolonedDomains & CStr(ir.offset(0, magEnum - 1).Value) & ";"
                     End If
                 End If
             End If
 
             
-            Set ir = ir.Offset(1, 0)
+            Set ir = ir.offset(1, 0)
+        Loop Until Trim(ir.Value) = ""
+        
+        
+        
+        Set prepareInputFOrManagersDa = tmpColl
+        
+        
+        Debug.Print "prepareInputFOrManagersDa: " & prepareInputFOrManagersDa.count
+        
+        
+    ElseIf specialValidConcat(ish) Then
+    
+    
+        articleEnum = 2
+        magEnum = 1
+        
+        Set ir = ish.Range("A2")
+        
+        Do
+        
+        
+
+            tmpColl.Add CStr(ir.offset(0, articleEnum - 1).Value)
+            
+
+            If semicolonedDomains Like "*" & CStr(ir.offset(0, magEnum - 1).Value) & "*" Then
+            Else
+            
+                If Trim(CStr(ir.offset(0, magEnum - 1).Value)) <> "" Then
+                    If Len(CStr(ir.offset(0, magEnum - 1).Value)) = 3 Then
+                        semicolonedDomains = semicolonedDomains & CStr(ir.offset(0, magEnum - 1).Value) & ";"
+                    End If
+                End If
+            End If
+
+            
+            Set ir = ir.offset(1, 0)
         Loop Until Trim(ir.Value) = ""
         
         
@@ -570,6 +903,22 @@ Private Function prepareInputFOrManagersDa(ish As Worksheet, ByRef semicolonedDo
 End Function
 
 
+
+
+
+Private Function specialValidConcat(sh1 As Worksheet) As Boolean
+    specialValidConcat = False
+    
+    If sh1.Cells(1, 1).Value = "DOMAIN" Then
+        If sh1.Cells(1, 2).Value = "ARTICLE" Then
+            If sh1.Cells(1, 7).Value = "DIV" Then
+                specialValidConcat = True
+            End If
+        End If
+    End If
+End Function
+
+
 Private Function validateIfTheSemicolonedDomainsAreSemicolonedDomains(str As String)
     validateIfTheSemicolonedDomainsAreSemicolonedDomains = False
     
@@ -583,9 +932,13 @@ End Function
 
 Private Sub managers_DA__fillLabels(orng As Range)
 
-    orng.Offset(0, EVO.E_MANAGERS_DA_ARTICLE - 1).Value = "PN"
-    orng.Offset(0, EVO.E_MANAGERS_DA_ACHETEUR - 1).Value = "ACHETEUR"
-    orng.Offset(0, EVO.E_MANAGERS_DA_RU - 1).Value = "RU"
+    orng.offset(0, EVO.E_MANAGERS_DA_ARTICLE - 1).Value = "PN"
+    orng.offset(0, EVO.E_MANAGERS_DA_ACHETEUR - 1).Value = "ACHETEUR"
+    orng.offset(0, EVO.E_MANAGERS_DA_RU - 1).Value = "RU"
+    
+    ' new from 0.92
+    orng.offset(0, EVO.E_MANAGERS_DA.E_MANAGERS_DA_FAMILY - 1).Value = "FAMILY ACHAT"
+    orng.offset(0, EVO.E_MANAGERS_DA.E_MANAGERS_DA_GROUP - 1).Value = "GROUP ACHETEUR"
     
 End Sub
 
@@ -641,18 +994,24 @@ Public Sub fillReceptionManagersDaColumn(mb51Out As Worksheet, managersDaSh As W
         Do
             
             If rm.Value = Split(rfa.Value, "-")(0) Then
-                rfa.Offset(0, EVO.E_MB51_0_RU - EVO.E_MB51_0_ARTICLE).Value = _
-                    rm.Offset(0, EVO.E_MANAGERS_DA_RU - EVO.E_MANAGERS_DA_ARTICLE).Value
+                rfa.offset(0, EVO.E_MB51_0_RU - EVO.E_MB51_0_ARTICLE).Value = _
+                    rm.offset(0, EVO.E_MANAGERS_DA_RU - EVO.E_MANAGERS_DA_ARTICLE).Value
                     
-                rfa.Offset(0, EVO.E_MB51_0_MANAGER_DA - EVO.E_MB51_0_ARTICLE).Value = _
-                    rm.Offset(0, EVO.E_MANAGERS_DA_ACHETEUR - EVO.E_MANAGERS_DA_ARTICLE).Value
+                rfa.offset(0, EVO.E_MB51_0_MANAGER_DA - EVO.E_MB51_0_ARTICLE).Value = _
+                    rm.offset(0, EVO.E_MANAGERS_DA_ACHETEUR - EVO.E_MANAGERS_DA_ARTICLE).Value
+                    
+                rfa.offset(0, EVO.E_MB51_0_FAMILY - EVO.E_MB51_0_ARTICLE).Value = _
+                    rm.offset(0, EVO.E_MANAGERS_DA_FAMILY - EVO.E_MANAGERS_DA_ARTICLE).Value
+                    
+                rfa.offset(0, EVO.E_MB51_0_GROUP - EVO.E_MB51_0_ARTICLE).Value = _
+                    rm.offset(0, EVO.E_MANAGERS_DA_GROUP - EVO.E_MANAGERS_DA_ARTICLE).Value
                     
                 ' Application.Calculation = xlCalculationManual
             End If
-            Set rm = rm.Offset(1, 0)
+            Set rm = rm.offset(1, 0)
         Loop Until Trim(rm.Value) = ""
         
-        Set rfa = rfa.Offset(1, 0)
+        Set rfa = rfa.offset(1, 0)
     Loop Until Trim(rfa.Value) = ""
     
     Application.Calculation = xlCalculationAutomatic
@@ -661,53 +1020,216 @@ End Sub
 
 
 ' ----------
-Public Sub fillGreenLightManagersDaColumn(aSh As Worksheet, managersDaSh As Worksheet)
+Public Sub fillGreenLightManagersDaColumn(ash As Worksheet, managersDaSh As Worksheet)
 
 
     Application.Calculation = xlCalculationManual
+    Application.DisplayAlerts = False
+    Application.EnableEvents = False
 
     Dim rfa As Range, rm As Range
-    Set rfa = aSh.Cells(2, EVO.E_ADJUSTED_SQ01_Reference)
+    Set rfa = ash.Cells(2, EVO.E_ADJUSTED_SQ01_Reference)
     
     Dim strPn As String
     
+    Dim bufferDic17 As Dictionary
+    Set bufferDic17 = New Dictionary
+    
+    
+    Dim areaOfRefInManagersDa As Range
+    Set areaOfRefInManagersDa = managersDaSh.Range(managersDaSh.Cells(2, EVO.E_MANAGERS_DA_ARTICLE), managersDaSh.Cells(2, EVO.E_MANAGERS_DA_ARTICLE).End(xlDown))
+    Debug.Print "areaOfRefInManagersDa: " & areaOfRefInManagersDa.Address
+    Dim match1 As Range
+    Set match1 = Nothing
+    
+    
+    
+    ' standard looking for data
     Do
-        ' starting from beg every time!
-        Set rm = managersDaSh.Cells(2, EVO.E_MANAGERS_DA_ARTICLE)
+
+        strPn = Split(rfa.Value, "-")(0)
         
-        Do
+        ' 0. opcja jesli juz w buferze mamy dane
+        Set match1 = Nothing
+        
+        If IsEmpty(bufferDic17(strPn)) Then
+            ' Debug.Print "IsEmpty(bufferDic17(strPn))"
+        Else
+            On Error Resume Next
+            Set match1 = managersDaSh.Range(CStr(bufferDic17(strPn)))
+        End If
+        
+        ' Debug.Print bufferDic17.count
         
         
-            ' Debug.Assert rfa.Value <> "9832114080-02"
+        ' 0 take from dic buffer
+        If Not match1 Is Nothing Then
+            ' =========================================================================================
+            ' =========================================================================================
+            rfa.offset(0, EVO.E_ADJUSTED_SQ01_RU - 1).Value = _
+                rm.offset(0, EVO.E_MANAGERS_DA_RU - EVO.E_MANAGERS_DA_ARTICLE).Value
+                
+            rfa.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_DA - 1).Value = _
+                rm.offset(0, EVO.E_MANAGERS_DA_ACHETEUR - EVO.E_MANAGERS_DA_ARTICLE).Value
+                
+                
+            'new 092
+            rfa.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_FAMILY - 1).Value = _
+                rm.offset(0, EVO.E_MANAGERS_DA_FAMILY - EVO.E_MANAGERS_DA_ARTICLE).Value
+                
+            rfa.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_GROUP - 1).Value = _
+                rm.offset(0, EVO.E_MANAGERS_DA_GROUP - EVO.E_MANAGERS_DA_ARTICLE).Value
+            ' =========================================================================================
+            ' =========================================================================================
+        Else
+        
+        
+            ' 1. najpierw robimy std find
+            Set match1 = Nothing
+            On Error Resume Next
+            Set match1 = areaOfRefInManagersDa.Find(strPn)
             
-            ' Debug.Assert rm.row < 71
             
             
-            strPn = Split(rfa.Value, "-")(0)
-            If CStr(rm.Value) = strPn Then
-                rfa.Offset(0, EVO.E_ADJUSTED_SQ01_RU - 1).Value = _
-                    rm.Offset(0, EVO.E_MANAGERS_DA_RU - EVO.E_MANAGERS_DA_ARTICLE).Value
+            ' 2. jesli sukces dla std find wtedy po prostu przepisujemy dane
+            If Not match1 Is Nothing Then
+            
+                
+                Set rm = match1
+                
+                
+                If IsEmpty(bufferDic17(strPn)) Then
+                    ' Debug.Print "we already have this key"
+                    bufferDic17(strPn) = match1.AddressLocal
+                Else
+                    bufferDic17.Add strPn, match1.AddressLocal
+                End If
+                
+                
+                ' Debug.Print bufferDic17.count
+                
+                ' =========================================================================================
+                ' =========================================================================================
+                rfa.offset(0, EVO.E_ADJUSTED_SQ01_RU - 1).Value = _
+                    rm.offset(0, EVO.E_MANAGERS_DA_RU - EVO.E_MANAGERS_DA_ARTICLE).Value
                     
-                rfa.Offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_DA - 1).Value = _
-                    rm.Offset(0, EVO.E_MANAGERS_DA_ACHETEUR - EVO.E_MANAGERS_DA_ARTICLE).Value
+                rfa.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_DA - 1).Value = _
+                    rm.offset(0, EVO.E_MANAGERS_DA_ACHETEUR - EVO.E_MANAGERS_DA_ARTICLE).Value
+                    
+                    
+                'new 092
+                rfa.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_FAMILY - 1).Value = _
+                    rm.offset(0, EVO.E_MANAGERS_DA_FAMILY - EVO.E_MANAGERS_DA_ARTICLE).Value
+                    
+                rfa.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_GROUP - 1).Value = _
+                    rm.offset(0, EVO.E_MANAGERS_DA_GROUP - EVO.E_MANAGERS_DA_ARTICLE).Value
+                ' =========================================================================================
+                ' =========================================================================================
+                
+            Else
+            
+                ' jesli dane sie nie znalazly robimy loop dlugi
+                ' ------------------------------------------------
+                ' jesli wszystko zgodne z planem - ta logika w ogole juz nie powinna sie uruchamiac
+            
+            
+                ' std looking by loop
+                ' starting from beg every time!
+                Set rm = managersDaSh.Cells(2, EVO.E_MANAGERS_DA_ARTICLE)
+                Do
+            
+                
+                    ' Debug.Assert rfa.Value <> "9832114080-02"
+                    
+                    ' Debug.Assert rm.row < 71
+                    
+                    
+                    
+                    If CStr(rm.Value) = strPn Then
+                    
+                    
+                        ' =========================================================================================
+                        ' =========================================================================================
+                        rfa.offset(0, EVO.E_ADJUSTED_SQ01_RU - 1).Value = _
+                            rm.offset(0, EVO.E_MANAGERS_DA_RU - EVO.E_MANAGERS_DA_ARTICLE).Value
+                            
+                        rfa.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_DA - 1).Value = _
+                            rm.offset(0, EVO.E_MANAGERS_DA_ACHETEUR - EVO.E_MANAGERS_DA_ARTICLE).Value
+                            
+                            
+                        'new 092
+                        rfa.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_FAMILY - 1).Value = _
+                            rm.offset(0, EVO.E_MANAGERS_DA_FAMILY - EVO.E_MANAGERS_DA_ARTICLE).Value
+                            
+                        rfa.offset(0, EVO.E_ADJUSTED_SQ01_MANAGER_GROUP - 1).Value = _
+                            rm.offset(0, EVO.E_MANAGERS_DA_GROUP - EVO.E_MANAGERS_DA_ARTICLE).Value
+                        ' =========================================================================================
+                        ' =========================================================================================
+                        
+                        
+                    End If
+                    Set rm = rm.offset(1, 0)
+                    
+                    ' Application.Calculation = xlCalculationManual
+                    
+                Loop Until Trim(rm.Value) = ""
             End If
-            Set rm = rm.Offset(1, 0)
-            
-            ' Application.Calculation = xlCalculationManual
-            
-        Loop Until Trim(rm.Value) = ""
         
-        Set rfa = rfa.Offset(1, 0)
+        
+        End If
+        
+        
+        
+        ' offset dla adjusted sh
+        Set rfa = rfa.offset(1, 0)
     Loop Until Trim(rfa.Value) = ""
     
     
     Application.Calculation = xlCalculationAutomatic
+    Application.DisplayAlerts = True
+    Application.EnableEvents = True
 End Sub
 
 
 Public Sub testForFillingManagersDaForGreenLightAdjustedWorkhsheet()
     
     fillGreenLightManagersDaColumn ThisWorkbook.Sheets("TP04_20201007_I"), ThisWorkbook.Sheets("MANAGERS_DA_20201007_I")
+End Sub
+
+
+
+
+
+
+
+Public Sub matchSq01WithDAManagers(ictrl As IRibbonControl)
+    Debug.Print "matchSq01With da managers"
+    
+    fillFormDaManagers "SQ01"
+End Sub
+
+
+Public Sub matchMb51WithDaManagers(ictrl As IRibbonControl)
+    Debug.Print "matchMb51With da managers"
+    
+    fillFormDaManagers "MB51"
+End Sub
+
+Private Sub fillFormDaManagers(typ As String)
+    
+    FindTangoOrIntSData.ComboBox1.Clear
+    ' FindTangoOrIntSData.Caption = "Match with Internal Suppliers"
+    
+    Dim sh As Worksheet
+    For Each sh In ThisWorkbook.Sheets
+        If sh.name Like "MANAGERS_DA_*" Then
+            FindTangoOrIntSData.ComboBox1.addItem sh.name
+        End If
+    Next sh
+    
+    FindTangoOrIntSData.Caption = "MANAGERS_DA_"
+    FindTangoOrIntSData.typ = CStr(typ)
+    FindTangoOrIntSData.show
 End Sub
     
     

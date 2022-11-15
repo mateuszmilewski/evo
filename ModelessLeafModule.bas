@@ -29,6 +29,12 @@ Option Explicit
 ' THE EVO TOOL
 
 
+Public Sub showSummaryForm(ictrl As IRibbonControl)
+    
+    EVO.startModelessLeaf
+End Sub
+
+
 Public Sub startModelessLeaf()
 Attribute startModelessLeaf.VB_ProcData.VB_Invoke_Func = "Q\n14"
 

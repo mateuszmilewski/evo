@@ -41,11 +41,15 @@ Private Sub AddLineBtn_Click()
         tbxMag.Top = 36 + 18
         tbxMag.Left = 84
         
+        tbxMag.Value = Format(Date - 14, "dd.mm.yyyy")
+        
+        
         Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxAu02", True)
         tbxMag.Top = 36 + 18
         tbxMag.Left = 162
         
         tbxMag.Value = Format(Date, "dd.mm.yyyy")
+        
         
         Set tbxMvt1 = cs.Add("Forms.TextBox.1", "TextBoxMvt1_02", True)
         tbxMvt1.Top = 36 + 18
@@ -71,27 +75,29 @@ Private Sub AddLineBtn_Click()
         If howManyLinesAlready < 10 Then
         
             
-            Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxMag0" & CStr(howManyLinesAlready), True)
+            Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxMag0" & CStr(howManyLinesAlready + 1), True)
             tbxMag.Top = 36 + 18 * (howManyLinesAlready)
             tbxMag.Left = 6
             
-            Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxDu0" & CStr(howManyLinesAlready), True)
+            Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxDu0" & CStr(howManyLinesAlready + 1), True)
             tbxMag.Top = 36 + 18 * (howManyLinesAlready)
             tbxMag.Left = 84
             
-            Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxAu0" & CStr(howManyLinesAlready), True)
+            tbxMag.Value = Format(Date - 14, "dd.mm.yyyy")
+            
+            Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxAu0" & CStr(howManyLinesAlready + 1), True)
             tbxMag.Top = 36 + 18 * howManyLinesAlready
             tbxMag.Left = 162
             
             tbxMag.Value = Format(Date, "dd.mm.yyyy")
             
-            Set tbxMvt1 = cs.Add("Forms.TextBox.1", "TextBoxMvt1_0" & CStr(howManyLinesAlready), True)
+            Set tbxMvt1 = cs.Add("Forms.TextBox.1", "TextBoxMvt1_0" & CStr(howManyLinesAlready + 1), True)
             tbxMvt1.Top = 36 + 18 * howManyLinesAlready
             tbxMvt1.Left = 240
             
             tbxMvt1.Value = "101"
             
-            Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxMvt2_0" & CStr(howManyLinesAlready), True)
+            Set tbxMag = cs.Add("Forms.TextBox.1", "TextBoxMvt2_0" & CStr(howManyLinesAlready + 1), True)
             tbxMag.Top = 36 + 18 * howManyLinesAlready
             tbxMag.Left = 318
             

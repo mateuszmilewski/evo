@@ -114,24 +114,43 @@ Public Sub reculculIfBetweenDatesWeekend(ByRef li As LineItem, Optional e As E_E
 
 
     Dim wd As Variant
-    Dim i As Date
+    Dim i As Date, i2 As Date
     Dim helper As Integer
     helper = 0
     
     If e = E_ECHANCIER_ONL_semaine_SCENARIO_DEL Then
     
-
-
-        For i = li.delDate To li.puDate Step -1
+        helper = 0
+            
+            
+        ' NOK - 2022-02-xx
+        ' ----------------------------------------------------
+        'For i = li.delDate To li.puDate Step -1
+        '
+        '    wd = Application.WorksheetFunction.Weekday(i, 2)
+        '
+        '    If Int(wd) = 6 Then
+        '        helper = helper + 1
+        '    ElseIf Int(wd) = 7 Then
+        '        helper = helper + 1
+        '    End If
+        'Next i
+        ' ----------------------------------------------------
+        
+        i = CDate(Format(li.delDate, "yyyy-mm-dd"))
+        i2 = CDate(Format(li.puDate, "yyyy-mm-dd"))
+        Do
             
             wd = Application.WorksheetFunction.Weekday(i, 2)
-            
+        
             If Int(wd) = 6 Then
                 helper = helper + 1
             ElseIf Int(wd) = 7 Then
                 helper = helper + 1
             End If
-        Next i
+            
+            i = i - 1
+        Loop While i >= i2
         
         li.puDate = CDate(li.puDate - helper)
         
@@ -146,21 +165,32 @@ Public Sub reculculIfBetweenDatesWeekend(ByRef li As LineItem, Optional e As E_E
             li.puDate = CDate(li.puDate - 1)
         End If
         
+        
+        
+        
     ElseIf e = E_ECHANCIER_ONL_semaine_SCENARIO_PU Then
     
     
-
+        helper = 0
         
-        For i = li.delDate To li.puDate Step -1
+        
+        
+        i = CDate(Format(li.delDate, "yyyy-mm-dd"))
+        i2 = CDate(Format(li.puDate, "yyyy-mm-dd"))
+        
+        Do
             
             wd = Application.WorksheetFunction.Weekday(i, 2)
-            
+        
             If Int(wd) = 6 Then
                 helper = helper + 1
             ElseIf Int(wd) = 7 Then
                 helper = helper + 1
             End If
-        Next i
+            
+            i = i - 1
+        Loop While i >= i2
+        
         
         li.delDate = CDate(li.delDate + helper)
         
@@ -188,6 +218,58 @@ Public Function validateSearching(pleRng As Range, cloeRng As Range, mainRng As 
             If Not mainRng Is Nothing Then
                 If Not condiRng Is Nothing Then
                     validateSearching = True
+                Else
+                    'On Error Resume Next
+                    'MsgBox "condi data missing for cofor exp: " & mainRng.Value, vbCritical
+                    'MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+                    'End
+                    
+                    Debug.Print "condi data missing for cofor exp: " & mainRng.Value & mainRng.row
+                End If
+            Else
+                'On Error Resume Next
+                'MsgBox "main data missing for cofor exp: " & mainRng.Value, vbCritical
+                'MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+                'End
+                
+                Debug.Print "main data missing for cofor exp: " & mainRng.Value & mainRng.row
+            End If
+        Else
+            'On Error Resume Next
+            'MsgBox "cloe data missing for cofor exp: " & mainRng.Value, vbCritical
+            'MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+            'End
+            
+            Debug.Print "cloe data missing for cofor exp: " & mainRng.Value & mainRng.row
+        End If
+    Else
+        'On Error Resume Next
+        'MsgBox "PLE missing for cofor exp: " & mainRng.Value, vbCritical
+        'MsgBox "Macro stops on validateSearching not able to continue - wrong data in ctrl tower db!", vbCritical
+        'End
+        
+        Debug.Print "ple data missing for cofor exp: " & mainRng.Value & mainRng.row
+    End If
+End Function
+
+
+
+Public Function validateSearchingWith999(pleRng As Range, cloeRng As Range, mainRng As Range, condiRng As Range, param999 As Integer) As Boolean
+
+
+    ' param999 - new field from CopyHandler - if PLE data missing then take 999 days artificially
+
+    ' -------------------------------
+    validateSearchingWith999 = False
+    
+    If (Not pleRng Is Nothing) Or (param999 = 999) Then
+        If Not cloeRng Is Nothing Then
+            If Not mainRng Is Nothing Then
+                If Not condiRng Is Nothing Then
+                
+                    ' -------------------------------
+                    validateSearchingWith999 = True
+                    
                 Else
                     'On Error Resume Next
                     'MsgBox "condi data missing for cofor exp: " & mainRng.Value, vbCritical
@@ -306,6 +388,11 @@ End Function
 
 
 Public Function adjustStringCofor(sc As String) As String
+
+
+    Debug.Print Len(sc)
+    Debug.Print CBool(sc Like "*  *")
+
 
     If sc Like "*  *" And Len(sc) > 0 Then
         adjustStringCofor = CStr(sc)
@@ -517,7 +604,7 @@ End Sub
 
 Private Sub changeFormulaIntoValue(sh As Worksheet, r As Range, lastRow As Long, e As E_PIVOT_SRC)
     Set r = sh.Range("A2:A" & lastRow)
-    Set r = r.Offset(0, e - 1)
+    Set r = r.offset(0, e - 1)
     r.Copy
     r.PasteSpecial xlPasteValues
     sh.Range("A2").Select
@@ -538,7 +625,7 @@ Private Sub makeSpecificDivForZ8(sh As Worksheet, r As Range, lastRow As Long, _
         wynikParsu = Replace(wynikParsu, "X", "R2C" & CStr(eforX) & ":R" & CStr(lastRow) & "C" & CStr(eforX))
         
         
-        Set r = r.Offset(0, e - 1)
+        Set r = r.offset(0, e - 1)
         r.FormulaArray = wynikParsu
     
 End Sub
@@ -558,7 +645,7 @@ Private Sub makeSpecificDivForZ7(sh As Worksheet, r As Range, lastRow As Long, _
         wynikParsu = Replace(wynikParsu, "Y", "R2C" & CStr(eforY) & ":R" & CStr(lastRow) & "C" & CStr(eforY))
         
         
-        Set r = r.Offset(0, e - 1)
+        Set r = r.offset(0, e - 1)
         r.FormulaArray = wynikParsu
     
 End Sub
@@ -578,7 +665,7 @@ Private Sub makeSpecificDivForZ6(sh As Worksheet, r As Range, lastRow As Long, _
         wynikParsu = Replace(wynikParsu, "X", "R2C" & CStr(eforX) & ":R" & CStr(lastRow) & "C" & CStr(eforX))
         
         
-        Set r = r.Offset(0, e - 1)
+        Set r = r.offset(0, e - 1)
         r.FormulaArray = wynikParsu
     
 End Sub
@@ -599,7 +686,7 @@ Private Sub makeSpecificDivForZ5(sh As Worksheet, r As Range, lastRow As Long, _
         wynikParsu = Replace(wynikParsu, "X", "R2C" & CStr(eforX) & ":R" & CStr(lastRow) & "C" & CStr(eforX))
         wynikParsu = Replace(wynikParsu, "Y", "R2C" & CStr(eforY) & ":R" & CStr(lastRow) & "C" & CStr(eforY))
         
-        Set r = r.Offset(0, e - 1)
+        Set r = r.offset(0, e - 1)
         r.FormulaArray = wynikParsu
     
 End Sub
@@ -620,7 +707,7 @@ Private Sub makeSpecificDivForZ4(sh As Worksheet, r As Range, lastRow As Long, _
         wynikParsu = Replace(wynikParsu, "Y", "R2C" & CStr(eforY) & ":R" & CStr(lastRow) & "C" & CStr(eforY))
         wynikParsu = Replace(wynikParsu, "Z", "R2C" & CStr(eforZ) & ":R" & CStr(lastRow) & "C" & CStr(eforZ))
         
-        Set r = r.Offset(0, e - 1)
+        Set r = r.offset(0, e - 1)
         r.FormulaArray = wynikParsu
     
 End Sub
@@ -640,7 +727,7 @@ Private Sub makeSpecificDivForZ3(sh As Worksheet, r As Range, lastRow As Long, _
         wynikParsu = Replace(wynikParsu, "Y", "R2C" & CStr(eforY) & ":R" & CStr(lastRow) & "C" & CStr(eforY))
         wynikParsu = Replace(wynikParsu, "Z", "R2C" & CStr(eforZ) & ":R" & CStr(lastRow) & "C" & CStr(eforZ))
         
-        Set r = r.Offset(0, e - 1)
+        Set r = r.offset(0, e - 1)
         r.FormulaArray = wynikParsu
 End Sub
 
@@ -656,7 +743,7 @@ Private Sub makeSpecificDiv(sh As Worksheet, r As Range, lastRow As Long, eforX 
     wynikParsu = Replace(wynikParsu, "X", "R2C" & CStr(eforX) & ":R" & CStr(lastRow) & "C" & CStr(eforX))
     wynikParsu = Replace(wynikParsu, "Y", "R2C" & CStr(eforY) & ":R" & CStr(lastRow) & "C" & CStr(eforY))
     
-    Set r = r.Offset(0, e - 1)
+    Set r = r.offset(0, e - 1)
     r.FormulaArray = wynikParsu
 End Sub
 
@@ -673,7 +760,7 @@ Private Sub makeSpecificSumIf(sh As Worksheet, r As Range, lastRow As Long, efor
     wynikParsu = Replace(wynikParsu, "Y", "R2C1:R" & CStr(lastRow) & "C1")
     wynikParsu = Replace(wynikParsu, "Z", "R2C" & CStr(eforZ) & ":R" & CStr(lastRow) & "C" & CStr(eforZ))
     
-    Set r = r.Offset(0, e - 1)
+    Set r = r.offset(0, e - 1)
     r.FormulaArray = wynikParsu
 End Sub
 
@@ -903,12 +990,12 @@ Public Sub copyThisPivotToTcamReport(ByRef ph As PivotHandler, Optional e As E_P
             .Cells(x, 1).Value = r1.Value
             .Cells(x, 1).Font.Bold = True
             .Cells(x, 1).Interior.Color = RGB(221, 235, 247)
-            .Cells(x, 2).Value = r1.Offset(0, 1).Value
+            .Cells(x, 2).Value = r1.offset(0, 1).Value
             .Cells(x, 2).Font.Bold = True
             .Cells(x, 2).Interior.Color = RGB(221, 235, 247)
         End With
         x = x + 1
-        Set r1 = r1.Offset(1, 0)
+        Set r1 = r1.offset(1, 0)
     Loop Until CStr(r1) = ""
     ' --------------------------------------------------------------------
     ' --------------------------------------------------------------------
@@ -923,26 +1010,26 @@ Public Sub copyThisPivotToTcamReport(ByRef ph As PivotHandler, Optional e As E_P
     With ph.tcamSheet
         r1.Copy .Cells(x, 1)
         x = x + 1
-        Set r1 = r1.Offset(1, 0)
+        Set r1 = r1.offset(1, 0)
         
         Set startingPointData = .Cells(x, 1)
         Debug.Print "startingPointData: " & startingPointData.Address
         .Range("H1").Value = startingPointData.row
         
-        Set r1 = ph.getPivot().Range(r1, r1.End(xlToRight).Offset(0, -1))
+        Set r1 = ph.getPivot().Range(r1, r1.End(xlToRight).offset(0, -1))
         ' first - copy labels!
         r1.Copy .Cells(x, 1)
         Set xtraLabelsMountPoint = .Cells(x, 1)
-        Set xtraLabelsMountPoint = xtraLabelsMountPoint.End(xlToRight).Offset(0, 1)
+        Set xtraLabelsMountPoint = xtraLabelsMountPoint.End(xlToRight).offset(0, 1)
         addXtraLabelsInTcamReport xtraLabelsMountPoint
         
-        ileMamyKolumn = CLng(xtraLabelsMountPoint.Offset(0, 3).Column)
+        ileMamyKolumn = CLng(xtraLabelsMountPoint.offset(0, 3).Column)
         'kolumny
         .Range("H2").Value = ileMamyKolumn
         
         
         x = x + 1
-        Set r1 = r1.Offset(1, 0)
+        Set r1 = r1.offset(1, 0)
         
         
         ' DATA
@@ -951,7 +1038,7 @@ Public Sub copyThisPivotToTcamReport(ByRef ph As PivotHandler, Optional e As E_P
             Do
                 r1.Copy .Cells(x, 1)
                 x = x + 1
-                Set r1 = r1.Offset(1, 0)
+                Set r1 = r1.offset(1, 0)
             Loop Until CStr(r1.Cells(1, 1).Value) = ""
         End If
         
@@ -972,27 +1059,27 @@ Public Sub copyThisPivotToTcamReport(ByRef ph As PivotHandler, Optional e As E_P
             
             If deco_r.row < ostatniWiersz Then
                 If IsDate(deco_r) Then
-                    usun_sumy_dla_dat_bo_to_bez_sensu deco_r, deco_r.Offset(0, 1), ileMamyKolumn
+                    usun_sumy_dla_dat_bo_to_bez_sensu deco_r, deco_r.offset(0, 1), ileMamyKolumn
                 ElseIf CStr(deco_r) <> "" Then
-                    zaokragliWartosci startingPointData, deco_r, deco_r.Offset(0, 1), ileMamyKolumn
+                    zaokragliWartosci startingPointData, deco_r, deco_r.offset(0, 1), ileMamyKolumn
                 Else
                     ' nop ?
                 End If
             Else
                 'ostatniWiersz
                 deco_r.Value = "SUM: "
-                wsadzFormulySumy deco_r, deco_r.Offset(0, 1), startingPointData, ileMamyKolumn
+                wsadzFormulySumy deco_r, deco_r.offset(0, 1), startingPointData, ileMamyKolumn
                 
                 If e = E_PIVOT_ANGEL_STD Then
-                    wsadzFormulyDlaCloeData ph.tcamSheet, deco_r, deco_r.Offset(0, 1), startingPointData, ileMamyKolumn
+                    wsadzFormulyDlaCloeData ph.tcamSheet, deco_r, deco_r.offset(0, 1), startingPointData, ileMamyKolumn
                 ElseIf e = E_PIVOT_CAROLINE_STD Then
-                    wsadzFormulyDlaCloeData_CarolineApproach ph.tcamSheet, deco_r, deco_r.Offset(0, 1), startingPointData, ileMamyKolumn
+                    wsadzFormulyDlaCloeData_CarolineApproach ph.tcamSheet, deco_r, deco_r.offset(0, 1), startingPointData, ileMamyKolumn
                 Else
                     MsgBox "No good std in this section! Call dev! :D", vbCritical
                 End If
             End If
             ' ------------------------------------------------------------------------
-            Set deco_r = deco_r.Offset(1, 0)
+            Set deco_r = deco_r.offset(1, 0)
         Loop Until CStr(deco_r) = ""
         
     End With
@@ -1018,7 +1105,7 @@ Private Sub usun_sumy_dla_dat_bo_to_bez_sensu(dateRange As Range, tmpDecoRange A
             tmpDecoRange.Value = ""
         End If
         
-        Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+        Set tmpDecoRange = tmpDecoRange.offset(0, 1)
     Loop While tmpDecoRange.Column <= imk
 End Sub
 
@@ -1049,7 +1136,7 @@ Private Sub zaokragliWartosci(sp As Range, dataRange As Range, tmpDecoRange As R
             End If
         End If
         
-        Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+        Set tmpDecoRange = tmpDecoRange.offset(0, 1)
     Loop While tmpDecoRange.Column <= imk
 End Sub
 
@@ -1080,8 +1167,8 @@ Private Sub wsadzFormulySumy(fstSumRange As Range, tmpDecoRange As Range, sp As 
                 
                 columnDiff = tmpDecoRange.Column - sp.Column
                 
-                adr1 = CStr(sp.Offset(1, columnDiff).Address)
-                adr2 = CStr(tmpDecoRange.Offset(-1, 0).Address)
+                adr1 = CStr(sp.offset(1, columnDiff).Address)
+                adr2 = CStr(tmpDecoRange.offset(-1, 0).Address)
                 tmpFromFormula = Replace(tmpFromFormula, "X", adr1 & ":" & adr2)
             
             
@@ -1095,45 +1182,45 @@ Private Sub wsadzFormulySumy(fstSumRange As Range, tmpDecoRange As Range, sp As 
             End If
         End If
         
-        Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+        Set tmpDecoRange = tmpDecoRange.offset(0, 1)
     Loop While tmpDecoRange.Column <= imk
     
     
     ' troche glupie, ale napewno 4 kolumny sa statyczne na bank!
-    Set tmpDecoRange = tmpDecoRange.Offset(0, -4)
+    Set tmpDecoRange = tmpDecoRange.offset(0, -4)
     
     
     fstSumRange.Copy tmpDecoRange
     tmpDecoRange.Value = "TRANS"
     
     
-    Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+    Set tmpDecoRange = tmpDecoRange.offset(0, 1)
     
     tmpFromFormula = CStr(formulaFromRegister.Formula)
                 
     columnDiff = tmpDecoRange.Column - sp.Column
             
-    adr1 = CStr(sp.Offset(1, columnDiff).Address)
-    adr2 = CStr(tmpDecoRange.Offset(-1, 0).Address)
+    adr1 = CStr(sp.offset(1, columnDiff).Address)
+    adr2 = CStr(tmpDecoRange.offset(-1, 0).Address)
     tmpFromFormula = Replace(tmpFromFormula, "X", adr1 & ":" & adr2)
     tmpDecoRange.Formula = CStr(tmpFromFormula)
     tmpDecoRange.Interior.Color = RGB(221, 235, 247)
     tmpDecoRange.Font.Bold = True
     
     
-    Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+    Set tmpDecoRange = tmpDecoRange.offset(0, 1)
     fstSumRange.Copy tmpDecoRange
     tmpDecoRange.Value = "INC"
     
     
-    Set tmpDecoRange = tmpDecoRange.Offset(0, 1)
+    Set tmpDecoRange = tmpDecoRange.offset(0, 1)
     
     tmpFromFormula = CStr(formulaFromRegister.Formula)
                 
     columnDiff = tmpDecoRange.Column - sp.Column
             
-    adr1 = CStr(sp.Offset(1, columnDiff).Address)
-    adr2 = CStr(tmpDecoRange.Offset(-1, 0).Address)
+    adr1 = CStr(sp.offset(1, columnDiff).Address)
+    adr2 = CStr(tmpDecoRange.offset(-1, 0).Address)
     tmpFromFormula = Replace(tmpFromFormula, "X", adr1 & ":" & adr2)
     tmpDecoRange.Formula = CStr(tmpFromFormula)
     tmpDecoRange.Interior.Color = RGB(221, 235, 247)
@@ -1157,10 +1244,10 @@ Private Sub wsadzFormulyDlaCloeData_CarolineApproach(tcamSh As Worksheet, fstSum
     
     tmpFromFormula = CStr(formulaFromRegister.FormulaR1C1Local)
     
-    Set tmpDecoRange = tmpDecoRange.Offset(0, columnMount - 1)
+    Set tmpDecoRange = tmpDecoRange.offset(0, columnMount - 1)
     
-    adr1 = CStr(sp.Offset(1, columnMount).Address)
-    adr2 = CStr(tmpDecoRange.Offset(-1, 0).Address)
+    adr1 = CStr(sp.offset(1, columnMount).Address)
+    adr2 = CStr(tmpDecoRange.offset(-1, 0).Address)
     
     Debug.Print "adrs: " & adr1 & ":" & adr2
     
@@ -1179,7 +1266,7 @@ Private Sub wsadzFormulyDlaCloeData_CarolineApproach(tcamSh As Worksheet, fstSum
     End With
     
     
-    Set rangeForCloeFormula = tcamSh.Range("" & adr1 & ":" & adr2).Offset(0, 1)
+    Set rangeForCloeFormula = tcamSh.Range("" & adr1 & ":" & adr2).offset(0, 1)
     tmpFromFormula = Replace(tmpFromFormula, "X", "1")
     rangeForCloeFormula.FormulaR1C1Local = tmpFromFormula
 
@@ -1203,10 +1290,10 @@ Private Sub wsadzFormulyDlaCloeData(tcamSh As Worksheet, fstSumRange As Range, t
     
     tmpFromFormula = CStr(formulaFromRegister.FormulaR1C1Local)
     
-    Set tmpDecoRange = tmpDecoRange.Offset(0, columnMount - 1)
+    Set tmpDecoRange = tmpDecoRange.offset(0, columnMount - 1)
     
-    adr1 = CStr(sp.Offset(1, columnMount).Address)
-    adr2 = CStr(tmpDecoRange.Offset(-1, 0).Address)
+    adr1 = CStr(sp.offset(1, columnMount).Address)
+    adr2 = CStr(tmpDecoRange.offset(-1, 0).Address)
     
     Debug.Print "adrs: " & adr1 & ":" & adr2
     
@@ -1225,7 +1312,7 @@ Private Sub wsadzFormulyDlaCloeData(tcamSh As Worksheet, fstSumRange As Range, t
     End With
     
     
-    Set rangeForCloeFormula = tcamSh.Range("" & adr1 & ":" & adr2).Offset(0, 1)
+    Set rangeForCloeFormula = tcamSh.Range("" & adr1 & ":" & adr2).offset(0, 1)
     tmpFromFormula = Replace(tmpFromFormula, "X", "1")
     rangeForCloeFormula.FormulaR1C1Local = tmpFromFormula
 
@@ -1238,13 +1325,13 @@ Private Sub addXtraLabelsInTcamReport(lr As Range)
     
     lr.Value = "TRANSPORT"
     
-    lr.Offset(0, 1).Value = "COST"
-    lr.Offset(0, 2).Value = "INCIDENT"
-    lr.Offset(0, 3).Value = "INCIDENT COST"
+    lr.offset(0, 1).Value = "COST"
+    lr.offset(0, 2).Value = "INCIDENT"
+    lr.offset(0, 3).Value = "INCIDENT COST"
     
-    With lr.Parent.Range(lr, lr.Offset(0, 3))
+    With lr.Parent.Range(lr, lr.offset(0, 3))
         .Font.Bold = True
-        .Interior.Color = CLng(lr.Offset(0, -1).Interior.Color)
+        .Interior.Color = CLng(lr.offset(0, -1).Interior.Color)
         .EntireColumn.ColumnWidth = 20
     End With
     
@@ -1255,7 +1342,7 @@ Private Sub addXtraLabelsInTcamReport(lr As Range)
     Set leftLabels = lr.Parent.Cells(lr.row, 2)
     Do
         leftLabels.EntireColumn.ColumnWidth = 12
-        Set leftLabels = leftLabels.Offset(0, 1)
+        Set leftLabels = leftLabels.offset(0, 1)
     Loop Until leftLabels.Address = lr.Address
     
 End Sub
