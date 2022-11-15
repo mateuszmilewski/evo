@@ -32,11 +32,11 @@ Private Sub innerSave()
     Dim x As Variant
 
     For x = 0 To 4
-        ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(0, x).Value = _
+        ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").offset(0, x).Value = _
             Me.Controls("TextBox1" & CStr(x + 1)).Text
            
         On Error Resume Next
-        ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").Offset(1, x).Value = _
+        ThisWorkbook.Sheets("register").Range("PRE_DEF_RUN_FOR_SQ01").offset(1, x).Value = _
             Me.Controls("TextBox2" & CStr(x + 1)).Text
     Next x
     

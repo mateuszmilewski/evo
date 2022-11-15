@@ -102,8 +102,8 @@ Private Function checkIfLabelsInOutputAreInlineWithStd(sh As Worksheet) As Boole
             Exit Do
         End If
         
-        Set fvr = fvr.Offset(0, 1)
-        Set rng = rng.Offset(0, 1)
+        Set fvr = fvr.offset(0, 1)
+        Set rng = rng.offset(0, 1)
         
         
     Loop Until CStr(fvr.Value) = ""

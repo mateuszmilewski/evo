@@ -80,11 +80,14 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
             
             
             Dim r As Range
-            Dim wynikSzukania1 As Range, adresPiewrszegoSzukania1 As String
+            Dim wynikSzukania1 As Range, adresPiewrszegoSzukania1 As String, wybraneSzukanie1 As Range
             Dim strArticleWithoutIndice As String
-            Dim wynikSzukania2 As Range, adresPiewrszegoSzukania2 As String
+            Dim wynikSzukania2 As Range, adresPiewrszegoSzukania2 As String, wybraneSzukanie2 As Range
             
             Dim bMatched1 As Boolean, bMatched2 As Boolean
+            
+            
+            Dim tmpForDebutDate As Date
             
             
             Set r = pusMasterSheet.Range("A3")
@@ -113,11 +116,13 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                     ' Debug.Print r.row
                     
                     ' check if dictionary have this data already
-                    If Not pt04ItemDictionary.Exists(CStr(r.Value & "_" & r.Offset(0, EVO.E_MASTER_cofor - 1).Value)) Then
+                    If Not pt04ItemDictionary.Exists(CStr(r.Value & "_" & r.offset(0, EVO.E_MASTER_cofor - 1).Value)) Then
                     
                         ' multi step matching:
                         ' 1.  "this" article - with proper inidice and matched cofor
                         Set wynikSzukania1 = Nothing
+                        Set wybraneSzukanie1 = Nothing
+                        tmpForDebutDate = CDate(0)
                         
                         On Error Resume Next
                         Set wynikSzukania1 = rngOfArticlesInsideTp04.Find(CStr(r.Value))
@@ -132,29 +137,53 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                                 'Debug.Print Cstr(r.Offset(0, EVO.E_MASTER_cofor - 1).Value) & "_" & _
                                 '    Cstr(wynikSzukania1.Offset(0, EVO.E_TP04_01_FOUR - EVO.E_TP04_01_ARTICLE))
                             
-                                If CStr(r.Offset(0, EVO.E_MASTER_cofor - 1).Value) = _
-                                    CStr(wynikSzukania1.Offset(0, EVO.E_TP04_01_FOUR - EVO.E_TP04_01_ARTICLE)) Then
+                                If CStr(r.offset(0, EVO.E_MASTER_cofor - 1).Value) = _
+                                    CStr(wynikSzukania1.offset(0, EVO.E_TP04_01_FOUR - EVO.E_TP04_01_ARTICLE)) Then
                                     
                                     
                                     ' matched! so OK!
                                     ' -------------------------------------------------------------------------------
+                                    
+                                    If CLng(tmpForDebutDate) = 0 Then
+                                        
+                                        On Error Resume Next
+                                        tmpForDebutDate = CDate(wynikSzukania1.offset(0, EVO.E_TP04_01_DATE_DEBUT - EVO.E_TP04_01_ARTICLE))
+                                        Set wybraneSzukanie1 = wynikSzukania1
+                                    Else
+                                    
+                                    
+                                        If IsDate(wynikSzukania1.offset(0, EVO.E_TP04_01_DATE_DEBUT - EVO.E_TP04_01_ARTICLE)) Then
+                                            
+                                            If CDate(tmpForDebutDate) < CDate(wynikSzukania1.offset(0, EVO.E_TP04_01_DATE_DEBUT - EVO.E_TP04_01_ARTICLE)) Then
+                                                
+                                                On Error Resume Next
+                                                tmpForDebutDate = CDate(wynikSzukania1.offset(0, EVO.E_TP04_01_DATE_DEBUT - EVO.E_TP04_01_ARTICLE))
+                                                Set wybraneSzukanie1 = wynikSzukania1
+                                            End If
+                                        
+                                        End If
+                                    End If
+                                    
                                     bMatched1 = True
-                                    Exit Do
+                                    ' Exit Do
                                     ' -------------------------------------------------------------------------------
                                     
                                     
                                 Else
                                     
-                                    bMatched1 = False
-                                    Set wynikSzukania1 = rngOfArticlesInsideTp04.FindNext(wynikSzukania1)
-                                    
-                                    
+                                    ' bMatched1 = False
                                 End If
+                                Set wynikSzukania1 = rngOfArticlesInsideTp04.FindNext(wynikSzukania1)
+                                    
+                                    
+                                
                             Loop Until adresPiewrszegoSzukania1 = wynikSzukania1.Address
                         End If
                         
                         ' 2. "base" article - with also matched cofor
                         Set wynikSzukania2 = Nothing
+                        Set wybraneSzukanie2 = Nothing
+                        tmpForDebutDate = CDate(0)
                         
                         If CStr(CStr(r.Value)) Like "*-??" Then
                             strArticleWithoutIndice = Left(r.Value, Len(r.Value) - 3)
@@ -197,36 +226,52 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                                 
                                 ' Debug.Print Len(wynikSzukania2)
                             
-                                If CStr(r.Offset(0, EVO.E_MASTER_cofor - 1).Value) = _
-                                    CStr(wynikSzukania2.Offset(0, EVO.E_TP04_01_FOUR - EVO.E_TP04_01_ARTICLE)) And _
-                                    Int(Len(wynikSzukania2)) = Int(10) Then
+                                If CStr(r.offset(0, EVO.E_MASTER_cofor - 1).Value) = _
+                                    CStr(wynikSzukania2.offset(0, EVO.E_TP04_01_FOUR - EVO.E_TP04_01_ARTICLE)) And _
+                                    (Not (CStr(wynikSzukania2) Like "*-??")) Then
                                     
                                     
                                     ' matched! so OK!
                                     ' -------------------------------------------------------------------------------
+                                    
+                                    If CLng(tmpForDebutDate) = 0 Then
+                                        On Error Resume Next
+                                        tmpForDebutDate = CDate(wynikSzukania2.offset(0, EVO.E_TP04_01_DATE_DEBUT - EVO.E_TP04_01_ARTICLE))
+                                        Set wybraneSzukanie2 = wynikSzukania2
+                                    Else
+                                        If CDate(tmpForDebutDate) < CDate(wynikSzukania2.offset(0, EVO.E_TP04_01_DATE_DEBUT - EVO.E_TP04_01_ARTICLE)) Then
+                                            
+                                            On Error Resume Next
+                                            tmpForDebutDate = CDate(wynikSzukania2.offset(0, EVO.E_TP04_01_DATE_DEBUT - EVO.E_TP04_01_ARTICLE))
+                                            Set wybraneSzukanie2 = wynikSzukania2
+                                        End If
+                                    End If
+                                    
+                                    
                                     bMatched2 = True
-                                    Exit Do
+                                    ' Exit Do
                                     ' -------------------------------------------------------------------------------
                                     
                                     
                                 Else
                                     
-                                    bMatched2 = False
-                                    Set wynikSzukania2 = rngOfArticlesInsideTp04.FindNext(wynikSzukania2)
-                                    
-                                    
-                                    If wynikSzukania2 Is Nothing Then
-                                        ' musimy szukac jeszcze raz!
-                                        Debug.Print "wynikSzukania2 is nothing :("
-                                    End If
-                                    
-                                    
+                                    ' bMatched2 = False
                                 End If
+                                    
+                                Set wynikSzukania2 = rngOfArticlesInsideTp04.FindNext(wynikSzukania2)
+                                    
+                                    
+                                If wynikSzukania2 Is Nothing Then
+                                    ' musimy szukac jeszcze raz!
+                                    Debug.Print "wynikSzukania2 is nothing :("
+                                End If
+                                    
+                                    
                             Loop Until adresPiewrszegoSzukania2 = wynikSzukania2.Address
                         End If
                         
                         ' article + cofor_ven
-                        If Not pt04ItemDictionary.Exists(CStr(r.Value & "_" & r.Offset(0, EVO.E_MASTER_cofor - 1).Value)) Then
+                        If Not pt04ItemDictionary.Exists(CStr(r.Value & "_" & r.offset(0, EVO.E_MASTER_cofor - 1).Value)) Then
                         
                         
                             ' nop
@@ -241,7 +286,7 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                             Set pt04Item = New TP04ItemHandler
                             With pt04Item
                             
-                                .name = CStr(r.Value & "_" & r.Offset(0, EVO.E_MASTER_cofor - 1).Value)
+                                .name = CStr(r.Value & "_" & r.offset(0, EVO.E_MASTER_cofor - 1).Value)
                                 
                                 If bMatched1 Then
                                     .thisLine.article = r.Value
@@ -251,26 +296,26 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                                     
                                     ' new from 060
                                     .thisLine.domain = _
-                                        CStr(wynikSzukania1.Offset(0, _
+                                        CStr(wybraneSzukanie1.offset(0, _
                                             EVO.E_FROM_SQ01_QUASI_TP04_DOMAIN - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value)
                                             
                                     .thisLine.ru = _
-                                        CStr(wynikSzukania1.Offset(0, _
+                                        CStr(wybraneSzukanie1.offset(0, _
                                             EVO.E_FROM_SQ01_QUASI_TP04_RU - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value)
                                             
                                     .thisLine.div = _
-                                        CStr(wynikSzukania1.Offset(0, _
+                                        CStr(wybraneSzukanie1.offset(0, _
                                             EVO.E_FROM_SQ01_QUASI_TP04_DIV - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value)
                                     
                                     
-                                    .thisLine.cofor = r.Offset(0, EVO.E_MASTER_cofor - 1).Value
+                                    .thisLine.cofor = r.offset(0, EVO.E_MASTER_cofor - 1).Value
                                     
                                     .thisLine.price = _
-                                        parsePriceAgain(wynikSzukania1.Offset(0, _
+                                        parsePriceAgain(wybraneSzukanie1.offset(0, _
                                             EVO.E_FROM_SQ01_QUASI_TP04_SUM - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value)
                                             
                                     .thisLine.curr = _
-                                        wynikSzukania1.Offset(0, _
+                                        wybraneSzukanie1.offset(0, _
                                             EVO.E_FROM_SQ01_QUASI_TP04_CURRENCY - EVO.E_FROM_SQ01_QUASI_TP04_ARTICLE).Value
                                     
                                     .thisLine.rate = 1
@@ -281,7 +326,7 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                                     .thisLine.priceInEur = (1# / CDbl(.thisLine.rate)) * 1# * .thisLine.price
                                     
                                     
-                                    .thisLine.pckgUn = wynikSzukania1.Offset(0, EVO.E_TP04_01_UNITE_DE_PRIX - EVO.E_TP04_01_ARTICLE).Value
+                                    .thisLine.pckgUn = wybraneSzukanie1.offset(0, EVO.E_TP04_01_UNITE_DE_PRIX - EVO.E_TP04_01_ARTICLE).Value
                                     .thisLine.pckgDiv = calcUn(.thisLine.pckgUn)
                                     
                                     
@@ -291,10 +336,10 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                                 
                                 
                                 If bMatched2 Then
-                                    .baseLine.article = wynikSzukania2.Value
-                                    .baseLine.cofor = r.Offset(0, EVO.E_MASTER_cofor - 1).Value
-                                    .baseLine.price = parsePriceAgain(wynikSzukania2.Offset(0, EVO.E_TP04_01_PRIX - EVO.E_TP04_01_ARTICLE).Value)
-                                    .baseLine.curr = wynikSzukania2.Offset(0, EVO.E_TP04_01_DEV - EVO.E_TP04_01_ARTICLE).Value
+                                    .baseLine.article = wybraneSzukanie2.Value
+                                    .baseLine.cofor = r.offset(0, EVO.E_MASTER_cofor - 1).Value
+                                    .baseLine.price = parsePriceAgain(wybraneSzukanie2.offset(0, EVO.E_TP04_01_PRIX - EVO.E_TP04_01_ARTICLE).Value)
+                                    .baseLine.curr = wybraneSzukanie2.offset(0, EVO.E_TP04_01_DEV - EVO.E_TP04_01_ARTICLE).Value
                                     
                                     .baseLine.rate = 1
                                     On Error Resume Next
@@ -304,7 +349,7 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                                     .baseLine.priceInEur = (1# / CDbl(.baseLine.rate)) * 1# * .baseLine.price
                                     
                                     
-                                    .baseLine.pckgUn = wynikSzukania2.Offset(0, EVO.E_TP04_01_UNITE_DE_PRIX - EVO.E_TP04_01_ARTICLE).Value
+                                    .baseLine.pckgUn = wybraneSzukanie2.offset(0, EVO.E_TP04_01_UNITE_DE_PRIX - EVO.E_TP04_01_ARTICLE).Value
                                     .baseLine.pckgDiv = calcUn(.baseLine.pckgUn)
                                     
                                     .baseLine.finalPrice = .baseLine.priceInEur / .baseLine.pckgDiv
@@ -317,7 +362,7 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                             
                             ' Debug.Assert pt04Item.baseLine.rate = 1
                             
-                            pt04ItemDictionary.Add CStr(r.Value & "_" & r.Offset(0, EVO.E_MASTER_cofor - 1).Value), pt04Item
+                            pt04ItemDictionary.Add CStr(r.Value & "_" & r.offset(0, EVO.E_MASTER_cofor - 1).Value), pt04Item
                         End If
                         
                         
@@ -325,7 +370,7 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                     
                     End If
                 End If
-                Set r = r.Offset(1, 0)
+                Set r = r.offset(1, 0)
                 
                 
                 If r.row Mod 10 = 0 Then stHndlr.progress_increase
@@ -355,12 +400,12 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                         Set pt04Item = Nothing
                     
                         On Error Resume Next
-                        Set pt04Item = pt04ItemDictionary(CStr(r.Value & "_" & r.Offset(0, EVO.E_MASTER_cofor - 1).Value))
+                        Set pt04Item = pt04ItemDictionary(CStr(r.Value & "_" & r.offset(0, EVO.E_MASTER_cofor - 1).Value))
                         
                         
                         If Not pt04Item Is Nothing Then
                         
-                            If r.Offset(0, EVO.E_MASTER_Reference - 1).Value Like "*-??" Then
+                            If r.offset(0, EVO.E_MASTER_Reference - 1).Value Like "*-??" Then
                             
                             
                                 ' Debug.Assert Trim(r.Value) <> "9677602580-03"
@@ -369,19 +414,19 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                                 ' two ENUMS!!!
                                 ' E_TP04_OUTPUT_REP_ - just part after blue columns from PUS!
                                 ' evo.E_ADJUSTED_SQ01 - all the table!
-                                repRng.Offset(0, EVO.E_ADJUSTED_SQ01_DOMAIN - 1).Value = _
+                                repRng.offset(0, EVO.E_ADJUSTED_SQ01_DOMAIN - 1).Value = _
                                     pt04Item.thisLine.domain
                                     
-                                repRng.Offset(0, EVO.E_ADJUSTED_SQ01_DIV - 1).Value = _
+                                repRng.offset(0, EVO.E_ADJUSTED_SQ01_DIV - 1).Value = _
                                     pt04Item.thisLine.div
                                     
-                                repRng.Offset(0, EVO.E_ADJUSTED_SQ01_RU - 1).Value = _
+                                repRng.offset(0, EVO.E_ADJUSTED_SQ01_RU - 1).Value = _
                                     pt04Item.thisLine.ru
                                 
                             
                             
                                 For outputIter = EVO.E_MASTER_Reference To E_MASTER_TMC
-                                    repRng.Offset(0, outputIter - 1).Value = r.Offset(0, outputIter - 1).Value
+                                    repRng.offset(0, outputIter - 1).Value = r.offset(0, outputIter - 1).Value
                                 Next outputIter
                                 
                                 'For outputIter = E_TP04_OUTPUT_REP_PART_PRESERIAL To EVO.E_TP04_OUTPUT_REP_PART_OKNOK
@@ -390,52 +435,60 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                                 If byUnit Then
                                     ' tbd
                                     
-                                    repRng.Offset(0, E_TP04_OUTPUT_REP_PART_PRESERIAL - 1).Value = _
+                                    repRng.offset(0, E_TP04_OUTPUT_REP_PART_PRESERIAL - 1).Value = _
                                         pt04Item.thisLine.priceInEur
-                                    repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_INIT_SERIAL_PRICE - 1).Value = _
+                                    repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_INIT_SERIAL_PRICE - 1).Value = _
                                         pt04Item.baseLine.priceInEur
-                                        
-                                    repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1).Value = _
-                                        CDbl(pt04Item.thisLine.priceInEur / pt04Item.baseLine.priceInEur)
+                                     
+                                    If CDbl(pt04Item.baseLine.finalPrice) <> 0 Then
+                                     
+                                        repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1).Value = _
+                                            CDbl(pt04Item.thisLine.priceInEur / pt04Item.baseLine.priceInEur)
+                                       
+                                    End If
                                     
                                     
-                                    If CDbl(pt04Item.baseLine.priceInEur) = 0# And CDbl(pt04Item.thisLine.priceInEur) = 0# Then
-                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK"
+                                    If CDbl(pt04Item.baseLine.priceInEur) = 0# Or CDbl(pt04Item.thisLine.priceInEur) = 0# Then
+                                        repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK"
                                     Else
-                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = defineOKNOKon(repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1))
+                                        repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = defineOKNOKon(repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1))
                                     End If
         
                                     
-                                    If repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK" Then
-                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Interior.Color = RGB(245, 0, 0)
+                                    If repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK" Then
+                                        repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Interior.Color = RGB(245, 0, 0)
                                     End If
                                 Else
                                 
                                     ' byUnit = false is default!
                                     ' so taking final price after div on size of the packaging!
                                 
-                                    repRng.Offset(0, E_TP04_OUTPUT_REP_PART_PRESERIAL - 1).Value = _
+                                    repRng.offset(0, E_TP04_OUTPUT_REP_PART_PRESERIAL - 1).Value = _
                                         pt04Item.thisLine.finalPrice
-                                    repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_INIT_SERIAL_PRICE - 1).Value = _
+                                    repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_INIT_SERIAL_PRICE - 1).Value = _
                                         pt04Item.baseLine.finalPrice
-                                        
-                                    repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1).Value = _
-                                        CDbl(pt04Item.thisLine.finalPrice / pt04Item.baseLine.finalPrice)
+                                    
+                                    If CDbl(pt04Item.baseLine.finalPrice) <> 0 Then
+                                    
+                                        repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1).Value = _
+                                            CDbl(pt04Item.thisLine.finalPrice / pt04Item.baseLine.finalPrice)
+                                            
+                                    End If
                                     
                                     
-                                    If CDbl(pt04Item.baseLine.finalPrice) = 0# And CDbl(pt04Item.thisLine.finalPrice) = 0# Then
-                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK"
+                                    If CDbl(pt04Item.baseLine.finalPrice) = 0# Or CDbl(pt04Item.thisLine.finalPrice) = 0# Then
+                                        repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK"
                                     Else
-                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = defineOKNOKon(repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1))
+                                        repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = defineOKNOKon(repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_RATE - 1))
                                     End If
         
                                     
-                                    If repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK" Then
-                                        repRng.Offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Interior.Color = RGB(245, 0, 0)
+                                    If repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Value = "NOK" Then
+                                        repRng.offset(0, EVO.E_TP04_OUTPUT_REP_PART_OKNOK - 1).Interior.Color = RGB(245, 0, 0)
                                     End If
                                 End If
                                     
-                                Set repRng = repRng.Offset(1, 0)
+                                Set repRng = repRng.offset(1, 0)
                                 
                             Else
                             
@@ -454,7 +507,7 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
                         
                     End If
                     
-                    Set r = r.Offset(1, 0)
+                    Set r = r.offset(1, 0)
                     
                     If r.row Mod 10 = 0 Then
                         stHndlr.progress_increase
@@ -479,7 +532,7 @@ Public Sub init(pusSh As Worksheet, tp04Sh As Worksheet, Optional byUnit As Bool
 End Sub
 
 
-Private Function parsePriceAgain(x As Variant) As Double
+Public Function parsePriceAgain(x As Variant) As Double
     
     If IsNumeric(x) Then
         'Debug.Print x
@@ -500,7 +553,7 @@ End Function
 
 
 
-Private Function calcUn(param As String) As Double
+Public Function calcUn(param As String) As Double
     calcUn = 1#
     
     Dim regRef As Range
@@ -508,10 +561,10 @@ Private Function calcUn(param As String) As Double
     
     Do
         If CStr(regRef.Value) = CStr(param) Then
-            calcUn = CDbl(regRef.Offset(0, 1).Value)
+            calcUn = CDbl(regRef.offset(0, 1).Value)
             Exit Do
         End If
-        Set regRef = regRef.Offset(1, 0)
+        Set regRef = regRef.offset(1, 0)
     Loop Until Trim(regRef.Value) = ""
 End Function
 
@@ -621,9 +674,9 @@ Private Function defineRangeOfArticlesFromPT04() As Range
     Dim r As Range
     Set r = tp04Sheet.Cells(1, EVO.E_TP04_01_ARTICLE)
     
-    If CStr(r.Offset(1, 0).Value) <> "" Then
+    If CStr(r.offset(1, 0).Value) <> "" Then
     
-        Set defineRangeOfArticlesFromPT04 = tp04Sheet.Range(r, r.Parent.Range("A1048576").End(xlUp).Offset(1, 0))
+        Set defineRangeOfArticlesFromPT04 = tp04Sheet.Range(r, r.Parent.Range("A1048576").End(xlUp).offset(1, 0))
         
         
         Debug.Print defineRangeOfArticlesFromPT04.Address

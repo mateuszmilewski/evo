@@ -73,6 +73,9 @@ Public Sub init_statusbar(m_max, Optional m_min)
     If Not IsMissing(m_min) Then
         act = m_min
     End If
+    
+    If max = 0 Then max = 1
+    
     dx = CDbl(szerokosc_paska) / CDbl(max)
     
     macro_starts = CDbl(Now)
